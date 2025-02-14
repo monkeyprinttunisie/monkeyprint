@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "prisma generate",
+    "build": "prisma generate && prisma migrate dev && prisma db push",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
