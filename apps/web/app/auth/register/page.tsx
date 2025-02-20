@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 
-const roles = [
-  "DROPSHIPPING", 
-  "ECOMMERCE_WEBSITE", 
-  "DESIGNER_TOOL"
+const roleOptions = [
+  { label: "Full Pack (Drop Shipping)", value: "DROPSHIPPING" },
+  { label: "Ecommerce + Designer Tool", value: "ECOMMERCE_WEBSITE" },
+  { label: "Designer Tool Only", value: "DESIGNER_TOOL" }
 ];
 
 export default function RegisterPage() {
@@ -13,7 +13,7 @@ export default function RegisterPage() {
     email: "",
     username: "",
     password: "",
-    role: roles[0],
+    role: roleOptions[0].value,
   });
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -127,9 +127,9 @@ export default function RegisterPage() {
               required
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             >
-              {roles.map((role) => (
-                <option key={role} value={role}>
-                  {role}
+              {roleOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>
