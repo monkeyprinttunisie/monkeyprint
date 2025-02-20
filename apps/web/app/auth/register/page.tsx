@@ -3,9 +3,9 @@
 import { useState } from "react";
 
 const roles = [
-  "Sign up for full pack (drop shipping)",
-  "Sign up for ecommerce website + Designer tool",
-  "Sign up for Designer tool",
+  "DROPSHIPPING", 
+  "ECOMMERCE_WEBSITE", 
+  "DESIGNER_TOOL"
 ];
 
 export default function RegisterPage() {
@@ -34,7 +34,7 @@ export default function RegisterPage() {
     setMessage(null);
 
     try {
-      const response = await fetch("/api/user", {
+      const response = await fetch("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -7,11 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  DROPSHIPPING
+  ECOMMERCE_WEBSITE
+  DESIGNER_TOOL
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   username  String   @unique
   password  String
-  role      String
+  role      Role     @default(DROPSHIPPING)
   createdAt DateTime @default(now())
 }
