@@ -4,8 +4,9 @@
     "private": true,
     "scripts": {
         "start": "tsx src/index.ts",
-        "dev": "ts-node src/index.ts"
+        "dev": "tsx src/index.ts"
     },
+    "type": "module",
     "dependencies": {
         "@monkeyprint/db": "workspace:*",
         "@monkeyprint/utils": "workspace:*",
