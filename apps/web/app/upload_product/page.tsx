@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { UploadDropzone } from "../../../../packages/utils/uploadthing";
+import { UploadDropzone } from "@/uploadthing";
 import Image from "next/image";
 
 export default function Home() {

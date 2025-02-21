@@ -54,6 +54,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@monkeyprint/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@uploadthing/react':
         specifier: ^7.3.0
         version: 7.3.0(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(uploadthing@7.5.2(next@15.1.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(tailwindcss@4.0.7))
