@@ -1,8 +1,9 @@
 "use client";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -19,17 +20,23 @@ export default function LoginPage() {
     });
 
     if (response.ok) {
-      router.push("/");
+      router.push("/profile");
     } else {
       // Handle errors
+      const data = await response.json();
+      setError(data.error || "Something went wrong. Please try again.");
     }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+
+      {error && <div style={{ color: "red" }}>{error}</div>}
+    </div>
   );
 }
