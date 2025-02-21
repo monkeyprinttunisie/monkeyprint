@@ -3,8 +3,8 @@ import * as z from "zod";
 
 export const RoleEnum = z.enum([
   "DROPSHIPPING",
-  "ECOMMERCE_WEBSITE", 
-  "DESIGNER_TOOL"
+  "ECOMMERCE_WEBSITE",
+  "DESIGNER_TOOL",
 ]);
 
 // Define a schema for input validation
@@ -15,5 +15,5 @@ export const registerSchema = z.object({
     .string()
     .min(1, "Password is required")
     .min(8, "Password must have more than 8 characters"),
-  role: RoleEnum
+  role: RoleEnum,
 });

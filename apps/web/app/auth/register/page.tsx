@@ -5,7 +5,7 @@ import { useState } from "react";
 const roleOptions = [
   { label: "Full Pack (Drop Shipping)", value: "DROPSHIPPING" },
   { label: "Ecommerce + Designer Tool", value: "ECOMMERCE_WEBSITE" },
-  { label: "Designer Tool Only", value: "DESIGNER_TOOL" }
+  { label: "Designer Tool Only", value: "DESIGNER_TOOL" },
 ];
 
 export default function RegisterPage() {
