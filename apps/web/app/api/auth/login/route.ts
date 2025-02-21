@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       });
     } else {
       return new Response(
-        JSON.stringify({ error: "Something went wrong." + error }),
+        JSON.stringify({ error: "Something went wrong."}),
         { status: 500 },
       );
     }
