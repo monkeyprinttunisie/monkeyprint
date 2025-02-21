@@ -7,9 +7,9 @@ export async function POST(req: Request) {
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {
     if ((error as { type: string }).type === "CredentialsSignin") {
-      return new Response(JSON.stringify({ error: "Invalid credentials." }), 
-      { status: 401 },
-      );
+      return new Response(JSON.stringify({ error: "Invalid credentials." }), {
+        status: 401,
+      });
     } else {
       return new Response(
         JSON.stringify({ error: "Something went wrong." + error }),

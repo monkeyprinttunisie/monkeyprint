@@ -1,7 +1,7 @@
-import { auth } from "@/auth"
+import { auth } from "@/auth";
 
 export default async function ProfilePage() {
-  const session = await auth()
+  const session = await auth();
 
   // If the user is not signed in, show a message
   if (!session?.user) {
@@ -15,4 +15,4 @@ export default async function ProfilePage() {
       <p>Welcome, {session.user.email}!</p>
     </div>
   );
-};
+}
