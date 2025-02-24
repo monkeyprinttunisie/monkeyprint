@@ -11,7 +11,9 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "target": "ES2022",
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "noEmit": true,
+        "allowImportingTsExtensions": true // this option and no emit option are set to allow typescript to  import .ts extensions
     },
     "exclude": [
         "node_modules",
