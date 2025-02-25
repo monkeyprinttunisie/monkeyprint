@@ -20,7 +20,7 @@ export default function DeleteProductButton({
       });
       if (!res.ok) throw new Error("Failed to delete product");
 
-      alert("Product soft deleted successfully");
+      alert("Product deleted successfully");
     } catch (err) {
       alert((err as Error).message);
     }
