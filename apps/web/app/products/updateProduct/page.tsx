@@ -69,7 +69,9 @@ export default function UpdateProductPage() {
           <label>Description</label>
           <textarea
             value={product.description}
-            onChange={(e) => setProduct({ ...product, description: e.target.value })}
+            onChange={(e) =>
+              setProduct({ ...product, description: e.target.value })
+            }
           />
         </div>
         <div>
@@ -77,7 +79,9 @@ export default function UpdateProductPage() {
           <input
             type="number"
             value={product.price}
-            onChange={(e) => setProduct({ ...product, price: parseFloat(e.target.value) })}
+            onChange={(e) =>
+              setProduct({ ...product, price: parseFloat(e.target.value) })
+            }
             required
           />
         </div>
@@ -86,7 +90,9 @@ export default function UpdateProductPage() {
           <input
             type="checkbox"
             checked={product.active}
-            onChange={(e) => setProduct({ ...product, active: e.target.checked })}
+            onChange={(e) =>
+              setProduct({ ...product, active: e.target.checked })
+            }
           />
         </div>
         <div>
