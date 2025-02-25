@@ -21,7 +21,7 @@ export async function DELETE(
     }
 
     return NextResponse.json(
-      { message: "Product soft deleted", product },
+      { message: "Product deleted", product },
       { status: 200 }
     );
   } catch (error) {
