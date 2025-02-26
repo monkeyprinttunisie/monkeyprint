@@ -1,10 +1,9 @@
 "use client";
 
+import { updateProduct } from "@/actions/productActions";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function UpdateProductPage() {
-  const router = useRouter();
   const [product, setProduct] = useState({
     id: "",
     name: "",
@@ -21,20 +20,11 @@ export default function UpdateProductPage() {
     setMessage(null);
 
     try {
-      const response = await fetch(`/api/products/${product.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(product),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
+      const updatedProduct = await updateProduct(product.id, product)
+      if (updatedProduct.success) {
         setMessage("Product updated successfully!");
       } else {
-        setMessage(result.error || "Failed to update product");
+        setMessage(updatedProduct.error || "Failed to update product");
       }
     } catch (error) {
       setMessage("Something went wrong");
