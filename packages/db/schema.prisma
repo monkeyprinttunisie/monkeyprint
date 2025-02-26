@@ -23,3 +23,13 @@ model User {
   passwordResetToken   String?   @unique
   passwordResetExpires DateTime?
 }
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  price       Float
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
