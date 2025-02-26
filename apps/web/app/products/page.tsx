@@ -1,4 +1,5 @@
-import { listProducts } from "../actions/productActions";
+import { listProducts } from "@/actions/productActions";
+
 
 export default async function ProductsPage() {
     const products = await listProducts();
