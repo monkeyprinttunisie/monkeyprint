@@ -1,5 +1,6 @@
 "use client";
 
+import { deleteProduct } from "@/actions/productActions";
 import { Button } from "./button";
 
 type DeleteProductButtonProps = {
@@ -15,10 +16,8 @@ export default function DeleteProductButton({
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      const res = await fetch(`/api/products/${productId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Failed to delete product");
+      const product = await deleteProduct(productId);
+      if (!product) throw new Error("Failed to delete product");
 
       alert("Product deleted successfully");
     } catch (err) {
