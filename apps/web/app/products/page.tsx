@@ -3,13 +3,13 @@ import React, { useState } from "react";
 import { UploadDropzone } from "@/uploadthing";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { createProduct } from "@/actions/productActions";
 
 const AddProduct: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [price, setPrice] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
-  const [imageUrlInput, setImageUrlInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -33,28 +33,16 @@ const AddProduct: React.FC = () => {
         const ufsUrl = uploadedFile.ufsUrl;
 
         setImageUrl(ufsUrl);
-        setImageUrlInput(ufsUrl);
 
         try {
-          const response = await fetch("/api/products", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name,
-              price: Number(price),
-              description,
-              imageUrl: ufsUrl,
-            }),
-          });
-
-          if (response.ok) {
+          setIsLoading(true);
+          const response = await createProduct(name, Number(price), description, ufsUrl); 
+          setIsLoading(false);
+          if (response.success) {
             setName("");
             setPrice("");
             setDescription("");
             setImageUrl("");
-            setImageUrlInput("");
             alert("Image data stored");
           } else {
             console.error("Failed to save product");
