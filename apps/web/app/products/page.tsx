@@ -1,10 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { UploadDropzone } from "@/uploadthing";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { createProduct } from "@/actions/productActions";
-import { listProducts } from "@/actions/productActions";
 
 const AddProduct: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -13,9 +11,6 @@ const AddProduct: React.FC = () => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const products = await listProducts();
-
-  const router = useRouter();
   const apiKey = process.env.UPLOADTHING_TOKEN;
   const appId = process.env.UPLOADTHING_APP_ID;
   const regions = process.env.UPLOADTHING_REGIONS?.split(",") || ["us", "eu"];
@@ -25,7 +20,9 @@ const AddProduct: React.FC = () => {
     regions,
   };
 
-  const encodedToken = Buffer.from(JSON.stringify(tokenData)).toString("base64");
+  const encodedToken = Buffer.from(JSON.stringify(tokenData)).toString(
+    "base64"
+  );
 
   const handleUploadComplete = async (res: any) => {
     if (res && res.length > 0) {
@@ -38,7 +35,12 @@ const AddProduct: React.FC = () => {
 
         try {
           setIsLoading(true);
-          const response = await createProduct(name, Number(price), description, ufsUrl); 
+          const response = await createProduct({
+            name,
+            description,
+            price: Number(price),
+            imageUrl: ufsUrl,
+          });
           setIsLoading(false);
           if (response.success) {
             setName("");
@@ -141,29 +143,7 @@ const AddProduct: React.FC = () => {
           </form>
         </div>
       </div>
-       <div>
-        <h1>Products</h1>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product.id}>
-                <td>{product.name}</td>
-                <td>{product.description}</td>
-                <td>{product.price.toString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 };
-
 export default AddProduct;
