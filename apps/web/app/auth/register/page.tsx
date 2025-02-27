@@ -117,14 +117,13 @@ export default function RegisterPage() {
             {isSubmitting ? "Submitting..." : "Register"}
           </button>
         </div>
-        {message && (
-          <div>
-            {message}
-          </div>
-        )}
+        {message && <div>{message}</div>}
       </form>
       <div>
-        <button type="button" onClick={() => router.push('/auth/forgotPassword')}>
+        <button
+          type="button"
+          onClick={() => router.push("/auth/forgotPassword")}
+        >
           Forgot password?
         </button>
       </div>

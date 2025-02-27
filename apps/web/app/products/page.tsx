@@ -1,9 +1,8 @@
 import { listProducts } from "@/actions/productActions";
 
-
 export default async function ProductsPage() {
-    const products = await listProducts();
-    
+  const products = await listProducts();
+
   return (
     <div>
       <h1>Products</h1>
