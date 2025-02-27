@@ -4,13 +4,16 @@ import { db } from "@monkeyprint/db";
 import { productUpdateSchema } from "@monkeyprint/utils/zod";
 
 interface IUpdatedProductData {
-    name?: string;  
-    description?: string;
-    price?: number;
-    active?: boolean;
+  name?: string;
+  description?: string;
+  price?: number;
+  active?: boolean;
 }
 
-export async function updateProduct(id: string, updateData: IUpdatedProductData) {
+export async function updateProduct(
+  id: string,
+  updateData: IUpdatedProductData,
+) {
   try {
     if (!id) {
       throw new Error("Product ID is required");
@@ -28,8 +31,7 @@ export async function updateProduct(id: string, updateData: IUpdatedProductData)
 
     console.log("Product updated successfully:", updatedProduct);
     return { success: true, product: updatedProduct };
-  
-} catch (error) {
+  } catch (error) {
     console.error("Error updating product:", error);
     return { success: false, error: "Failed to update product" };
   }

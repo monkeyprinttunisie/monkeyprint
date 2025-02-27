@@ -8,7 +8,10 @@ interface UpdateProductButtonProps {
   onClick: (e: React.FormEvent) => void;
 }
 
-export const UpdateProductButton = ({ isSubmitting, onClick }: UpdateProductButtonProps) => {
+export const UpdateProductButton = ({
+  isSubmitting,
+  onClick,
+}: UpdateProductButtonProps) => {
   return (
     <Button
       className="bg-blue-500 text-white px-4 py-2 rounded"

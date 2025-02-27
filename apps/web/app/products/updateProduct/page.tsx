@@ -21,7 +21,7 @@ export default function UpdateProductPage() {
     setMessage(null);
 
     try {
-      const updatedProduct = await updateProduct(product.id, product)
+      const updatedProduct = await updateProduct(product.id, product);
       if (updatedProduct.success) {
         setMessage("Product updated successfully!");
       } else {
@@ -87,12 +87,10 @@ export default function UpdateProductPage() {
           />
         </div>
         <div>
-            
           <UpdateProductButton
             isSubmitting={isSubmitting}
             onClick={handleSubmit}
-          /> 
-
+          />
         </div>
         {message && <div>{message}</div>}
       </form>
