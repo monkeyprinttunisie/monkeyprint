@@ -2,6 +2,7 @@
 
 import { updateProduct } from "@/actions/productActions";
 import { useState } from "react";
+import { UpdateProductButton } from "@/components/updateProductButton";
 
 export default function UpdateProductPage() {
   const [product, setProduct] = useState({
@@ -68,7 +69,7 @@ export default function UpdateProductPage() {
           <label>Price</label>
           <input
             type="number"
-            value={product.price}
+            value={product.price.toString()}
             onChange={(e) =>
               setProduct({ ...product, price: parseFloat(e.target.value) })
             }
@@ -86,9 +87,12 @@ export default function UpdateProductPage() {
           />
         </div>
         <div>
-          <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Update Product"}
-          </button>
+            
+          <UpdateProductButton
+            isSubmitting={isSubmitting}
+            onClick={handleSubmit}
+          /> 
+
         </div>
         {message && <div>{message}</div>}
       </form>
