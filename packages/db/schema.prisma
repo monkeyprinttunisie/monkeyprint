@@ -26,17 +26,12 @@ model User {
 }
 
 model Product {
-  id        String  @id @default(uuid())
-  name      String
-  price     Decimal
-  isDeleted Boolean @default(false)
-}
-model Product {
   id          String   @id @default(uuid()) 
   name        String   @db.VarChar(255)
   description String?  @db.Text
-  price       Decimal  @db.Decimal(10,2)
+  price       Float 
   imageUrl    String   @db.Text
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  isDeleted   Boolean  @default(false)
 }

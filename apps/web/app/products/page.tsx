@@ -4,6 +4,7 @@ import { UploadDropzone } from "@/uploadthing";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { createProduct } from "@/actions/productActions";
+import { listProducts } from "@/actions/productActions";
 
 const AddProduct: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -12,6 +13,7 @@ const AddProduct: React.FC = () => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const products = await listProducts();
 
   const router = useRouter();
   const apiKey = process.env.UPLOADTHING_TOKEN;
@@ -138,6 +140,27 @@ const AddProduct: React.FC = () => {
             </div>
           </form>
         </div>
+      </div>
+       <div>
+        <h1>Products</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product.id}>
+                <td>{product.name}</td>
+                <td>{product.description}</td>
+                <td>{product.price.toString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

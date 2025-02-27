@@ -2,6 +2,16 @@
 
 import { db } from "@monkeyprint/db";
 
+export async function listProducts() {
+  try {
+    const products = await db.product.findMany();
+    return products;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw new Error("Failed to fetch products");
+  }
+}
+
 export async function deleteProduct(id: string) {
   if (!id) {
     throw new Error("Product ID is required");
@@ -35,4 +45,3 @@ export async function createProduct(name: string, price: number, description: st
         return { success: false, error: "Failed to create product" };
     }
 }
-
