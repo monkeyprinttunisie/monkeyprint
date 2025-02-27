@@ -22,6 +22,14 @@ model User {
   createdAt            DateTime  @default(now())
   passwordResetToken   String?   @unique
   passwordResetExpires DateTime?
+  isDeleted            Boolean   @default(false)
+}
+
+model Product {
+  id        String  @id @default(uuid())
+  name      String
+  price     Decimal
+  isDeleted Boolean @default(false)
 }
 model Product {
   id          String   @id @default(uuid()) 

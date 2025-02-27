@@ -2215,6 +2215,7 @@ snapshots:
       file-selector: 0.6.0
       react: 19.0.0
       uploadthing: 7.5.2(next@15.1.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
+      
     optionalDependencies:
       next: 15.1.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
 
