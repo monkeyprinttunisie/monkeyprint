@@ -12,11 +12,11 @@ export const UpdateProductButton = ({
   isSubmitting,
   onClick,
 }: UpdateProductButtonProps) => {
+  const handleClick = () => {
+    onClick({} as React.FormEvent);
+  };
   return (
-    <Button
-      className="bg-blue-500 text-white px-4 py-2 rounded"
-      onClick={onClick}
-    >
+    <Button className="" onClick={handleClick}>
       {isSubmitting ? "Submitting..." : "Update Product"}
     </Button>
   );

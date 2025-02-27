@@ -10,7 +10,7 @@ export default function UpdateProductPage() {
     name: "",
     description: "",
     price: 0,
-    active: true,
+    imageUrl: "",
   });
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,16 +76,19 @@ export default function UpdateProductPage() {
             required
           />
         </div>
+        {/*
         <div>
           <label>Active</label>
           <input
             type="checkbox"
-            checked={product.active}
+            checked={product.isDeleted}
             onChange={(e) =>
-              setProduct({ ...product, active: e.target.checked })
+              setProduct({ ...product, isDeleted: e.target.checked })
             }
           />
         </div>
+        */}
+        
         <div>
           <UpdateProductButton
             isSubmitting={isSubmitting}
