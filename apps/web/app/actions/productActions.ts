@@ -4,15 +4,15 @@ import { db } from "@monkeyprint/db";
 import { productUpdateSchema } from "@monkeyprint/utils/zod";
 
 interface IUpdatedProductData {
-  name?: string;
+  name: string;
   description?: string;
-  price?: number;
-  isDeleted: boolean;
+  price: number;
+  imageUrl: string;
 }
 
 export async function updateProduct(
   id: string,
-  updateData: IUpdatedProductData,
+  updateData: IUpdatedProductData
 ) {
   try {
     if (!id) {
@@ -64,19 +64,14 @@ export async function deleteProduct(id: string) {
   }
 }
 
-export async function createProduct(name: string, price: number, description: string, imageUrl: string) {
-    try {
-        await db.product.create({
-            data: {
-                name,
-                price,
-                description,
-                imageUrl,
-            },
-        });
-        return { success: true };
-    } catch (error) {
-        console.error("Error creating product:", error);
-        return { success: false, error: "Failed to create product" };
-    }
+export async function createProduct(productData: IUpdatedProductData) {
+  try {
+    await db.product.create({
+      data: productData,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error("Error creating product:", error);
+    return { success: false, error: "Failed to create product" };
+  }
 }
