@@ -7,6 +7,7 @@ import { createProduct } from "@/actions/productActions";
 const AddProduct: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [price, setPrice] = useState<string>("");
+  const [stock, setStock] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -40,11 +41,13 @@ const AddProduct: React.FC = () => {
             description,
             price: Number(price),
             imageUrl: ufsUrl,
+            stock: Number(stock),
           });
           setIsLoading(false);
           if (response.success) {
             setName("");
             setPrice("");
+            setStock("");
             setDescription("");
             setImageUrl("");
             alert("Image data stored");
@@ -107,6 +110,17 @@ const AddProduct: React.FC = () => {
                 onChange={(e) => setPrice(e.target.value)}
                 className="input input-bordered"
                 placeholder="Price"
+              />
+            </div>
+
+            <div className="form-control w-full">
+              <label className="label font-bold">Stock</label>
+              <input
+                type="text"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                className="input input-bordered"
+                placeholder="0"
               />
             </div>
 

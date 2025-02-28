@@ -12,6 +12,7 @@ export default async function ProductHome() {
             <th>Name</th>
             <th>Description</th>
             <th>Price</th>
+            <th>Stock</th>
           </tr>
         </thead>
         <tbody>
@@ -20,6 +21,7 @@ export default async function ProductHome() {
               <td>{product.name}</td>
               <td>{product.description}</td>
               <td>{product.price.toString()}</td>
+              <td>{product.stock}</td>
             </tr>
           ))}
         </tbody>

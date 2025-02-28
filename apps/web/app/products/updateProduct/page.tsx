@@ -11,6 +11,7 @@ export default function UpdateProductPage() {
     description: "",
     price: 0,
     imageUrl: "",
+    stock: 0,
   });
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,6 +77,16 @@ export default function UpdateProductPage() {
             required
           />
         </div>
+        <div>
+          <label>Stock</label>
+          <input
+            type="number"
+            value={product.stock.toString()}
+            onChange={(e) =>
+              setProduct({ ...product, stock: parseInt(e.target.value) })
+            }
+          />
+        </div>
         {/*
         <div>
           <label>Active</label>
@@ -88,7 +99,7 @@ export default function UpdateProductPage() {
           />
         </div>
         */}
-        
+
         <div>
           <UpdateProductButton
             isSubmitting={isSubmitting}
