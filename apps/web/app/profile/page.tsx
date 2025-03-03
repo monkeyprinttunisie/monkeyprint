@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import SignOut from "@/components/signOutButton";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -13,6 +14,7 @@ export default async function ProfilePage() {
     <div>
       <h1>User signed in successfully!</h1>
       <p>Welcome, {session.user.email}!</p>
+      <SignOut />
     </div>
   );
 }
