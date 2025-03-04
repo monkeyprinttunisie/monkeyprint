@@ -47,7 +47,7 @@ export async function listProducts() {
   }
 }
 
-export async function deleteProduct(id: string) {
+export async function deleteProductAction(id: string) {
   if (!id) {
     throw new Error("Product ID is required");
   }
