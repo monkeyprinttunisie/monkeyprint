@@ -1,6 +1,7 @@
 "use client";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import SignIn from "@/components/oAuthSignInButton";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +43,10 @@ export default function LoginPage() {
       </form>
 
       {error && <div style={{ color: "red" }}>{error}</div>}
+      <div className="flex flex-col space-y-4">
+        <SignIn provider="google" />
+        <SignIn provider="facebook" />
+      </div>
     </div>
   );
 }
