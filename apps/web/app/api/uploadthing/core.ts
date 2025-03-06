@@ -9,6 +9,10 @@ export const ourFileRouter = {
     const userId = (metadata as any).userId;
     console.log("Upload complete for userId:", userId);
     console.log("file url", file.ufsUrl);
+
+    // we wanna keep this url for creating products 
+    const imageUrl = file.ufsUrl;
+    return { imageUrl };
   }),
 } satisfies FileRouter;
 

@@ -28,3 +28,10 @@ export const signInSchema = object({
     .min(1, "Password is required")
     .min(8, "Password must be more than 8 characters"),
 });
+
+export const productUpdateSchema = z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+  price: z.number().positive("Price must be a positive number").optional(),
+  active: z.boolean().optional(),
+});

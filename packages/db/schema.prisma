@@ -67,4 +67,16 @@ model VerificationToken {
   expires    DateTime
 
   @@id([identifier, token])
+  isDeleted            Boolean   @default(false)
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  price       Float
+  imageUrl    String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isDeleted   Boolean  @default(false)
 }

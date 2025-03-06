@@ -75,7 +75,7 @@ export default function Home() {
                   Authorization: `Bearer ${encodedToken}`, // Pass the token as an Authorization header
                 }}
                 onClientUploadComplete={(res: any) => {
-                  console.log("Upload successful:", res); // Debug log
+                  console.log("Upload successful:", res);
                   if (res && res.length > 0) {
                     setImageData(res[0].url);
                     window.alert("Upload completed");
