@@ -51,7 +51,7 @@ export default function Cart() {
         </div>
         <div className="flex items-center justify-center my-3">
           {cart.length === 0 && (
-            <img src="icons/empty-cart.svg" alt="empty cart" />
+            <img src="/icons/empty-cart.svg" alt="empty cart" />
           )}
         </div>
         <div className="max-h-[73vh] overflow-y-auto rounded-[4%]">
