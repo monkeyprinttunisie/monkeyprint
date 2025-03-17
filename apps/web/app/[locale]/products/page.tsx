@@ -1,8 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UploadDropzone } from "@/uploadthing";
 import Image from "next/image";
 import { createProduct } from "@/actions/productActions";
+import { useCategories } from "@/context/categoryContext"; 
+import { CategoryType } from "@monkeyprint/db"; 
 
 const AddProduct: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -12,6 +14,26 @@ const AddProduct: React.FC = () => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [selectedTargetCategories, setSelectedTargetCategories] = useState<
+    string[]
+  >([]);
+  const [selectedProductCategory, setSelectedProductCategory] =
+    useState<string>("");
+  const [selectedSubproductCategories, setSelectedSubproductCategories] =
+    useState<string[]>([]);
+
+  const { targetCategories, productCategories, subproductCategories } =
+    useCategories();
+
+  // Get only subproduct categories for the selected product category
+  const filteredSubproductCategories = subproductCategories.filter((cat) => {
+    return (
+      cat.parentCategories?.some(
+        (relation) => relation.parentId === selectedProductCategory
+      ) ?? false
+    );
+  });
+
   const apiKey = process.env.UPLOADTHING_TOKEN;
   const appId = process.env.UPLOADTHING_APP_ID;
   const regions = process.env.UPLOADTHING_REGIONS?.split(",") || ["us", "eu"];
@@ -30,33 +52,7 @@ const AddProduct: React.FC = () => {
       const uploadedFile = res[0];
 
       if (uploadedFile && uploadedFile.ufsUrl) {
-        const ufsUrl = uploadedFile.ufsUrl;
-
-        setImageUrl(ufsUrl);
-
-        try {
-          setIsLoading(true);
-          const response = await createProduct({
-            name,
-            description,
-            price: Number(price),
-            imageUrl: ufsUrl,
-            stock: Number(stock),
-          });
-          setIsLoading(false);
-          if (response.success) {
-            setName("");
-            setPrice("");
-            setStock("");
-            setDescription("");
-            setImageUrl("");
-            alert("Image data stored");
-          } else {
-            console.error("Failed to save product");
-          }
-        } catch (error) {
-          console.error("Error while saving the product:", error);
-        }
+        setImageUrl(uploadedFile.ufsUrl);
       } else {
         console.error("Uploaded file object or ufsUrl is missing");
       }
@@ -73,16 +69,83 @@ const AddProduct: React.FC = () => {
     setIsOpen(!isOpen);
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      // Combine all selected categories
+      const categoryIds = [
+        ...selectedTargetCategories,
+        ...selectedSubproductCategories,
+      ];
+
+      // Only include the product category if one is selected
+      if (selectedProductCategory) {
+        categoryIds.push(selectedProductCategory);
+      }
+
+      const response = await createProduct({
+        name,
+        description,
+        price: Number(price),
+        imageUrl,
+        stock: Number(stock),
+        categoryIds,
+      });
+
+      if (response.success) {
+        // Reset form
+        setName("");
+        setPrice("");
+        setStock("");
+        setDescription("");
+        setImageUrl("");
+        setSelectedTargetCategories([]);
+        setSelectedProductCategory("");
+        setSelectedSubproductCategories([]);
+        handleModal(); // Close modal
+        alert("Product created successfully");
+      } else {
+        console.error("Failed to save product:", response.error);
+        alert(`Failed to create product: ${response.error}`);
+      }
+    } catch (error) {
+      console.error("Error while saving the product:", error);
+      alert("Error while saving the product");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Toggle selection for target categories
+  const toggleTargetCategory = (categoryId: string) => {
+    setSelectedTargetCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+
+  // Toggle selection for subproduct categories
+  const toggleSubproductCategory = (categoryId: string) => {
+    setSelectedSubproductCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+
   return (
-    <div>
+    <div className="h-[80vh]">
       <button className="btn" onClick={handleModal}>
         Add New Product
       </button>
 
       <div className={isOpen ? "modal modal-open" : "modal"}>
-        <div className="modal-box">
+        <div className="modal-box max-w-3xl">
           <h3 className="font-bold text-lg">Add New Product</h3>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="form-control w-full">
               <label className="label font-bold">Product Name</label>
               <input
@@ -91,8 +154,10 @@ const AddProduct: React.FC = () => {
                 onChange={(e) => setName(e.target.value)}
                 className="input input-bordered"
                 placeholder="Product Name"
+                required
               />
             </div>
+
             <div className="form-control w-full">
               <label className="label font-bold">Description</label>
               <textarea
@@ -100,33 +165,109 @@ const AddProduct: React.FC = () => {
                 onChange={(e) => setDescription(e.target.value)}
                 className="input input-bordered"
                 placeholder="Product Description"
-              />
-            </div>
-            <div className="form-control w-full">
-              <label className="label font-bold">Price</label>
-              <input
-                type="text"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="input input-bordered"
-                placeholder="Price"
+                rows={3}
               />
             </div>
 
-            <div className="form-control w-full">
-              <label className="label font-bold">Stock</label>
-              <input
-                type="text"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
-                className="input input-bordered"
-                placeholder="0"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="form-control w-full">
+                <label className="label font-bold">Price</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="input input-bordered"
+                  placeholder="Price"
+                  required
+                />
+              </div>
+
+              <div className="form-control w-full">
+                <label className="label font-bold">Stock</label>
+                <input
+                  type="number"
+                  value={stock}
+                  onChange={(e) => setStock(e.target.value)}
+                  className="input input-bordered"
+                  placeholder="0"
+                />
+              </div>
             </div>
 
-            <div className="form-control w-full">
+            <div className="form-control w-full mt-4">
+              <label className="label font-bold">Target Categories</label>
+              <div className="flex flex-wrap gap-2">
+                {targetCategories.map((category) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    className={`px-3 py-1.5 rounded-md ${
+                      selectedTargetCategories.includes(category.id)
+                        ? "bg-blue-100 border-blue-600 border text-blue-600"
+                        : "bg-gray-100"
+                    }`}
+                    onClick={() => toggleTargetCategory(category.id)}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="form-control w-full">
+                <label className="label font-bold">Product Category</label>
+                <select
+                  value={selectedProductCategory}
+                  onChange={(e) => setSelectedProductCategory(e.target.value)}
+                  className="select select-bordered w-full"
+                >
+                  <option value="">Select a category</option>
+                  {productCategories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-control w-full">
+                <label className="label font-bold">Subproduct Categories</label>
+                <div className="flex flex-wrap gap-2 border rounded-md p-2 min-h-[44px] overflow-y-auto max-h-32">
+                  {selectedProductCategory ? (
+                    filteredSubproductCategories.length > 0 ? (
+                      filteredSubproductCategories.map((category) => (
+                        <button
+                          key={category.id}
+                          type="button"
+                          className={`px-3 py-1.5 rounded-md ${
+                            selectedSubproductCategories.includes(category.id)
+                              ? "bg-blue-100 border-blue-600 border text-blue-600"
+                              : "bg-gray-100"
+                          }`}
+                          onClick={() => toggleSubproductCategory(category.id)}
+                        >
+                          {category.name}
+                        </button>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        No subcategories available
+                      </p>
+                    )
+                  ) : (
+                    <p className="text-sm text-gray-500">
+                      Select a product category first
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="form-control w-[10vw] mt-4">
               <label className="label font-bold">Product Image</label>
-              <UploadDropzone
+              <UploadDropzone className="text-black"
                 endpoint="productImage"
                 headers={{
                   Authorization: `Bearer ${encodedToken}`,
@@ -135,7 +276,7 @@ const AddProduct: React.FC = () => {
                 onUploadError={handleUploadError}
               />
               {imageUrl && (
-                <div className="w-full overflow-hidden rounded-lg shadow-md mt-4">
+                <div className="w-full overflow-hidden rounded-lg text-black shadow-md mt-4">
                   <Image
                     src={imageUrl}
                     alt="Product Image"
@@ -148,11 +289,20 @@ const AddProduct: React.FC = () => {
             </div>
 
             <div className="modal-action">
-              {isLoading && (
-                <button type="button" className="btn loading">
-                  Saving...
-                </button>
-              )}
+              <button
+                type="button"
+                className="text-black"
+                onClick={handleModal}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="text-black"
+                disabled={isLoading || !name || !price || !imageUrl}
+              >
+                {isLoading ? "Saving..." : "Save Product"}
+              </button>
             </div>
           </form>
         </div>
