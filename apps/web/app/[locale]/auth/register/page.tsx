@@ -12,7 +12,7 @@ const roleOptions = [
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     email: "",
-    username: "",
+    name: "",
     password: "",
     role: roleOptions[0].value,
   });
@@ -75,12 +75,12 @@ export default function RegisterPage() {
           />
         </div>
         <div>
-          <label htmlFor="username">Username</label>
+          <label htmlFor="name">Username</label>
           <input
             type="text"
-            id="username"
-            name="username"
-            value={formData.username}
+            id="name"
+            name="name"
+            value={formData.name}
             onChange={handleChange}
             required
           />
