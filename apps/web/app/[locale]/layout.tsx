@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/../i18n/routing";
 import { CartProvider } from "@/context/CartContext";
 import { ProductProvider } from "@/context/ProductContext";
+import { CategoryProvider } from "@/context/categoryContext";
 import "@/globals.css";
 import MenuWrapper from "@/components/menuWrapper";
 
@@ -29,10 +30,12 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <CartProvider>
-            <ProductProvider>
-              {children}
-              <MenuWrapper />
-            </ProductProvider>
+            <CategoryProvider>
+              <ProductProvider>
+                {children}
+                <MenuWrapper />
+              </ProductProvider>
+            </CategoryProvider>
           </CartProvider>
         </NextIntlClientProvider>
       </body>
