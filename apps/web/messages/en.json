@@ -1,6 +1,8 @@
 {
   "HomePage": {
     "title": "Hello world!",
-    "login": "Go to the login page"
+    "login": "Go to the login page",
+    "designer_tool": "customize your products",
+    "default_designer_Page": "get started !  "
   }
 }
