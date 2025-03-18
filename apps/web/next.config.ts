@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     UPLOADTHING_REGIONS: process.env.UPLOADTHING_REGIONS,
   },
   images: {
-    domains: ["dpd7awju8t.ufs.sh", "ufs.sh"],
+    domains: ["c6ha9vzzh0.ufs.sh", "ufs.sh"],
   },
 };
 
