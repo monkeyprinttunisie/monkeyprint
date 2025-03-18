@@ -2,7 +2,10 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { Product } from "@/types";
-import { listProducts, deleteProductAction } from "@/actions/productActions";
+import {
+  listProductsAction,
+  deleteProductAction,
+} from "@/actions/productActions";
 
 interface ProductContextType {
   products: Product[];
@@ -16,7 +19,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const loadProducts = async () => {
-      const productsList = await listProducts();
+      const productsList = await listProductsAction();
       setProducts(productsList);
     };
     loadProducts();

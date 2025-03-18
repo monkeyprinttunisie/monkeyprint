@@ -34,4 +34,5 @@ export const productUpdateSchema = z.object({
   description: z.string().optional(),
   price: z.number().positive("Price must be a positive number").optional(),
   active: z.boolean().optional(),
+  stock: z.number().int().optional(),
 });

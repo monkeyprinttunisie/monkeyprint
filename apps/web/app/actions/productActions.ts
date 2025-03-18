@@ -8,6 +8,7 @@ interface IUpdatedProductData {
   description?: string;
   price: number;
   imageUrl: string;
+  stock?: number;
 }
 
 export async function updateProduct(
@@ -37,7 +38,7 @@ export async function updateProduct(
   }
 }
 
-export async function listProducts() {
+export async function listProductsAction() {
   try {
     const products = await db.product.findMany();
     return products;

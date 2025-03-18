@@ -79,4 +79,5 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   isDeleted   Boolean  @default(false)
+  stock       Int?     @default(0)
 }
