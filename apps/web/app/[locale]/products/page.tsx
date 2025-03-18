@@ -132,10 +132,9 @@ const AddProduct: React.FC = () => {
                 </div>
               )}
             </div>
-
             <div className="modal-action">
               {isLoading && (
-                <button type="button" className="btn loading">
+                <button type="button" className="text-black">
                   Saving...
                 </button>
               )}
