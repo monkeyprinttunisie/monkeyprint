@@ -2,11 +2,9 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/../i18n/routing";
-import { CartProvider } from "@/context/CartContext";
-import { ProductProvider } from "@/context/ProductContext";
-import { CategoryProvider } from "@/context/categoryContext";
 import "@/globals.css";
 import MenuWrapper from "@/components/menuWrapper";
+import { StoreProvider } from "@/providers/StoreProvider";
 
 export default async function LocaleLayout({
   children,
@@ -29,14 +27,10 @@ export default async function LocaleLayout({
     <html lang={locale}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <CartProvider>
-            <CategoryProvider>
-              <ProductProvider>
-                {children}
-                <MenuWrapper />
-              </ProductProvider>
-            </CategoryProvider>
-          </CartProvider>
+          <StoreProvider>
+            {children}
+            <MenuWrapper />
+          </StoreProvider>
         </NextIntlClientProvider>
       </body>
     </html>

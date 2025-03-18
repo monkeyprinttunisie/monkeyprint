@@ -2,15 +2,20 @@
 
 import { useState } from "react";
 import { createCategory } from "@/actions/categoryActions";
-import { useCategories } from "@/context/categoryContext";
+import { useCategoryStore } from "@/store/useCategoryStore";
 import { CategoryType } from "@monkeyprint/db";
 import { useRouter } from "next/navigation";
 
 export default function CreateCategoryPage() {
   const router = useRouter();
-  const { targetCategories, productCategories, refreshCategories } =
-    useCategories();
 
+  const refreshCategories = useCategoryStore(
+    (state) => state.refreshCategories
+  );
+  const targetCategories = useCategoryStore((state) => state.targetCategories);
+  const productCategories = useCategoryStore(
+    (state) => state.productCategories
+  );
   const [categoryData, setCategoryData] = useState({
     name: "",
     type: "TARGET" as CategoryType,
@@ -71,7 +76,6 @@ export default function CreateCategoryPage() {
 
         // Refresh categories in context
         await refreshCategories();
-
       } else {
         setMessage(result.error || "Failed to create category");
         setMessageType("error");

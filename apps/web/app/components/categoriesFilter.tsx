@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useCategories } from "@/context/categoryContext";
+import { useCategoryStore } from "@/store/useCategoryStore";
 import ProductCategorySection from "@/components/productCategorySection";
 import { Category } from "@/types";
 
@@ -19,9 +19,26 @@ export default function CategoriesFilter({
   onCategorySelect,
   onSubCategorySelect,
 }: CategoriesFilterProps) {
-  const { targetCategories, loading, getProductCategoriesByTarget } =
-    useCategories();
 
+  const targetCategories = useCategoryStore((state) => state.targetCategories);
+  const loading = useCategoryStore((state) => state.loading);
+  const getProductCategoriesByTarget = useCategoryStore(
+    (state) => state.getProductCategoriesByTarget
+  );
+  const getSubproductCategoriesByProduct = useCategoryStore(
+    (state) => state.getSubproductCategoriesByProduct
+  );
+
+  // Get filtered product categories based on selected target
+  const availableProductCategories =
+    getProductCategoriesByTarget(selectedCategory);
+
+  // Get filtered subproduct categories based on selected product categories
+  const availableSubCategories =
+    selectedCategory !== "all"
+      ? getSubproductCategoriesByProduct(selectedCategory)
+      : [];
+      
   const [expandedCategories, setExpandedCategories] = useState<
     Record<string, boolean>
   >({});

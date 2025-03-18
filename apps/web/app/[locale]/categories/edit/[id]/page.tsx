@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { updateCategory, getCategoryById } from "@/actions/categoryActions";
-import { useCategories } from "@/context/categoryContext";
+import { useCategoryStore } from "@/store/useCategoryStore";
 import { CategoryType } from "@monkeyprint/db";
 import { useRouter, useParams } from "next/navigation";
 
@@ -11,8 +11,11 @@ export default function EditCategoryPage() {
   const params = useParams();
   const categoryId = params.id as string;
 
-  const { targetCategories, productCategories, refreshCategories } =
-    useCategories();
+  const refreshCategories = useCategoryStore(
+    (state) => state.refreshCategories
+  );
+  const targetCategories = useCategoryStore((state) => state.targetCategories);
+  const productCategories = useCategoryStore((state) => state.productCategories);
 
   const [categoryData, setCategoryData] = useState({
     name: "",

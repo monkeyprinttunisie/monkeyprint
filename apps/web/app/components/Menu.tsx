@@ -3,10 +3,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCart } from "@/context/CartContext";
+import { useCartStore } from "@/store/useCartStore";
 
 export default function Menu() {
-  const { cart } = useCart();
+  /* const { cart } = useCart(); */
+  const cart = useCartStore((state) => state.cart);
   const pathname = usePathname(); // Get the current route
 
   return (

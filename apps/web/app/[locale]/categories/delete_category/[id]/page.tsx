@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { deleteCategory } from "@/actions/categoryActions";
-import { useCategories } from "@/context/categoryContext";
-
+import { useCategoryStore } from "@/store/useCategoryStore";
 
 export default function DeleteCategoryPage() {
   const router = useRouter();
   const { id } = useParams();
-  const {
-    refreshCategories,
-  } = useCategories();
+  
+  const refreshCategories = useCategoryStore(
+    (state) => state.refreshCategories
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState(false);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCategories } from "@/context/categoryContext";
+import { useCategoryStore } from "@/store/useCategoryStore";
 import { Category } from "@/types";
 
 interface ProductCategorySectionProps {
@@ -18,7 +18,10 @@ export default function ProductCategorySection({
   selectedSubCategories,
   onSubCategorySelect,
 }: ProductCategorySectionProps) {
-  const { getSubproductCategoriesByProduct } = useCategories();
+
+  const getSubproductCategoriesByProduct = useCategoryStore(
+    (state) => state.getSubproductCategoriesByProduct
+  );
 
   // Get subproduct categories for this product category
   const subCategories = getSubproductCategoriesByProduct(category.id);

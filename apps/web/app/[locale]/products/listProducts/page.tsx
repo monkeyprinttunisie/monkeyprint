@@ -1,12 +1,17 @@
 "use client";
 
 import { AddToCartButton } from "@/components/addToCartButton";
-import { useProducts } from "@/context/ProductContext";
+import { useProductStore } from "@/store/useProductStore";
 import CategoriesFilter from "@/components/categoriesFilter";
 import { useEffect, useState } from "react";
 
 export default function ProductHome() {
-  const { filteredProducts, loading, filterByCategories } = useProducts();
+  const filteredProducts = useProductStore((state) => state.filteredProducts);
+  const loading = useProductStore((state) => state.loading);
+  const filterByCategories = useProductStore(
+    (state) => state.filterByCategories
+  );
+
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSubCategories, setSelectedSubCategories] = useState<string[]>(
     []
@@ -41,8 +46,7 @@ export default function ProductHome() {
     };
 
     handleFilterProducts();
-
-  }, [selectedCategory, selectedSubCategories]);
+  }, [selectedCategory, selectedSubCategories, filterByCategories]);
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -55,7 +59,7 @@ export default function ProductHome() {
   };
 
   return (
-    <div className="bg-white h-[90vh] overflow-x-hidden">
+    <div className="bg-white pb-[8.5vh] overflow-x-hidden">
       <CategoriesFilter
         selectedCategory={selectedCategory}
         selectedSubCategories={selectedSubCategories}

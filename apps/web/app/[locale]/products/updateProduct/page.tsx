@@ -2,8 +2,7 @@
 
 import { updateProduct, getProductById } from "@/actions/productActions";
 import { useState, useEffect, useRef } from "react";
-import { UpdateProductButton } from "@/components/updateProductButton";
-import { useCategories } from "@/context/categoryContext";
+import { useCategoryStore } from "@/store/useCategoryStore";
 import { getCategoryById } from "@/actions/categoryActions";
 
 export default function UpdateProductPage() {
@@ -25,8 +24,13 @@ export default function UpdateProductPage() {
   const [selectedSubproductCategories, setSelectedSubproductCategories] =
     useState<string[]>([]);
 
-  const { targetCategories, productCategories, subproductCategories } =
-    useCategories();
+  const targetCategories = useCategoryStore((state) => state.targetCategories);
+  const productCategories = useCategoryStore(
+    (state) => state.productCategories
+  );
+  const subproductCategories = useCategoryStore(
+    (state) => state.subproductCategories
+  );
 
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -206,46 +210,45 @@ export default function UpdateProductPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Update Product</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">Product ID</label>
+    <div className="px-4 pt-4 pb-[8.5vh] w-full max-w-lg mx-auto">
+      <h1 className="text-xl font-bold mb-4">Update Product</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Product ID</label>
           <input
             type="text"
             value={product.id}
             onChange={(e) => handleProductIdChange(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border border-gray-300 rounded-lg text-base"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">Name</label>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Name</label>
           <input
             type="text"
             value={product.name}
             onChange={(e) => setProduct({ ...product, name: e.target.value })}
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border border-gray-300 rounded-lg text-base"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">Description</label>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Description</label>
           <textarea
             value={product.description}
             onChange={(e) =>
               setProduct({ ...product, description: e.target.value })
             }
-            className="w-full p-2 border rounded"
-            rows={3}
+            className="w-full p-3 border border-gray-300 rounded-lg text-base min-h-[100px]"
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block mb-2 font-medium">Price</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Price</label>
             <input
               type="number"
               step="0.01"
@@ -253,54 +256,54 @@ export default function UpdateProductPage() {
               onChange={(e) =>
                 setProduct({ ...product, price: parseFloat(e.target.value) })
               }
-              className="w-full p-2 border rounded"
+              className="w-full p-3 border border-gray-300 rounded-lg text-base"
               required
             />
           </div>
 
-          <div>
-            <label className="block mb-2 font-medium">Stock</label>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Stock</label>
             <input
               type="number"
               value={product.stock.toString()}
               onChange={(e) =>
                 setProduct({ ...product, stock: parseInt(e.target.value) })
               }
-              className="w-full p-2 border rounded"
+              className="w-full p-3 border border-gray-300 rounded-lg text-base"
             />
           </div>
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">Image URL</label>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Image URL</label>
           <input
             type="text"
             value={product.imageUrl}
             onChange={(e) =>
               setProduct({ ...product, imageUrl: e.target.value })
             }
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border border-gray-300 rounded-lg text-base"
             required
           />
           {product.imageUrl && (
-            <div className="mt-2">
+            <div className="mt-2 rounded-lg overflow-hidden bg-gray-100 flex justify-center">
               <img
                 src={product.imageUrl}
                 alt="Product preview"
-                className="max-h-40 object-contain"
+                className="h-[180px] object-contain"
               />
             </div>
           )}
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-2 font-medium">Target Categories</label>
+        <div className="space-y-2 pt-2">
+          <label className="block text-sm font-medium">Target Categories</label>
           <div className="flex flex-wrap gap-2">
             {targetCategories.map((category) => (
               <button
                 key={category.id}
                 type="button"
-                className={`px-3 py-1.5 rounded-md ${
+                className={`px-3 py-2 rounded-lg text-sm ${
                   selectedTargetCategories.includes(category.id)
                     ? "bg-blue-100 border-blue-600 border text-blue-600"
                     : "bg-gray-100"
@@ -313,13 +316,15 @@ export default function UpdateProductPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block mb-2 font-medium">Product Category</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">
+              Product Category
+            </label>
             <select
               value={selectedProductCategory}
               onChange={(e) => setSelectedProductCategory(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full p-3 border border-gray-300 rounded-lg text-base bg-white"
             >
               <option value="">Select a category</option>
               {productCategories.map((category) => (
@@ -330,18 +335,18 @@ export default function UpdateProductPage() {
             </select>
           </div>
 
-          <div>
-            <label className="block mb-2 font-medium">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">
               Subproduct Categories
             </label>
-            <div className="flex flex-wrap gap-2 border rounded p-2 min-h-[44px]">
+            <div className="flex flex-wrap gap-2 border border-gray-300 rounded-lg p-3 min-h-[60px] max-h-[120px] overflow-y-auto">
               {selectedProductCategory ? (
                 filteredSubproductCategories.length > 0 ? (
                   filteredSubproductCategories.map((category) => (
                     <button
                       key={category.id}
                       type="button"
-                      className={`px-3 py-1.5 rounded-md ${
+                      className={`px-3 py-2 rounded-lg text-sm ${
                         selectedSubproductCategories.includes(category.id)
                           ? "bg-blue-100 border-blue-600 border text-blue-600"
                           : "bg-gray-100"
@@ -352,12 +357,12 @@ export default function UpdateProductPage() {
                     </button>
                   ))
                 ) : (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 w-full text-center py-2">
                     No subcategories available
                   </p>
                 )
               ) : (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 w-full text-center py-2">
                   Select a product category first
                 </p>
               )}
@@ -365,16 +370,23 @@ export default function UpdateProductPage() {
           </div>
         </div>
 
-        <div className="mt-6">
-          <UpdateProductButton
-            isSubmitting={isSubmitting}
-            onClick={handleSubmit}
-          />
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3 bg-blue-500 text-white rounded-lg text-base font-medium shadow-md disabled:bg-blue-300"
+          >
+            {isSubmitting ? "Updating..." : "Update Product"}
+          </button>
         </div>
 
         {message && (
           <div
-            className={`mt-4 p-3 rounded ${message.includes("success") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}
+            className={`mt-4 p-3 rounded-lg ${
+              message.includes("success")
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
           >
             {message}
           </div>

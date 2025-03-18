@@ -11,6 +11,15 @@ export interface Product {
   categoryIds?: string[];
 }
 
+export interface ProductState {
+  products: Product[];
+  filteredProducts: Product[];
+  loading: boolean;
+  loadProducts: () => Promise<void>;
+  deleteProduct: (productId: string) => Promise<void>;
+  filterByCategories: (categoryIds: string[]) => Promise<void>;
+}
+
 export interface IUpdatedProductData {
   name: string;
   description?: string;
@@ -37,6 +46,17 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface CartState {
+  cart: CartItem[];
+  addToCart: (product: CartItem) => Promise<void>;
+  updateCartItemQuantity: (
+    productId: string,
+    quantity: number
+  ) => Promise<void>;
+  removeFromCart: (productId: string) => Promise<void>;
+  clearCart: () => Promise<void>;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -46,6 +66,24 @@ export interface Category {
   createdAt: Date;
   updatedAt: Date;
   isDeleted: boolean;
+}
+
+export interface CategoryState {
+  targetCategories: Category[];
+  productCategories: Category[];
+  subproductCategories: Category[];
+  categoryRelations: CategoryRelations;
+  loading: boolean;
+  refreshCategories: () => Promise<void>;
+  getProductCategoriesByTarget: (targetId: string) => Category[];
+  getSubproductCategoriesByProduct: (productId: string) => Category[];
+}
+
+export interface CategoryRelations {
+  [key: string]: {
+    parents: string[];
+    children: string[];
+  };
 }
 
 export interface CategoryRelation {

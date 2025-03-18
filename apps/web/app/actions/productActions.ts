@@ -1,6 +1,6 @@
 "use server";
 
-import { ProductResponse, IProductData } from "@/types";
+import { ProductResponse, IProductData, Product } from "@/types";
 import { db } from "@monkeyprint/db";
 import { productUpdateSchema } from "@monkeyprint/utils/zod";
 import { revalidatePath } from "next/cache";
@@ -54,7 +54,11 @@ export async function updateProduct(
   }
 }
 
-export async function listProductsAction() {
+export async function listProductsAction(): Promise<{
+  success?: boolean;
+  products?: Product[];
+  error?: string;
+}> {
   try {
     const products = await db.product.findMany({
       where: { isDeleted: false },
@@ -67,10 +71,16 @@ export async function listProductsAction() {
       },
     });
 
-    return products || []; //to make sure we always return array even if no products found
+    return {
+      success: true,
+      products
+    }; //to make sure we always return array even if no products found
   } catch (error) {
     console.error("Error fetching products:", error);
-    return []; // Return empty array instead of throwing error
+    return {
+      success: false,
+      error: "Failed to fetch products",
+    };; // Return empty array instead of throwing error
   }
 }
 
