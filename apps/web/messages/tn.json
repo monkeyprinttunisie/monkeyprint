@@ -1,6 +1,16 @@
 {
   "HomePage": {
-    "title": "!مرحبا",
+    "title": "!مرحبابيك",
     "login": "login اعمل"
+  },
+
+  "LoginPage": {
+    "title": "أدخل",
+    "subTitle": "شهل غيبة؟ خليت علينا بلاصة",
+    "emailPlaceholder": "إمايل متاعك",
+    "passwordPlaceholder": "مودوباس",
+    "oAuthMessage": "او أدخل بل",
+    "regiterMessage": "جديد معانا؟",
+    "signUp": "سجّل"
   }
 }
