@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     console.log("Request body:", body);
-    const { email, username, password, role } = registerSchema.parse(body);
+    const { email, name, password, role } = registerSchema.parse(body);
 
     //check if email already exists
     const existingUserByEmail = await db.user.findUnique({
@@ -20,23 +20,13 @@ export async function POST(req: Request) {
       );
     }
 
-    //check if usename already exists
-    const existingUserByUsername = await db.user.findUnique({
-      where: { username: username },
-    });
-    if (existingUserByUsername) {
-      return NextResponse.json(
-        { user: null, message: "User with this username already exists" },
-        { status: 409 },
-      );
-    }
 
     //hash password using bcrypt from utils/hash
     const hashedPassword = await hashPassword(password);
     const newUser = await db.user.create({
       data: {
         email,
-        username,
+        name,
         password: hashedPassword,
         role,
       },

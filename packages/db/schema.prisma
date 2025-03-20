@@ -65,19 +65,62 @@ model VerificationToken {
   identifier String
   token      String
   expires    DateTime
+  isDeleted  Boolean  @default(false)
 
   @@id([identifier, token])
-  isDeleted            Boolean   @default(false)
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  name        String   @db.VarChar(255)
-  description String?  @db.Text
+  id          String            @id @default(uuid())
+  name        String            @db.VarChar(255)
+  description String?           @db.Text
   price       Float
-  imageUrl    String   @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  stock       Int?     @default(0)
+  imageUrl    String            @db.Text
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  isDeleted   Boolean           @default(false)
+  stock       Int?              @default(0)
+  categories  ProductCategory[]
+}
+
+model Category {
+  id               String             @id @default(uuid())
+  name             String // Name of the category (e.g., "Clothing", "Mugs")
+  type             CategoryType // Added enum to differentiate categories
+  parentId         String? // Self-referencing to create hierarchy
+  parentCategories CategoryRelation[] @relation("ChildToParent")
+  childCategories  CategoryRelation[] @relation("ParentToChild")
+  products         ProductCategory[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  isDeleted        Boolean            @default(false)
+
+  // Explanation of the hierarchy:
+  // - If `parentId` is null, this is a **Target Category** (top-level category).
+  // - If `parentId` points to a Target Category, this is a **Product Category**.
+  // - If `parentId` points to a Product Category, this is a **Subproduct Category**.
+}
+
+model CategoryRelation {
+  parentId String
+  childId  String
+  parent   Category @relation("ParentToChild", fields: [parentId], references: [id])
+  child    Category @relation("ChildToParent", fields: [childId], references: [id])
+
+  @@id([parentId, childId])
+}
+
+enum CategoryType {
+  TARGET // Top-level categories (Male, Female, All)
+  PRODUCT // Mid-level categories (Clothing, Mugs)
+  SUBPRODUCT // Low-level categories (T-shirts, Hoodies, Magic Mugs)
+}
+
+model ProductCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId])
 }

@@ -1,14 +1,14 @@
 "use client";
 
 import { Product } from "@/types";
-import { useCart } from "@/context/CartContext";
+import { useCartStore } from "@/store/useCartStore";
 import { Button } from "@/components/button";
 interface AddToCartButtonProps {
   product: Product;
 }
 
 export function AddToCartButton({ product }: AddToCartButtonProps) {
-  const { addToCart } = useCart();
+  const addToCart = useCartStore((state) => state.addToCart);
 
   const handleAddToCart = async () => {
     await addToCart({

@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { useCart } from "@/context/CartContext";
-import { Button } from "@/components/button";
+import { useCartStore } from "@/store/useCartStore";
 import { updateProduct } from "@/actions/productActions";
 export default function Cart() {
-  const { cart, updateCartItemQuantity, removeFromCart, clearCart } = useCart();
-
+  const cart = useCartStore((state) => state.cart);
+  const updateCartItemQuantity = useCartStore(
+    (state) => state.updateCartItemQuantity
+  );
+  const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const clearCart = useCartStore((state) => state.clearCart);
+  
   const handleBuy = async () => {
     try {
       for (const item of cart) {
