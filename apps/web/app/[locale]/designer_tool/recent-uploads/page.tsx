@@ -81,7 +81,7 @@ export default function RecentUploads() {
                     images.map((image, index) => (
                         <div
                             key={index}
-                            className={`cursor-pointer relative group bg-white p-3 rounded-lg shadow-md ${selectedIndices.includes(index) ? 'ring-2 ring-blue-500' : ''}`}
+                            className={`cursor-pointer relative group bg-white p-3 rounded-lg shadow-md ${selectedIndices.includes(index)}`}
                             onClick={() => handleImageClick(index)}
                         >
                             {/* Fixed aspect ratio container for consistent sizing */}
