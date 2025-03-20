@@ -9,7 +9,7 @@ export const RoleEnum = z.enum([
 
 // Define a schema for input validation
 export const registerSchema = z.object({
-  username: z.string().min(1, "Username is required").max(100),
+  name: z.string().min(1, "Username is required").max(100),
   email: z.string().min(1, "Email is required").email("Invalid email"),
   password: z
     .string()
@@ -30,8 +30,9 @@ export const signInSchema = object({
 });
 
 export const productUpdateSchema = z.object({
-  name: z.string().optional(),
+  name: z.string().min(1, "Name is required").max(255),
   description: z.string().optional(),
-  price: z.number().positive("Price must be a positive number").optional(),
-  active: z.boolean().optional(),
+  price: z.number().positive("Price must be a positive number"),
+  imageUrl: z.string().min(1, "Image URL is required"),
+  stock: z.number().int().nonnegative().optional(),
 });

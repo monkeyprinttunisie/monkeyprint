@@ -95,9 +95,9 @@ model Category {
   isDeleted        Boolean            @default(false)
 
   // Explanation of the hierarchy:
-  // - If parentId is null, this is a *Target Category* (top-level category).
-  // - If parentId points to a Target Category, this is a *Product Category*.
-  // - If parentId points to a Product Category, this is a *Subproduct Category*.
+  // - If `parentId` is null, this is a **Target Category** (top-level category).
+  // - If `parentId` points to a Target Category, this is a **Product Category**.
+  // - If `parentId` points to a Product Category, this is a **Subproduct Category**.
 }
 
 model CategoryRelation {

@@ -3,6 +3,8 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/../i18n/routing";
 import "@/globals.css";
+import MenuWrapper from "@/components/menuWrapper";
+import { StoreProvider } from "@/providers/StoreProvider";
 
 export default async function LocaleLayout({
   children,
@@ -25,7 +27,10 @@ export default async function LocaleLayout({
     <html lang={locale} dir={locale === "tn" ? "rtl" : "ltr"}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <StoreProvider>
+            {children}
+            <MenuWrapper />
+          </StoreProvider>
         </NextIntlClientProvider>
       </body>
     </html>
