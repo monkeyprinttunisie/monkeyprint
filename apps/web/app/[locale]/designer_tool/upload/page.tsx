@@ -1,6 +1,7 @@
 "use client";
 import UploaderComponent from "@/components/UploaderComponent";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import useImageStore from "@/store/imageStore";
 import { useState, useEffect } from "react";
 interface UploadResponse {
@@ -12,7 +13,7 @@ export default function Page() {
     const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
     const searchParams = useSearchParams();
     const productId = searchParams.get("productId");
-
+    const router = useRouter();
     useEffect(() => {
         if (productId) {
             setSelectedProduct(productId);
@@ -29,9 +30,10 @@ export default function Page() {
         if (res && res.length > 0) {
             const uploadedFile = res[0];
             if (uploadedFile.ufsUrl) {
-                addImage(uploadedFile.ufsUrl); 
+                addImage(uploadedFile.ufsUrl);
                 if (selectedProduct) {
-                    window.location.href = `/designer_tool/products/previewProduct?product=${selectedProduct}&image=${encodeURIComponent(uploadedFile.ufsUrl)}`;
+                    localStorage.setItem("activeNavLink", "products");
+                    router.push(`/designer_tool/products/previewProduct?product=${selectedProduct}&image=${encodeURIComponent(uploadedFile.ufsUrl)}`);
                 } else {
                     alert("Please select a product first");
                 }
