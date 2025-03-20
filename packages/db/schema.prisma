@@ -65,7 +65,6 @@ model VerificationToken {
   identifier String
   token      String
   expires    DateTime
-  isDeleted  Boolean  @default(false)
 
   @@id([identifier, token])
 }

@@ -2,5 +2,15 @@
   "HomePage": {
     "title": "Hello world!",
     "login": "Go to the login page"
+  },
+
+  "LoginPage": {
+    "title": "Login",
+    "subTitle": "Good to see you back!",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "oAuthMessage": "OR Continue with",
+    "regiterMessage": "Create An Account",
+    "signUp": "Sign Up"
   }
 }
