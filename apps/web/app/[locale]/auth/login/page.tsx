@@ -33,8 +33,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col justify-around items-center min-h-screen w-screen max-w-[500px] p-5">
-      <div className="flex flex-col items-center">
+    <div className="flex flex-col justify-around items-center min-h-screen w-screen max-w-[500px] p-9 pt-[90px]">
+      <div className="absolute inset-0 -z-10 bg-[url('/bubbles-login.svg')] bg-cover bg-no-repeat rtl:scale-x-[-1]"></div>
+      <div className="flex flex-col w-full justify-self-start">
         <span className="text-[52px] leading-[61px] font-bold tracking-[-0.52px] text-[#202020]">
           {t("title")}
         </span>
@@ -64,7 +65,8 @@ export default function LoginPage() {
         </div>
         <button
           type="submit"
-          className="w-[90vw] max-w-[335px] h-[61px] p-[15.764px_19.705px] bg-[#004CFF] rounded-[16px]"
+          className="w-[90vw] max-w-[335px] h-[61px] p-[15.764px_19.705px] bg-[#004CFF] rounded-[16px] text-white
+          transition-all duration-300 ease-in-out active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
         >
           {t("title")}
         </button>

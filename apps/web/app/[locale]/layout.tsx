@@ -23,7 +23,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={locale === "tn" ? "rtl" : "ltr"}>
-      <body className="min-h-screen w-screen">
+      <body>
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>
