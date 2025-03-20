@@ -5,10 +5,10 @@
   },
 
   "LoginPage": {
-    "title": "أدخل",
+    "title": "أهلا بيك",
     "subTitle": "شهل غيبة؟ خليت علينا بلاصة",
     "emailPlaceholder": "إمايل متاعك",
-    "passwordPlaceholder": "مودوباس",
+    "passwordPlaceholder": "كلمة السّر",
     "oAuthMessage": "او أدخل بل",
     "regiterMessage": "جديد معانا؟",
     "signUp": "سجّل"
