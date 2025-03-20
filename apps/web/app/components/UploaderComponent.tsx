@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { UploadDropzone } from "@uploadthing/react";
 import Image from "next/image";
 import type { OurFileRouter } from "@/api/uploadthing/core";
+import { useTranslations } from "next-intl";
+
 interface UploadResponse {
     ufsUrl: string;
 }
@@ -10,6 +12,7 @@ interface UploaderComponentProps {
     handleUploadComplete: (res: UploadResponse[]) => void;
 }
 export default function UploaderComponent({ handleUploadComplete }: UploaderComponentProps) {
+    const t = useTranslations("RecentUploads");
     const [imageUrl, setImageUrl] = useState<string>("");
     const apiKey = process.env.UPLOADTHING_TOKEN;
     const appId = process.env.UPLOADTHING_APP_ID;
@@ -31,7 +34,7 @@ export default function UploaderComponent({ handleUploadComplete }: UploaderComp
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 ">
             <div className="w-full max-w-lg p-6 bg-white rounded-xl shadow-md ">
-                <h2 className="text-2xl  text-blue-600 text-center">Upload an Image</h2>
+                <h2 className="text-2xl  text-blue-600 text-center">{t("upload")}</h2>
 
                 <div className="mt-6 border-none ">
                     <UploadDropzone<OurFileRouter, "productImage">

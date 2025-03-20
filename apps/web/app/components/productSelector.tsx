@@ -4,6 +4,7 @@ import Link from 'next/link';
 import IconButton from "@/components/iconButton";
 import { useTranslations } from "next-intl";
 import { products } from "@/productOptions"
+import { useRouter } from 'next/navigation';
 interface ProductSelectorProps {
     onButtonClick: (link: string) => void;
 }
@@ -17,7 +18,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({ onButtonClick }) => {
 
     const t = useTranslations("HomePage");
 
-
+    const router = useRouter();
     const handleProductClick = (productId: string) => {
         setSelectedProduct(productId);
         console.log("Product ID is", productId);
@@ -25,7 +26,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({ onButtonClick }) => {
         localStorage.setItem('selectedProduct', productId);  // Save selected product to localStorage
     };
     const handleDoubleClick = (productId: string) => {
-        window.location.href = `/designer_tool/products/previewProduct?product=${productId}`;
+        router.push(`/designer_tool/products/previewProduct?product=${productId}`);
     };
 
     const handleLinkClick = (link: string) => {
