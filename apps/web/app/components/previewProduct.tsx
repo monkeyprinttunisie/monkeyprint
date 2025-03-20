@@ -2,211 +2,311 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { products } from "@/productOptions";
-import useImageStore from "@/store/imageStore";
 
 const PreviewProduct: React.FC = () => {
+    // URL params and state
     const searchParams = useSearchParams();
     const [productId, setProductId] = useState<string | null>(null);
     const [view, setView] = useState<'front' | 'back'>('front');
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const { images } = useImageStore();
 
-    // Image editing state
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-    const [size, setSize] = useState(100);
-    const [rotation, setRotation] = useState(0);
+    // Refs
+    const containerRef = useRef<HTMLDivElement>(null);
+    const imageRef = useRef<HTMLDivElement>(null);
+
+    // Design state
+    const [designImages, setDesignImages] = useState<Array<{
+        url: string;
+        position: { x: number, y: number };
+        size: number;
+        rotation: number;
+        isSelected: boolean;
+    }>>([]);
+
+    // Interaction states
     const [isDragging, setIsDragging] = useState(false);
     const [isResizing, setIsResizing] = useState(false);
     const [isRotating, setIsRotating] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [initialSize, setInitialSize] = useState(0);
     const [initialRotation, setInitialRotation] = useState(0);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const imageRef = useRef<HTMLDivElement>(null);
-    const imageContainerRef = useRef<HTMLDivElement>(null);
-    const [isSelected, setIsSelected] = useState(false);
 
-
+    // Load and initialize design
     useEffect(() => {
         const id = searchParams.get("product");
-        setProductId(id);
-        const imageParam = searchParams.get("image");
-        if (imageParam) {
-            setImageUrl(imageParam);
-        } else {
-            setImageUrl(null);
-        }
-    }, [searchParams, images]);
+        if (!id) return;
 
+        setProductId(id);
+        const designStorageKey = `design_${id}`;
+        const imageParam = searchParams.get("image");
+
+        // Load existing design if available
+        let currentDesign: any[] = [];
+        try {
+            const savedDesign = localStorage.getItem(designStorageKey);
+            if (savedDesign) {
+                const parsedDesign = JSON.parse(savedDesign);
+                if (Array.isArray(parsedDesign) && parsedDesign.length > 0) {
+                    currentDesign = parsedDesign;
+                    setDesignImages(parsedDesign.map(img => ({ ...img, isSelected: false })));
+                }
+            }
+        } catch (e) {
+            console.error("Error loading design:", e);
+        }
+
+        // Handle new images from RecentUploads
+        try {
+            const storedImages = localStorage.getItem("selectedImages");
+            const createNewDesign = localStorage.getItem("createNewDesign") === "true";
+
+            if (storedImages) {
+                const parsedImages = JSON.parse(storedImages);
+                if (Array.isArray(parsedImages) && parsedImages.length > 0) {
+                    // Create new image objects
+                    const newImageObjects = parsedImages.map((url, index) => ({
+                        url,
+                        position: { x: 20 + index * 15, y: 20 + index * 15 },
+                        size: 100,
+                        rotation: 0,
+                        isSelected: index === 0
+                    }));
+
+                    if (createNewDesign) {
+                        setDesignImages(newImageObjects);
+                        localStorage.setItem(designStorageKey, JSON.stringify(newImageObjects));
+                    } else {
+                        // Add to existing design without duplicates
+                        const existingUrls = currentDesign.map(img => img.url);
+                        const filteredNewImages = newImageObjects.filter(
+                            img => !existingUrls.includes(img.url)
+                        );
+
+                        const updatedDesign = [
+                            ...currentDesign.map(img => ({ ...img, isSelected: false })),
+                            ...filteredNewImages
+                        ];
+
+                        setDesignImages(updatedDesign);
+                        localStorage.setItem(designStorageKey, JSON.stringify(updatedDesign));
+                    }
+
+                    if (imageParam) setImageUrl(imageParam);
+                }
+
+                // Clear localStorage after processing
+                localStorage.removeItem("selectedImages");
+                localStorage.removeItem("createNewDesign");
+            } else if (imageParam && currentDesign.length === 0) {
+                // Handle single image parameter
+                const newDesign = [{
+                    url: imageParam,
+                    position: { x: 0, y: 0 },
+                    size: 100,
+                    rotation: 0,
+                    isSelected: true
+                }];
+
+                setImageUrl(imageParam);
+                setDesignImages(newDesign);
+                localStorage.setItem(designStorageKey, JSON.stringify(newDesign));
+            }
+        } catch (e) {
+            console.error("Error processing images:", e);
+        }
+    }, [searchParams]);
+
+    // Save design changes
+    useEffect(() => {
+        if (productId && designImages.length > 0) {
+            localStorage.setItem(`design_${productId}`, JSON.stringify(designImages));
+        }
+    }, [designImages, productId]);
+
+    // Handle touch events
     useEffect(() => {
         const containerElement = containerRef.current;
+        if (!containerElement) return;
 
-        if (containerElement) {
-            const handleTouchMoveNonPassive = (e: TouchEvent) => {
-                if (isDragging || isResizing || isRotating) {
-                    e.preventDefault();
+        const handleTouchMove = (e: TouchEvent) => {
+            if (!isDragging && !isResizing && !isRotating) return;
 
-                    if (e.touches.length === 1) {
-                        const touch = e.touches[0];
-                        if (isDragging) {
-                            setPosition({
+            e.preventDefault();
+            if (e.touches.length !== 1) return;
+
+            const touch = e.touches[0];
+            const selectedIndex = designImages.findIndex(img => img.isSelected);
+            if (selectedIndex < 0) return;
+
+            if (isDragging) {
+                setDesignImages(prev => prev.map((img, i) =>
+                    i === selectedIndex
+                        ? {
+                            ...img, position: {
                                 x: touch.clientX - dragStart.x,
                                 y: touch.clientY - dragStart.y
-                            });
-                        } else if (isResizing) {
-                            const dx = touch.clientX - dragStart.x;
-                            const newSize = Math.max(50, initialSize + dx);
-                            setSize(newSize);
-                        } else if (isRotating && imageRef.current) {
-                            const rect = imageRef.current.getBoundingClientRect();
-                            const centerX = rect.left + rect.width / 2;
-                            const centerY = rect.top + rect.height / 2;
-                            const angle = Math.atan2(touch.clientY - centerY, touch.clientX - centerX);
-                            setRotation(initialRotation + angle * (180 / Math.PI));
+                            }
                         }
-                    }
-                }
-            };
+                        : img
+                ));
+            } else if (isResizing) {
+                const newSize = Math.max(50, initialSize + (touch.clientX - dragStart.x));
+                setDesignImages(prev => prev.map((img, i) =>
+                    i === selectedIndex ? { ...img, size: newSize } : img
+                ));
+            } else if (isRotating && imageRef.current) {
+                const rect = imageRef.current.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const angle = Math.atan2(touch.clientY - centerY, touch.clientX - centerX);
+                const newRotation = initialRotation + angle * (180 / Math.PI);
 
-            // Add non-passive event listener
-            containerElement.addEventListener('touchmove', handleTouchMoveNonPassive, { passive: false });
-
-            // Add class to body when dragging
-            if (isDragging || isResizing || isRotating) {
-                document.body.classList.add('dragging');
-            } else {
-                document.body.classList.remove('dragging');
+                setDesignImages(prev => prev.map((img, i) =>
+                    i === selectedIndex ? { ...img, rotation: newRotation } : img
+                ));
             }
+        };
 
-            // Clean up
-            return () => {
-                containerElement.removeEventListener('touchmove', handleTouchMoveNonPassive);
-                document.body.classList.remove('dragging');
-            };
+        containerElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+        if (isDragging || isResizing || isRotating) {
+            document.body.classList.add('dragging');
+        } else {
+            document.body.classList.remove('dragging');
         }
-    }, [isDragging, isResizing, isRotating, dragStart, initialSize, initialRotation]);
+
+        return () => {
+            containerElement.removeEventListener('touchmove', handleTouchMove);
+            document.body.classList.remove('dragging');
+        };
+    }, [isDragging, isResizing, isRotating, dragStart, initialSize, initialRotation, designImages]);
+
+    // Click outside to deselect
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (
-                imageRef.current &&
-                !imageRef.current.contains(event.target as Node) &&
-                !isDragging &&
-                !isResizing &&
-                !isRotating
+                containerRef.current?.contains(event.target as Node) &&
+                !isDragging && !isResizing && !isRotating
             ) {
-                setIsSelected(false);
+                const clickedOnImage = designImages.some((_, index) => {
+                    const imageElement = document.getElementById(`design-image-${index}`);
+                    return imageElement?.contains(event.target as Node);
+                });
+
+                if (!clickedOnImage) {
+                    setDesignImages(prev => prev.map(img => ({ ...img, isSelected: false })));
+                }
             }
         };
 
         document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isDragging, isResizing, isRotating]);
-    const product = productId ? products[productId] : null;
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isDragging, isResizing, isRotating, designImages]);
 
-    const toggleView = () => {
-        setView(prev => (prev === 'front' ? 'back' : 'front'));
+    const product = productId ? products[productId] : null;
+    if (!product) return <div>Product not found</div>;
+
+    // Image manipulation handlers
+    const handleSelectImage = (index: number) => {
+        setDesignImages(prev => prev.map((img, i) => ({
+            ...img, isSelected: i === index
+        })));
     };
 
-    if (!product) return <div>Product not found...</div>;
-
-    // Drag handlers
-    const handleMouseDown = (e: React.MouseEvent) => {
+    const handleMouseDown = (e: React.MouseEvent, index: number) => {
         e.stopPropagation();
-        setIsSelected(true); // Set selected when interacting with the image
+        handleSelectImage(index);
         setIsDragging(true);
+        const currentImage = designImages[index];
         setDragStart({
-            x: e.clientX - position.x,
-            y: e.clientY - position.y
+            x: e.clientX - currentImage.position.x,
+            y: e.clientY - currentImage.position.y
         });
     };
 
-    // Touch handlers for mobile
-    const handleTouchStart = (e: React.TouchEvent) => {
+    const handleTouchStart = (e: React.TouchEvent, index: number) => {
         e.stopPropagation();
-        setIsSelected(true); // Set selected when interacting with the image
+        handleSelectImage(index);
         if (e.touches.length === 1) {
             setIsDragging(true);
+            const currentImage = designImages[index];
             setDragStart({
-                x: e.touches[0].clientX - position.x,
-                y: e.touches[0].clientY - position.y
+                x: e.touches[0].clientX - currentImage.position.x,
+                y: e.touches[0].clientY - currentImage.position.y
             });
         }
     };
 
     const handleMouseMove = (e: React.MouseEvent) => {
-        if (isDragging) {
-            setPosition({
-                x: e.clientX - dragStart.x,
-                y: e.clientY - dragStart.y
-            });
-        } else if (isResizing && imageRef.current) {
-            const dx = e.clientX - dragStart.x;
-            const newSize = Math.max(50, initialSize + dx);
-            setSize(newSize);
-        } else if (isRotating) {
-            const rect = imageRef.current?.getBoundingClientRect();
-            if (rect) {
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
+        const selectedIndex = designImages.findIndex(img => img.isSelected);
+        if (selectedIndex < 0) return;
 
-                // Calculate angle between center of element and mouse position
-                const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
-                setRotation(initialRotation + angle * (180 / Math.PI));
-            }
+        if (isDragging) {
+            setDesignImages(prev => prev.map((img, i) =>
+                i === selectedIndex
+                    ? {
+                        ...img, position: {
+                            x: e.clientX - dragStart.x,
+                            y: e.clientY - dragStart.y
+                        }
+                    }
+                    : img
+            ));
+        } else if (isResizing) {
+            const newSize = Math.max(50, initialSize + (e.clientX - dragStart.x));
+            setDesignImages(prev => prev.map((img, i) =>
+                i === selectedIndex ? { ...img, size: newSize } : img
+            ));
+        } else if (isRotating && imageRef.current) {
+            const rect = imageRef.current.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+            setDesignImages(prev => prev.map((img, i) =>
+                i === selectedIndex
+                    ? { ...img, rotation: initialRotation + angle * (180 / Math.PI) }
+                    : img
+            ));
         }
     };
 
-    const handleMouseUp = () => {
-        setIsDragging(false);
-        setIsResizing(false);
-        setIsRotating(false);
-    };
-
-    const handleTouchEnd = () => {
-        setIsDragging(false);
-        setIsResizing(false);
-        setIsRotating(false);
-    };
-
-    // Resize handlers
-    const handleResizeStart = (e: React.MouseEvent) => {
+    const handleResizeStart = (e: React.MouseEvent, index: number) => {
         e.stopPropagation();
         setIsResizing(true);
         setDragStart({ x: e.clientX, y: e.clientY });
-        setInitialSize(size);
+        setInitialSize(designImages[index].size);
     };
 
-    const handleResizeTouchStart = (e: React.TouchEvent) => {
-        e.stopPropagation();
-        if (e.touches.length === 1) {
-            setIsResizing(true);
-            setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-            setInitialSize(size);
-        }
-    };
-
-    // Rotation handlers
-    const handleRotateStart = (e: React.MouseEvent) => {
+    const handleRotateStart = (e: React.MouseEvent, index: number) => {
         e.stopPropagation();
         setIsRotating(true);
-        setInitialRotation(rotation);
-        const rect = imageRef.current?.getBoundingClientRect();
-        if (rect) {
+        setInitialRotation(designImages[index].rotation);
+        const imageElement = document.getElementById(`design-image-${index}`);
+        if (imageElement) {
+            const rect = imageElement.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             setDragStart({ x: e.clientX - centerX, y: e.clientY - centerY });
         }
     };
 
-    const handleRotateTouchStart = (e: React.TouchEvent) => {
+    const handleResizeTouchStart = (e: React.TouchEvent, index: number) => {
+        e.stopPropagation();
+        if (e.touches.length === 1) {
+            setIsResizing(true);
+            setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+            setInitialSize(designImages[index].size);
+        }
+    };
+
+    const handleRotateTouchStart = (e: React.TouchEvent, index: number) => {
         e.stopPropagation();
         if (e.touches.length === 1) {
             setIsRotating(true);
-            setInitialRotation(rotation);
-            const rect = imageRef.current?.getBoundingClientRect();
-            if (rect) {
+            setInitialRotation(designImages[index].rotation);
+            const imageElement = document.getElementById(`design-image-${index}`);
+            if (imageElement) {
+                const rect = imageElement.getBoundingClientRect();
                 const centerX = rect.left + rect.width / 2;
                 const centerY = rect.top + rect.height / 2;
                 setDragStart({
@@ -217,23 +317,19 @@ const PreviewProduct: React.FC = () => {
         }
     };
 
-    // close
-    const handleClose = () => {
-        // Remove the image from view
-        setImageUrl(null);
+    const handleRemoveImage = (index: number) => {
+        setDesignImages(prev => prev.filter((_, i) => i !== index));
+        if (designImages.length === 1) setImageUrl(null);
     };
 
-    // Reset positioning
-    const handleReset = () => {
-        setPosition({ x: 0, y: 0 });
-        setSize(100);
-        setRotation(0);
+    // Reset interaction states
+    const handleMouseUp = () => {
+        setIsDragging(false);
+        setIsResizing(false);
+        setIsRotating(false);
     };
 
-    // Handle image click to set selected
-    const handleImageClick = () => {
-        setIsSelected(true);
-    };
+    const toggleView = () => setView(prev => prev === 'front' ? 'back' : 'front');
 
     return (
         <div className="flex flex-col items-center">
@@ -243,75 +339,76 @@ const PreviewProduct: React.FC = () => {
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
-                onTouchEnd={handleTouchEnd}
+                onTouchEnd={handleMouseUp}
             >
-                {/* Product image as background */}
+                {/* Product background */}
                 <img
                     src={product.images[view]}
                     alt={`${product.name} ${view}`}
                     className="w-full h-full absolute top-0 left-0"
                 />
 
-                {/* Uploaded image overlay with edit controls */}
-                {imageUrl && (
+                {/* Design images */}
+                {designImages.map((image, index) => (
                     <div
-                        ref={imageRef}
+                        id={`design-image-${index}`}
+                        key={`${image.url}-${index}`}
+                        ref={image.isSelected ? imageRef : null}
                         className="absolute"
                         style={{
-                            left: `calc(50% + ${position.x}px)`,
-                            top: `calc(50% + ${position.y}px)`,
-                            transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
-                            width: `${size}px`,
+                            left: `calc(50% + ${image.position.x}px)`,
+                            top: `calc(50% + ${image.position.y}px)`,
+                            transform: `translate(-50%, -50%) rotate(${image.rotation}deg)`,
+                            width: `${image.size}px`,
                             height: 'auto',
-                            zIndex: 10,
-                            border: isSelected ? '2px dashed #2563eb' : 'none',
+                            zIndex: image.isSelected ? 20 : 10,
+                            border: image.isSelected ? '2px dashed #2563eb' : 'none',
                             padding: '4px',
                             borderRadius: '4px'
                         }}
-                        onClick={handleImageClick}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectImage(index);
+                        }}
                     >
-                        {/* Main image - draggable */}
                         <div
-                            ref={imageContainerRef}
                             className="relative w-full h-full"
-                            onMouseDown={handleMouseDown}
-                            onTouchStart={handleTouchStart}
+                            onMouseDown={(e) => handleMouseDown(e, index)}
+                            onTouchStart={(e) => handleTouchStart(e, index)}
                             style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
                         >
                             <img
-                                src={imageUrl}
-                                alt="Your design"
+                                src={image.url}
+                                alt={`Design ${index + 1}`}
                                 className="max-w-full max-h-full object-contain"
                                 draggable="false"
                             />
 
-                            {/* Conditionally render controls based on isSelected */}
-                            {isSelected && (
+                            {/* Control handles for selected image */}
+                            {image.isSelected && (
                                 <>
                                     {/* Resize handle */}
                                     <div
                                         className="absolute w-6 h-6 bg-blue-500 rounded-full right-0 bottom-0 cursor-se-resize transform translate-x-1/2 translate-y-1/2 border-2 border-white flex items-center justify-center"
-                                        onMouseDown={handleResizeStart}
-                                        onTouchStart={handleResizeTouchStart}
+                                        onMouseDown={(e) => handleResizeStart(e, index)}
+                                        onTouchStart={(e) => handleResizeTouchStart(e, index)}
                                     >
-                                        {/* Simple diagonal arrow icon for resize */}
                                         <span className="text-white text-xs font-bold transform rotate-45">↔</span>
                                     </div>
 
-                                    {/* Rotation handle */}
+                                    {/* Rotate handle */}
                                     <div
                                         className="absolute w-6 h-6 bg-green-500 rounded-full top-0 cursor-move transform -translate-x-1/2 -translate-y-4 border-2 border-white flex items-center justify-center"
-                                        onMouseDown={handleRotateStart}
-                                        onTouchStart={handleRotateTouchStart}
+                                        onMouseDown={(e) => handleRotateStart(e, index)}
+                                        onTouchStart={(e) => handleRotateTouchStart(e, index)}
                                     >
-                                        {/* Simple rotation icon */}
                                         <span className="text-white text-xs">↻</span>
                                     </div>
 
-                                    {/* Close button */}
+                                    {/* Remove button */}
                                     <button
-                                        onClick={handleClose}
-                                        className="absolute top-0 right-0 w-6 h-6  rounded-full text-white flex items-center justify-center transform translate-x-1/2 -translate-y-1/2"
+                                        onClick={() => handleRemoveImage(index)}
+                                        className="absolute top-0 right-0 w-6 h-6 rounded-full text-white flex items-center justify-center transform translate-x-1/2 -translate-y-1/2"
                                         title="Remove image"
                                     >
                                         <img
@@ -325,36 +422,20 @@ const PreviewProduct: React.FC = () => {
                             )}
                         </div>
                     </div>
-                )}
+                ))}
             </div>
 
-            {/* Navigation and control buttons */}
+            {/* View toggle */}
             <div className="flex justify-between space-x-20 mb-4">
-                <button
-                    onClick={toggleView}
-                    className="flex justify-center w-12 h-12"
-                >
-                    <img
-                        src="/icons/arrow_left.svg"
-                        alt="Previous View"
-                        className="w-4 h-4"
-                    />
+                <button onClick={toggleView} className="flex justify-center w-12 h-12">
+                    <img src="/icons/arrow_left.svg" alt="Previous" className="w-4 h-4" />
                 </button>
-
-                <button
-                    onClick={toggleView}
-                    className="flex justify-center w-12 h-12"
-                >
-                    <img
-                        src="/icons/arrow_right.svg"
-                        alt="Next View"
-                        className="w-4 h-4"
-                    />
+                <button onClick={toggleView} className="flex justify-center w-12 h-12">
+                    <img src="/icons/arrow_right.svg" alt="Next" className="w-4 h-4" />
                 </button>
             </div>
 
-
-            {/* Add prevent-scroll style for mobile */}
+            {/* Mobile styling */}
             <style jsx global>{`
                 @media (max-width: 768px) {
                     body.dragging {
