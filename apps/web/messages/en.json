@@ -4,5 +4,11 @@
     "login": "Go to the login page",
     "designer_tool": "customize your products",
     "default_designer_Page": "get started !  "
+  },
+  "RecentUploads": {
+    "title": "Recent Uploads",
+    "no_uploads": "No uploads yet",
+    "upload": "Upload Image",
+    "apply": "Apply"
   }
 }

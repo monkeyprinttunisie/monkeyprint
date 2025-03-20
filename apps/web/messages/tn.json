@@ -2,7 +2,13 @@
   "HomePage": {
     "title": "!مرحبا",
     "login": "login اعمل",
-    "designer_tool": "Akhtar 3ala kifek  ",
-    "default_designer_Page": "Aya nebdew ! "
+    "designer_tool": "أختار على كيفك  ",
+    "default_designer_Page": "! هيا نبداو  "
+  },
+  "RecentUploads": {
+    "title": "تصاور استعملتهم",
+    "no_uploads": "ما عندكش تصويرة",
+    "upload": "أختار تصويرة ",
+    "apply": "استعملها"
   }
 }
