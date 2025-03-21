@@ -1,19 +1,27 @@
 "use client";
 
 import { signInAction } from "@/actions/authActions";
-import { Button } from "./button";
+import { Button } from "@/components/button";
 
 interface SignInProps {
   provider: string;
+  iconPath?: string;
+  className?: string;
 }
 
-export default function SignIn({ provider }: SignInProps) {
+const providerIcons: Record<string, string> = {
+  google: "bg-[url('/icons/google.svg')]",
+  facebook: "bg-[url('/icons/facebook.svg')]",
+};
+
+export default function SignIn({ provider, className }: SignInProps) {
   return (
     <Button
-      className="bg-blue-500 text-white px-4 py-2 rounded"
+      className={
+        className +
+        ` p-4  w-[54px] h-[54px] bg-[#F4F3FC] border border-[#004CFF] rounded-full bg-no-repeat bg-center ${providerIcons[provider] || ""} bg-[length:50%_50%]`
+      }
       onClick={() => signInAction(provider)}
-    >
-      Sign in with {provider.charAt(0).toUpperCase() + provider.slice(1)}
-    </Button>
+    />
   );
 }
