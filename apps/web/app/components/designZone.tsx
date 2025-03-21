@@ -24,7 +24,7 @@ const DesignZone: React.FC<DesignZoneProps> = ({
 }) => {
     return (
         <div
-            className={`absolute ${showBorder ? 'border-2 border-dashed border-blue-400 border-opacity-90' : ''}`}
+            className={`absolute ${showBorder ? 'border-2 border-dashed border-blue-400' : ''}`}
             style={{
                 left: `50%`,
                 top: `60%`,
@@ -32,6 +32,7 @@ const DesignZone: React.FC<DesignZoneProps> = ({
                 height: `${zone.height}px`,
                 transform: `translate(-50%, -50%) translate(${zone.x}px, ${zone.y}px) rotate(${zone.rotation}deg)`,
                 overflow: 'hidden',
+                borderColor: showBorder ? 'rgba(96, 165, 250, 0.4)' : 'transparent',
                 zIndex: isActive ? 4 : 1
             }}
             data-zone-id={zone.id}
