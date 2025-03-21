@@ -15,11 +15,14 @@ enum Role {
 
 model User {
   id                   String    @id @default(cuid())
-  name                 String?
+  name                 String?   //store name
+  firstName            String?   // Owner's first name
+  lastName             String?   // Owner's last name
   email                String    @unique
   emailVerified        DateTime?
   password             String?
   image                String?
+  phoneNumber          String?   // phone number with country code
   role                 Role      @default(DROPSHIPPING)
   accounts             Account[]
   sessions             Session[]
