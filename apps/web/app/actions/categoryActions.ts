@@ -106,10 +106,7 @@ export async function deleteCategory(id: string): Promise<CategoryResponse> {
     await db.categoryRelation.deleteMany({
       where: { OR: [{ parentId: id }, { childId: id }] },
     });
-    const deletedCategory = await db.category.update({
-      where: { id },
-      data: { isDeleted: true },
-    });
+    const deletedCategory = await db.category.softDelete({ id });
 
     revalidatePath("/categories");
     revalidatePath("/products");
@@ -201,7 +198,6 @@ export async function getCategoriesByType(
 ): Promise<CategoryResponse> {
   try {
     const categories = await db.category.findMany({
-      where: { type, isDeleted: false },
       include: {
         childCategories: {
           include: {
