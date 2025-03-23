@@ -10,5 +10,16 @@
     "no_uploads": "ما عندكش تصويرة",
     "upload": "أختار تصويرة ",
     "apply": "استعملها"
+    "title": "!مرحبابيك",
+    "login": "login اعمل"
+  },
+  "LoginPage": {
+    "title": "أهلا بيك",
+    "subTitle": "شهل غيبة؟ خليت علينا بلاصة",
+    "emailPlaceholder": "إمايل متاعك",
+    "passwordPlaceholder": "كلمة السّر",
+    "oAuthMessage": "او أدخل بل",
+    "regiterMessage": "جديد معانا؟",
+    "signUp": "سجّل"
   }
 }
