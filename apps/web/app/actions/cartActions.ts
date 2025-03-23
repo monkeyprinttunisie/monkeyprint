@@ -26,7 +26,10 @@ export async function addToCartAction(product: CartItem) {
   return cart;
 }
 
-export async function updateCartItemQuantityAction(productId: string, quantity: number) {
+export async function updateCartItemQuantityAction(
+  productId: string,
+  quantity: number
+) {
   const cart = await fetchCart();
   const product = cart.find((item) => item.id === productId);
 
@@ -38,6 +41,9 @@ export async function updateCartItemQuantityAction(productId: string, quantity: 
     throw new Error("Cannot add more than available stock.");
   }*/
 
+  if (quantity <= 0) {
+    return removeFromCartAction(productId);
+  }
   product.quantity = quantity;
   (await cookies()).set("cart", JSON.stringify(cart));
   return cart;
