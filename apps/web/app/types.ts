@@ -1,4 +1,4 @@
-import { CategoryType } from "@monkeyprint/db";
+import { CategoryType, OrderStatus, ShippingMethod } from "@monkeyprint/db";
 
 export interface Product {
   id: string;
@@ -143,5 +143,45 @@ export interface ProductResponse {
   success: boolean;
   product?: Product;
   products?: Product[];
+  error?: string;
+}
+
+// Order related types
+export interface ShippingAddress {
+  country: string;
+  address: string;
+  city: string;
+  postcode: string;
+}
+
+export interface ContactInfo {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string;
+}
+
+export interface OrderItem extends CartItem {
+  orderId: string;
+}
+
+export interface Order {
+  id: string;
+  userId?: string | null; // Change this to accept null as well
+  status: OrderStatus;
+  totalPrice: number;
+  shippingMethod: ShippingMethod;
+  shippingFee: number;
+  items: OrderItem[];
+  shippingAddress?: ShippingAddress;
+  contactInfo?: ContactInfo;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface OrderResponse {
+  success: boolean;
+  order?: Order;
+  orders?: Order[];
   error?: string;
 }
