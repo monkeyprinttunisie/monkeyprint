@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   },
   images: {
     domains: ["c6ha9vzzh0.ufs.sh", "ufs.sh", "utfs.io"],
+    unoptimized: process.env.NODE_ENV === 'development',
   },
 };
 
