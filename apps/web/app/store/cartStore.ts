@@ -1,7 +1,6 @@
 import { createStore } from "zustand/vanilla";
-import { CartItem, CartState } from "@/types";
+import { CartState } from "@/types";
 import {
-  fetchCart,
   addToCartAction,
   updateCartItemQuantityAction,
   removeFromCartAction,
