@@ -9,18 +9,18 @@ import { useRouter } from "next/navigation";
 export default function CategoriesPage() {
   const router = useRouter();
 
-   const targetCategories = useCategoryStore((state) => state.targetCategories);
-   const productCategories = useCategoryStore(
-     (state) => state.productCategories
-   );
-   const subproductCategories = useCategoryStore(
-     (state) => state.subproductCategories
-   );
-   const loading = useCategoryStore((state) => state.loading);
-   const refreshCategories = useCategoryStore(
-     (state) => state.refreshCategories
-   );
-   
+  const targetCategories = useCategoryStore((state) => state.targetCategories);
+  const productCategories = useCategoryStore(
+    (state) => state.productCategories
+  );
+  const subproductCategories = useCategoryStore(
+    (state) => state.subproductCategories
+  );
+  const loading = useCategoryStore((state) => state.loading);
+  const refreshCategories = useCategoryStore(
+    (state) => state.refreshCategories
+  );
+
   const [deleteMessage, setDeleteMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"success" | "error">(
     "success"
