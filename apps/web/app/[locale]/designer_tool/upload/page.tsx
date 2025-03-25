@@ -76,5 +76,5 @@ export default function Page() {
         );
     };
 
-    return <UploaderComponent handleUploadComplete={handleUploadComplete} />;
+    return <div className="items-center flex justify-center h-screen bg-gray-50"><UploaderComponent handleUploadComplete={handleUploadComplete} /></div>;
 }
