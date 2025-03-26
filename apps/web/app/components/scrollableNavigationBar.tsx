@@ -126,18 +126,6 @@ export default function ScrollableNav() {
             </div>
           </Link>
 
-          <Link href="/designer_tool/recent-uploads">
-            <div
-              onClick={() => handleLinkClick("recent-uploads")}
-              className={` rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center  ${activeLink === "recent-uploads" ? "bg-[#ECF1FF]" : ""}`}
-            >
-              <IconButton
-                iconSrc="/icons/recentUpload_icon.svg"
-                altText="Recent Uploads Icon"
-              />
-            </div>
-          </Link>
-
           <Link href="/designer_tool/ai-generation">
             <div
               onClick={() => handleLinkClick("ai-generation")}
