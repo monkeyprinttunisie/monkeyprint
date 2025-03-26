@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { UploadDropzone } from "@/uploadthing";
+import UploaderComponent from "@/components/UploaderComponent";
 import Image from "next/image";
 import { createProduct } from "@/actions/productActions";
 import { useCategoryStore } from "@/store/useCategoryStore";
@@ -270,15 +270,7 @@ const AddProduct: React.FC = () => {
 
           <div className="space-y-3 pt-2">
             <label className="block text-sm font-medium">Product Image</label>
-            <UploadDropzone
-              endpoint="productImage"
-              headers={{
-                Authorization: `Bearer ${encodedToken}`,
-              }}
-              onClientUploadComplete={handleUploadComplete}
-              onUploadError={handleUploadError}
-              className="ut-label:text-sm ut-allowed-content:text-xs ut-upload-icon:h-8 ut-upload-icon:w-8 ut-button:py-1 ut-button:px-2 ut-button:text-sm ut-container:p-4"
-            />
+            <UploaderComponent handleUploadComplete={handleUploadComplete} />
             {imageUrl && (
               <div className="w-full mt-4 rounded-lg overflow-hidden bg-gray-50 flex justify-center">
                 <Image
