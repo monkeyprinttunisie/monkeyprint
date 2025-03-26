@@ -17,6 +17,7 @@ interface CheckoutProps {
   onShippingMethodChange: (method: ShippingMethod) => void;
   shippingMethod: ShippingMethod;
   setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsOrderComplete: React.Dispatch<React.SetStateAction<boolean>>; // Add this
 }
 
 export default function Checkout({
@@ -26,6 +27,7 @@ export default function Checkout({
   shippingMethod,
   onShippingMethodChange,
   setIsProcessing,
+  setIsOrderComplete,
 }: CheckoutProps) {
   const router = useRouter();
   const [isShippingAddressSheetOpen, setIsShippingAddressSheetOpen] =
@@ -70,6 +72,7 @@ export default function Checkout({
           cartItems: cartCopyForSummary,
         });
         setOrderComplete(true);
+        setIsOrderComplete(true);
         await clearCart();
       } else {
         alert(result.error || "Failed to create order. Please try again.");
@@ -196,7 +199,7 @@ export default function Checkout({
                     </span>
                   </div>
                   <div className="flex-1">
-                    <p className="font-nunito-sans font-meduim text-[16px]  ml-[3vw] text-black">
+                    <p className="font-nunito-sans font-meduim text-[16px] ml-[3vw] text-black">
                       {item.name}
                     </p>
                   </div>
@@ -210,7 +213,7 @@ export default function Checkout({
             </div>
           </div>
           {/* Shipping Methods Section */}
-          <div className="my-4">
+          <div className="my-4 mb-18">
             <h2 className="font-raleway font-bold text-[24px] text-[#202020] mb-3">
               Shipping Options
             </h2>

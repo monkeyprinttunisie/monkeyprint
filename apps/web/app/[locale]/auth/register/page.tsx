@@ -170,7 +170,7 @@ export default function RegisterPage() {
   );
 
   return (
-    <div className="bg-[url('/icons/register-bg.svg')] bg-cover bg-center px-5 h-screen flex flex-col  min-h-screen justify-center overflow-auto">
+    <div className="bg-[url('/icons/register-bg.svg')] bg-cover bg-center px-5 h-screen flex flex-col  max-h-[92vh] justify-center overflow-auto">
       {/* Success notification */}
       {message && (
         <div
