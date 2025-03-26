@@ -19,6 +19,7 @@
     "passwordPlaceholder": "كلمة السّر",
     "oAuthMessage": "او أدخل بل",
     "regiterMessage": "جديد معانا؟",
-    "signUp": "سجّل"
+    "signUp": "سجّل",
+    "forgotPassword": "نسيت كلمة السّر؟"
   }
 }
