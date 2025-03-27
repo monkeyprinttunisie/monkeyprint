@@ -8,8 +8,14 @@ import {
   deleteOrder,
 } from "@/actions/orderActions";
 import { Order } from "@/types";
-import { OrderStatus } from "@monkeyprint/db";
-
+enum OrderStatus {
+  CANCELED = "CANCELED",
+  CONFIRMED = "CONFIRMED",
+  PRINTED = "PRINTED",
+  FULFILLED = "FULFILLED",
+  PAID = "PAID",
+  PENDING = "PENDING",
+}
 interface OrderDetailClientProps {
   id: string;
 }
@@ -74,7 +80,7 @@ export default function OrderDetailClient({ id }: OrderDetailClientProps) {
     }
   };
 
-  const getStatusBadgeColor = (status: OrderStatus) => {
+  const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "PENDING":
         return "bg-yellow-100 text-yellow-800";
