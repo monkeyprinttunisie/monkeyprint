@@ -1,9 +1,5 @@
 import OrderDetailClient from "./order-detail-client";
 
-export default function OrderDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function OrderDetailPage({ params }: any) {
   return <OrderDetailClient id={params.id} />;
 }
