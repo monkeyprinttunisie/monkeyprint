@@ -19,6 +19,7 @@
     "passwordPlaceholder": "Password",
     "oAuthMessage": "OR Continue with",
     "regiterMessage": "Create An Account",
-    "signUp": "Sign Up"
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot Password"
   }
 }

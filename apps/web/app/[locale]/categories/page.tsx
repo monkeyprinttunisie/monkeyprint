@@ -78,14 +78,14 @@ export default function CategoriesPage() {
       router.push(`/categories/delete_category/${id}`);
       /* const result = await deleteCategory(id);
 
-      if (result.success) {
-        setDeleteMessage("Category deleted successfully");
-        setMessageType("success");
-        refreshCategories();
-      } else {
-        setDeleteMessage(result.error || "Failed to delete category");
-        setMessageType("error");
-      } */
+if (result.success) {
+setDeleteMessage("Category deleted successfully");
+setMessageType("success");
+refreshCategories();
+} else {
+setDeleteMessage(result.error || "Failed to delete category");
+setMessageType("error");
+} */
     } catch (error) {
       setDeleteMessage("An error occurred while deleting the category");
       setMessageType("error");
@@ -98,7 +98,7 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-6 mb-[2vh]">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Category Management</h1>
         <Link href="/categories/create" className="btn btn-primary">

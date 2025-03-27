@@ -36,17 +36,26 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4 py-12 relative overflow-hidden">
-      {/* Top-right decorative shapes */}
+    <div className="min-h-[92vh] flex flex-col items-center justify-center bg-white px-4 py-12 relative overflow-hidden">
       <div className="absolute -top-10 -right-9 w-[374px] transform -rotate-[0deg]">
         <img src="/icons/bubble02.svg" alt="" className="w-full" />
       </div>
       <div className="absolute -right-30 -top-20 w-[403px] transform -rotate-z-10">
         <img src="/icons/bubble01.svg" alt="" className="w-full" />
       </div>
-
-      <div className="w-full max-w-md z-10">
-        <div className="fixed right-0 top-[13vh] left-0">
+      {message && (
+        <div
+          className={`fixed top-[3vh] left-0 right-0 mx-auto w-[90%] max-w-md p-4 rounded-lg text-center shadow-md z-50 ${
+            message.includes("sent")
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {message}
+        </div>
+      )}
+      <div className="w-full max-w-md ">
+        <div className="fixed right-0 top-[14vh] left-0">
           <div className="flex flex-col items-center mb-8">
             <div className="rounded-full p-1 mb-6 border-3 border-white shadow-lg">
               <img
@@ -55,17 +64,17 @@ export default function ForgotPasswordPage() {
                 className="w-24 h-24 p-1 rounded-[100%]"
               />
             </div>
-            <h1 className="text-2xl font-medium text-gray-900 text-center">
+            <h1 className="text-2xl font-semibold text-gray-900 text-center">
               Password Recovery
             </h1>
-            <p className="text-black font-light text-xl text-center mt-2">
+            <p className="text-black font-light text-l text-center mt-2">
               Please enter your email address below
             </p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2 fixed top-[41vh] left-[5vw] right-[5vw]">
+          <div className="space-y-2 fixed top-[42vh] left-[5vw] right-[5vw]">
             <input
               type="email"
               id="email"
@@ -99,18 +108,6 @@ export default function ForgotPasswordPage() {
               Cancel
             </button>
           </div>
-
-          {message && (
-            <div
-              className={`p-3 rounded-lg text-sm ${
-                message.includes("sent")
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-              }`}
-            >
-              {message}
-            </div>
-          )}
         </form>
       </div>
     </div>

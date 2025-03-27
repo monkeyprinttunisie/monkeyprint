@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -10,6 +10,7 @@ export default function ResetPasswordPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,7 +47,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4 py-12 relative overflow-hidden">
+    <div className="min-h-[92vh] flex flex-col items-center justify-center bg-white px-4 py-12 relative overflow-hidden">
       {/* Top-right decorative shapes */}
       <div className="absolute -top-10 -right-9 w-[374px] transform -rotate-[0deg]">
         <img src="/icons/bubble02.svg" alt="" className="w-full" />
@@ -54,9 +55,19 @@ export default function ResetPasswordPage() {
       <div className="absolute -right-30 -top-20 w-[403px] transform -rotate-z-10">
         <img src="/icons/bubble01.svg" alt="" className="w-full" />
       </div>
-
-      <div className="w-full max-w-md z-10">
-        <div className="fixed right-0 top-[13vh] left-0">
+      {message && (
+        <div
+          className={`fixed top-[3vh] left-0 right-0 mx-auto w-[90%] max-w-md p-4 rounded-lg text-center shadow-md z-50 ${
+            message.includes("successfully")
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {message}
+        </div>
+      )}
+      <div className="w-full max-w-md">
+        <div className="fixed right-0 top-[14vh] left-0">
           <div className="flex flex-col items-center mb-8">
             <div className="rounded-full p-1 mb-6 border-3 border-white shadow-lg">
               <img
@@ -65,17 +76,17 @@ export default function ResetPasswordPage() {
                 className="w-24 h-24 p-1 rounded-[100%]"
               />
             </div>
-            <h1 className="text-2xl font-medium text-gray-900 text-center">
+            <h1 className="text-2xl font-semibold text-gray-900 text-center">
               Setup New Password
             </h1>
-            <p className="text-black font-light text-xl text-center mt-2">
+            <p className="text-black font-light text-l text-center mt-2 mx-2">
               Please, setup a new password for your account
             </p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="space-y-2 fixed top-[41vh] left-[5vw] right-[5vw]">
+          <div className="space-y-1 fixed top-[45vh] left-[5vw] right-[5vw]">
             <input
               type="password"
               id="password"
@@ -103,7 +114,7 @@ export default function ResetPasswordPage() {
             </p>
           </div>
 
-          <div className="fixed bottom-[11vh] space-y-4 left-0 right-0 px-8 w-full">
+          <div className="fixed bottom-[5vh] space-y-4 left-0 right-0 px-8 w-full">
             <button
               type="submit"
               disabled={isSubmitting}
@@ -114,24 +125,12 @@ export default function ResetPasswordPage() {
 
             <button
               type="button"
-              onClick={() => window.history.back()}
+              onClick={() => router.push("/auth/login")}
               className="w-full text-center text-[15px] text-[#202020] opacity-90 font-light"
             >
               Cancel
             </button>
           </div>
-
-          {message && (
-            <div
-              className={`fixed bottom-[25vh] left-[5vw] right-[5vw] p-3 rounded-lg text-sm ${
-                message.includes("successfully")
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-              }`}
-            >
-              {message}
-            </div>
-          )}
         </form>
       </div>
     </div>

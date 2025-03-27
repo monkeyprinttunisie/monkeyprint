@@ -15,7 +15,13 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | "ALL">("ALL");
+  const filteredOrders =
+    statusFilter === "ALL"
+      ? orders
+      : orders.filter((order) => order.status === statusFilter);
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -56,17 +62,19 @@ export default function OrdersPage() {
     }
   };
 
-  const handleDeleteOrder = async (orderId: string) => {
-    if (!confirm("Are you sure you want to delete this order?")) {
-      return;
-    }
+  const handleDeleteClick = (orderId: string) => {
+    setOrderToDelete(orderId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!orderToDelete) return;
 
     try {
-      const response = await deleteOrder(orderId);
+      const response = await deleteOrder(orderToDelete);
       if (response.success) {
-        // Remove from local state
         setOrders((prevOrders) =>
-          prevOrders.filter((order) => order.id !== orderId)
+          prevOrders.filter((order) => order.id !== orderToDelete)
         );
       } else {
         alert(response.error || "Failed to delete order");
@@ -74,7 +82,15 @@ export default function OrdersPage() {
     } catch (err) {
       console.error(err);
       alert("An error occurred while deleting the order");
+    } finally {
+      setIsDeleteModalOpen(false);
+      setOrderToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setOrderToDelete(null);
   };
 
   const handleViewOrder = (orderId: string) => {
@@ -130,16 +146,41 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white p-4">
-      <h1 className="font-raleway font-bold text-2xl mb-6">Orders</h1>
+    <div className="min-h-screen pb-[10vh] bg-white p-4">
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <h1 className="font-raleway font-bold text-2xl">Orders</h1>
+        <div className="flex-1 max-w-[40vw]">
+          <select
+            value={statusFilter}
+            onChange={(e) =>
+              setStatusFilter(e.target.value as OrderStatus | "ALL")
+            }
+            className="w-full h-9 px-3 text-sm border border-gray-300 rounded-md bg-white shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="ALL">All Orders</option>
+            <option value="PENDING">Pending</option>
+            <option value="CONFIRMED">Confirmed</option>
+            <option value="PRINTED">Printed</option>
+            <option value="FULFILLED">Fulfilled</option>
+            <option value="PAID">Paid</option>
+            <option value="CANCELED">Canceled</option>
+          </select>
+        </div>
+      </div>
 
       {orders.length === 0 ? (
         <div className="text-center py-10">
           <p className="font-nunito text-gray-500">No orders found</p>
         </div>
+      ) : filteredOrders.length === 0 ? (
+        <div className="text-center py-10">
+          <p className="font-nunito text-gray-500">
+            No {statusFilter.toLowerCase()} orders found
+          </p>
+        </div>
       ) : (
         <div className="space-y-4">
-          {orders.map((order) => (
+          {filteredOrders.map((order) => (
             <div
               key={order.id}
               className="border border-gray-200 rounded-lg p-4 shadow-sm"
@@ -209,7 +250,7 @@ export default function OrdersPage() {
                   View
                 </button>
                 <button
-                  onClick={() => handleDeleteOrder(order.id)}
+                  onClick={() => handleDeleteClick(order.id)}
                   className="px-3 py-1 text-sm text-red-600 border border-red-600 rounded hover:bg-red-50"
                 >
                   Delete
@@ -217,6 +258,51 @@ export default function OrdersPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-[rgba(0,66,224,0.12)] backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 animate-fadeIn">
+            <div className="mb-4 text-center">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                <svg
+                  className="h-10 w-10 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  ></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Delete Order
+              </h3>
+              <p className="text-gray-600">
+                Are you sure you want to delete this order? This action cannot
+                be undone.
+              </p>
+            </div>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={cancelDelete}
+                className="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

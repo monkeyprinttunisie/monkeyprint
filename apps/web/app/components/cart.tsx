@@ -14,6 +14,7 @@ export default function Cart() {
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const clearCart = useCartStore((state) => state.clearCart);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isOrderComplete, setIsOrderComplete] = useState(false);
   // For checkout mode
   const [shippingMethod, setShippingMethod] =
     useState<ShippingMethod>("STANDARD");
@@ -69,11 +70,11 @@ export default function Cart() {
                 <img src="/icons/empty-cart.svg" alt="empty cart" />
               )}
             </div>
-            <div className="max-h-[73vh] overflow-y-auto rounded-[4%]">
+            <div className="max-h-[67.5vh] overflow-y-auto rounded-[4%]">
               {cart.map((item) => (
                 <div key={item.id} className="flex items-center pb-4 mb-4">
                   <span className="relative inline-block">
-                    <div className="p-1.5 w-[40vw] mr-4 bg-white shadow-md shadow-[rgba(0,0,0,0.1)] rounded-[9px]">
+                    <div className="p-1.5 w-[36vw] mr-2 bg-white shadow-md shadow-[rgba(0,0,0,0.1)] rounded-[9px]">
                       <img
                         className="h-[15vh] rounded-[9px]"
                         src={item.imageUrl}
@@ -81,13 +82,13 @@ export default function Cart() {
                       />
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        className="absolute bottom-4 left-4"
+                        className="absolute bottom-3 left-3"
                       >
                         <img
                           src="/icons/delete-icon.svg"
                           alt="Delete icon"
-                          width="42"
-                          height="42"
+                          width="38"
+                          height="38"
                           onClick={(e) =>
                             (e.currentTarget.src =
                               "/icons/delete-icon-clicked.svg")
@@ -103,37 +104,35 @@ export default function Cart() {
 
                     <div className="flex mt-2 w-[45vw] justify-between items-center">
                       <div>
-                        <p className="font-raleway font-bold text-[18px] text-[#202020]">
+                        <p className="font-raleway font-bold text-[16px] text-[#202020]">
                           {item.price}dt
                         </p>
                       </div>
-
-                      <div className="flex justify-between items-center gap-1">
-                        <button
-                          onClick={() =>
-                            updateCartItemQuantity(item.id, item.quantity - 1)
-                          }
-                          className="rounded-full w-9 h-9 border-[#004BFE] border-3 hover:bg-gray-300"
-                        >
-                          <span className="font-raleway font-bold text-[24px] text-[#004BFE]">
+                      <div className="relative">
+                        <div className="absolute -right-7 -top-4.5 flex justify-between items-center gap-1">
+                          <button
+                            onClick={() =>
+                              updateCartItemQuantity(item.id, item.quantity - 1)
+                            }
+                            className="rounded-full w-8 h-8 border-[#004BFE] border-3 hover:bg-gray-300 font-raleway font-bold text-[18px] text-[#004BFE]"
+                          >
                             -
+                          </button>
+
+                          <span className="px-4 bg-[#E5EBFC] rounded-[7px]">
+                            <p className="font-raleway my-1.5 font-medium text-[16px] text-black">
+                              {item.quantity}
+                            </p>
                           </span>
-                        </button>
-                        <span className="px-4 bg-[#E5EBFC] rounded-[7px]">
-                          <p className="font-raleway my-1.5 font-medium text-[16px] text-black">
-                            {item.quantity}
-                          </p>
-                        </span>
-                        <button
-                          onClick={() =>
-                            updateCartItemQuantity(item.id, item.quantity + 1)
-                          }
-                          className="rounded-full w-9 h-9 border-[#004BFE] border-3 hover:bg-gray-300"
-                        >
-                          <span className="font-raleway font-bold text-[24px] text-[#004BFE]">
+                          <button
+                            onClick={() =>
+                              updateCartItemQuantity(item.id, item.quantity + 1)
+                            }
+                            className="rounded-full w-8 h-8 border-[#004BFE] border-3 hover:bg-gray-300 font-raleway font-bold text-[18px] text-[#004BFE]"
+                          >
                             +
-                          </span>
-                        </button>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </span>
@@ -150,76 +149,79 @@ export default function Cart() {
             shippingMethod={shippingMethod}
             onShippingMethodChange={handleShippingMethodChange}
             setIsProcessing={setIsProcessing}
+            setIsOrderComplete={setIsOrderComplete}
           />
         )}
 
         {/* Total & Checkout/Buy Button (Always visible) */}
-        <div className="fixed bottom-[8vh] left-0 w-full p-4 bg-[#E5EBFC]">
-          <div className="flex items-center justify-between">
-            <span>
-              <p className="font-bold text-gray-800">
-                <span className="font-raleway font-extrabold text-[20px] text-black">
-                  Total{" "}
-                </span>
-                <span className="font-raleway font-bold text-[18px] text-[#202020]">
-                  {totalPrice}dt
-                </span>
-              </p>
-            </span>
-            <span>
-              {!isCheckoutMode ? (
-                <button
-                  onClick={handleCheckout}
-                  disabled={cart.length === 0}
-                  className={`p-2 px-7.5 rounded-[11px] ${
-                    cart.length > 0
-                      ? "bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300 ease-in-out active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
-                      : "bg-white text-[#0C0C0C] cursor-not-allowed"
-                  }`}
-                >
-                  Checkout
-                </button>
-              ) : (
-                <button
-                  onClick={handleBuy}
-                  disabled={cart.length === 0 || isProcessing}
-                  className={`p-2 px-7.5 rounded-[11px] ${
-                    cart.length > 0
-                      ? "bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300 ease-in-out active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
-                      : "bg-white text-[#0C0C0C] cursor-not-allowed"
-                  }`}
-                >
-                  {isProcessing ? (
-                    <div className="flex justify-center items-center">
-                      <svg
-                        className="animate-spin h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                    </div>
-                  ) : (
-                    "Buy"
-                  )}
-                </button>
-              )}
-            </span>
+        {!isOrderComplete && (
+          <div className="fixed bottom-[8vh] left-0 w-full p-4 bg-[#E5EBFC]">
+            <div className="flex items-center justify-between">
+              <span>
+                <p className="font-bold text-gray-800">
+                  <span className="font-raleway font-extrabold text-[20px] text-black">
+                    Total{" "}
+                  </span>
+                  <span className="font-raleway font-bold text-[18px] text-[#202020]">
+                    {totalPrice}dt
+                  </span>
+                </p>
+              </span>
+              <span>
+                {!isCheckoutMode ? (
+                  <button
+                    onClick={handleCheckout}
+                    disabled={cart.length === 0}
+                    className={`p-2 px-7.5 rounded-[11px] ${
+                      cart.length > 0
+                        ? "bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300 ease-in-out active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+                        : "bg-white text-[#0C0C0C] cursor-not-allowed"
+                    }`}
+                  >
+                    Checkout
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleBuy}
+                    disabled={cart.length === 0 || isProcessing}
+                    className={`p-2 px-7.5 rounded-[11px] min-w-[90px] ${
+                      cart.length > 0
+                        ? "bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300 ease-in-out active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+                        : "bg-white text-[#0C0C0C] cursor-not-allowed"
+                    }`}
+                  >
+                    {isProcessing ? (
+                      <div className="flex justify-center items-center">
+                        <svg
+                          className="animate-spin h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                      </div>
+                    ) : (
+                      "Buy"
+                    )}
+                  </button>
+                )}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
