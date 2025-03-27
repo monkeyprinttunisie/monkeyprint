@@ -9,12 +9,27 @@ export default function ScrollableNav() {
   const router = useRouter();
   const [activeLink, setActiveLink] = useState<string>("products");
 
+  // Update with pathname dependency
   useEffect(() => {
+    // Read from localStorage whenever path changes
     const savedLink = localStorage.getItem("activeNavLink");
     if (savedLink) {
       setActiveLink(savedLink);
     }
-  }, []);
+
+    // Listen for localStorage changes from other components
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "activeNavLink") {
+        setActiveLink(e.newValue || "products");
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [pathname]);
 
   const handleLinkClick = (linkName: string) => {
     setActiveLink(linkName);
@@ -85,7 +100,7 @@ export default function ScrollableNav() {
             <IconButton
               iconSrc="/icons/text_icon.svg"
               altText="Text Icon"
-              classN={`rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center ${activeLink === "color" ? "bg-[#ECF1FF]" : ""}`}
+              classN={`rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center ${activeLink === "text" ? "bg-[#ECF1FF]" : ""}`}
 
             />
           </div>

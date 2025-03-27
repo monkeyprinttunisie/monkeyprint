@@ -65,7 +65,7 @@ export default function Page() {
 
         // Method 1: Set selectedImages for previewProduct to detect
         localStorage.setItem("selectedImages", JSON.stringify([uploadedFile.ufsUrl]));
-        localStorage.setItem("createNewDesign", "false"); // Add to existing design if any
+        localStorage.setItem("createNewDesign", "false");
 
         // Method 2: Also pass via URL for direct loading
         const zoneParam = targetZoneId ? `&zoneId=${targetZoneId}` : '';

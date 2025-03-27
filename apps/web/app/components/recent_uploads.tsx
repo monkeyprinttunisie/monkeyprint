@@ -63,7 +63,11 @@ export default function RecentUploads() {
 
             // Set active nav link
             localStorage.setItem("activeNavLink", "products");
-
+            
+            // Dispatch storage event to notify other components
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new Event('storage'));
+            }
             // Navigate to preview with the first selected image as parameter
             router.push(`/designer_tool/products/previewProduct?product=${selectedProduct}&image=${encodeURIComponent(selectedImages[0])}`);
         } catch (error) {
@@ -85,7 +89,6 @@ export default function RecentUploads() {
                                 className={`cursor-pointer relative group bg-white p-3 rounded-lg shadow-md ${selectedIndices.includes(index)}`}
                                 onClick={() => handleImageClick(index)}
                             >
-                                {/* Fixed aspect ratio container for consistent sizing */}
                                 <div className="relative aspect-square w-full overflow-hidden rounded-md">
                                     <Image
                                         src={image}
@@ -139,14 +142,14 @@ export default function RecentUploads() {
                 </div>
             </div>
 
-            {/* Apply button */}
+            {/* Apply button - fixed at the bottom of the screen */}
             {images.length > 0 && (
-                <div className="w-full flex justify-center p-2 mt-2">
+                <div className="fixed bottom-0 left-0 right-0 flex justify-center p-16   z-10">
                     <button
                         onClick={handleApplyClick}
                         disabled={selectedIndices.length === 0}
-                        className={`py-3 px-8 rounded-full text-white font-medium shadow-lg transition-all
-                                ${selectedIndices.length !== 0
+                        className={`py-2 px-6 rounded-full text-white font-medium shadow-lg transition-all
+                    ${selectedIndices.length !== 0
                                 ? 'bg-blue-600 hover:bg-blue-700'
                                 : 'bg-gray-400 cursor-not-allowed'}`}
                     >
