@@ -1,6 +1,11 @@
 "use server";
 
-import { ProductResponse, IProductData, Product } from "@/types";
+import {
+  ProductResponse,
+  IProductData,
+  Product,
+  PaginationProps,
+} from "@/types";
 import { db } from "@monkeyprint/db";
 import { productUpdateSchema } from "@monkeyprint/utils/zod";
 import { revalidatePath } from "next/cache";
@@ -73,14 +78,14 @@ export async function listProductsAction(): Promise<{
 
     return {
       success: true,
-      products
+      products,
     }; //to make sure we always return array even if no products found
   } catch (error) {
     console.error("Error fetching products:", error);
     return {
       success: false,
       error: "Failed to fetch products",
-    };; // Return empty array instead of throwing error
+    }; // Return empty array instead of throwing error
   }
 }
 
@@ -277,5 +282,55 @@ export async function getProductById(id: string): Promise<ProductResponse> {
   } catch (error) {
     console.error("Error fetching product:", error);
     return { success: false, error: "Failed to fetch product" };
+  }
+}
+
+export async function getFirstFourProductsByCategorie(
+  categoryId: string
+): Promise<ProductResponse> {
+  try {
+    const result = await getProductsByCategories([categoryId]);
+    const products = result.products?.slice(0, 4);
+    return {
+      success: true,
+      products,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: "An error occurred while fetching products.",
+    };
+  }
+}
+
+export async function getNewProducts({
+  take,
+  skip,
+}: PaginationProps): Promise<ProductResponse> {
+  try {
+    const products = await db.product.findMany({
+      take: take,
+      skip: skip * take,
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return {
+      success: true,
+      products,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: "An error occurred while fetching products.",
+    };
   }
 }

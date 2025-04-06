@@ -145,3 +145,7 @@ export interface ProductResponse {
   products?: Product[];
   error?: string;
 }
+export interface PaginationProps {
+  take: number;
+  skip: number;
+}
