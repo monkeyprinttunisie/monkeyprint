@@ -275,9 +275,9 @@ export default function ColorPage() {
                                             </div>
 
                                             {/* Color grid */}
-                                            <div className="w-3/4 rounded-lg mb-8   h-30"> {/* Added fixed height and background */}
+                                            <div className="w-3/4 rounded-lg mb-8   h-10"> {/* Added fixed height and background */}
                                                 <div
-                                                    className="grid grid-cols-5 gap-2 max-h-28 overflow-y-auto pr-2 pb-1"
+                                                    className="grid grid-cols-5 gap-2 max-h-28 overflow-y-auto pl-1 pb-1"
                                                     style={{ scrollbarWidth: 'thin' }} /* For Firefox */
                                                 >
                                                     {adminColors.map((color, index) => (
@@ -292,7 +292,7 @@ export default function ColorPage() {
 
 
                                                 {/* Apply button */}
-                                                <div className="flex justify-end mt-3">
+                                                <div className="flex justify-end mt-[-30px] mr-[4vw] ">
                                                     <button
                                                         className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white h-6 w-6 rounded-full"
                                                         onClick={applyColorToProduct}
