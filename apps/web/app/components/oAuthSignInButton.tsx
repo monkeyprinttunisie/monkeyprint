@@ -1,7 +1,7 @@
 "use client";
 
 import { signInAction } from "@/actions/authActions";
-import { Button } from "./button";
+import { Button } from "@/components/button";
 
 interface SignInProps {
   provider: string;

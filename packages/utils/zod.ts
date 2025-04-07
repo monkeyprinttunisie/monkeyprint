@@ -16,6 +16,10 @@ export const registerSchema = z.object({
     .min(1, "Password is required")
     .min(8, "Password must have more than 8 characters"),
   role: RoleEnum,
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  image: z.string().optional(),
 });
 
 import { object, string } from "zod";

@@ -1,4 +1,32 @@
-import { CategoryType } from "@monkeyprint/db";
+import { CategoryType, OrderStatus, ShippingMethod } from "@monkeyprint/db";
+
+// types.ts
+export interface DesignZone {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  maxImagesAllowed?: number;
+}
+export interface ProductOption {
+  id: string;
+  name: string;
+  price?: number;
+  ImpressionType?: string;
+  link?: string;
+  description: string;
+  images: {
+    front: string;
+    back: string;
+  };
+  designZones: {
+    front: DesignZone[];
+    back: DesignZone[];
+  };
+}
 
 export interface Product {
   id: string;
@@ -145,7 +173,50 @@ export interface ProductResponse {
   products?: Product[];
   error?: string;
 }
+
 export interface PaginationProps {
   take: number;
   skip: number;
 }
+
+// Order related types
+export interface ShippingAddress {
+  country: string;
+  address: string;
+  city: string;
+  postcode: string;
+}
+
+export interface ContactInfo {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string;
+}
+
+export interface OrderItem extends CartItem {
+  orderId: string;
+}
+
+export interface Order {
+  id: string;
+  userId?: string | null;
+  status: OrderStatus;
+  totalPrice: number;
+  shippingMethod: ShippingMethod;
+  shippingFee: number;
+  items: OrderItem[];
+  shippingAddress?: ShippingAddress;
+  contactInfo?: ContactInfo;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface OrderResponse {
+  success: boolean;
+  order?: Order;
+  orders?: Order[];
+  error?: string;
+}
+
+

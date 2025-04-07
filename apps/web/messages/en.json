@@ -1,9 +1,17 @@
 {
   "HomePage": {
     "title": "Hello world!",
+    "login": "Go to the login page",
+    "designer_tool": "customize your products",
+    "default_designer_Page": "get started !  "
+  },
+  "RecentUploads": {
+    "title": "Recent Uploads",
+    "no_uploads": "No uploads yet",
+    "upload": "Upload Image",
+    "apply": "Apply",
     "login": "Go to the login page"
   },
-
   "LoginPage": {
     "title": "Login",
     "subTitle": "Good to see you back!",
@@ -11,6 +19,7 @@
     "passwordPlaceholder": "Password",
     "oAuthMessage": "OR Continue with",
     "regiterMessage": "Create An Account",
-    "signUp": "Sign Up"
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot Password"
   }
 }

@@ -18,5 +18,12 @@
   "packageManager": "pnpm@9.0.0",
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "@next/font": "^14.2.15",
+    "framer-motion": "^12.4.10",
+    "tailwind-scrollbar": "^4.0.1",
+    "uploadthing": "^7.5.2",
+    "zustand": "^5.0.3"
   }
 }

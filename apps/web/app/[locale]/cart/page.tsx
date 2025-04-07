@@ -1,4 +1,3 @@
-// cart/page.tsx
 "use client";
 
 import Cart from "@/components/cart";

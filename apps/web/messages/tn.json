@@ -1,9 +1,17 @@
 {
   "HomePage": {
-    "title": "!مرحبابيك",
+    "title": "!مرحبا",
+    "login": "login اعمل",
+    "designer_tool": "أختار على كيفك  ",
+    "default_designer_Page": "! هيا نبداو  "
+  },
+  "RecentUploads": {
+    "title": "تصاور استعملتهم",
+    "no_uploads": "ما عندكش تصويرة",
+    "upload": "أختار تصويرة ",
+    "apply": "استعملها",
     "login": "login اعمل"
   },
-
   "LoginPage": {
     "title": "أهلا بيك",
     "subTitle": "شهل غيبة؟ خليت علينا بلاصة",
@@ -11,6 +19,7 @@
     "passwordPlaceholder": "كلمة السّر",
     "oAuthMessage": "او أدخل بل",
     "regiterMessage": "جديد معانا؟",
-    "signUp": "سجّل"
+    "signUp": "سجّل",
+    "forgotPassword": "نسيت كلمة السّر؟"
   }
 }

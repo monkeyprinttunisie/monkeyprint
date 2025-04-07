@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -15,11 +16,14 @@ enum Role {
 
 model User {
   id                   String    @id @default(cuid())
-  name                 String?
+  name                 String? //store name
+  firstName            String? // Owner's first name
+  lastName             String? // Owner's last name
   email                String    @unique
   emailVerified        DateTime?
   password             String?
   image                String?
+  phoneNumber          String? // phone number with country code
   role                 Role      @default(DROPSHIPPING)
   accounts             Account[]
   sessions             Session[]
@@ -80,6 +84,7 @@ model Product {
   isDeleted   Boolean           @default(false)
   stock       Int?              @default(0)
   categories  ProductCategory[]
+  orderItems  OrderItem[]
 }
 
 model Category {
@@ -122,4 +127,65 @@ model ProductCategory {
   category   Category @relation(fields: [categoryId], references: [id])
 
   @@id([productId, categoryId])
+}
+
+enum OrderStatus {
+  CANCELED
+  CONFIRMED
+  PRINTED
+  FULFILLED
+  PAID
+  PENDING
+}
+
+enum ShippingMethod {
+  STANDARD
+  EXPRESS
+}
+
+model Order {
+  id              String           @id @default(uuid())
+  userId          String?
+  status          OrderStatus      @default(PENDING)
+  totalPrice      Float
+  shippingMethod  ShippingMethod   @default(STANDARD)
+  shippingFee     Float
+  items           OrderItem[]
+  shippingAddress ShippingAddress?
+  contactInfo     ContactInfo?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  isDeleted       Boolean          @default(false)
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+  name      String
+  imageUrl  String
+}
+
+model ShippingAddress {
+  id       String @id @default(uuid())
+  orderId  String @unique
+  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  country  String @default("Tunisia")
+  address  String
+  city     String
+  postcode String
+}
+
+model ContactInfo {
+  id        String  @id @default(uuid())
+  orderId   String  @unique
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  firstName String
+  lastName  String
+  phone     String
+  email     String?
 }

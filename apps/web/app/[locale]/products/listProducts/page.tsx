@@ -94,8 +94,8 @@ export default function ProductHome() {
                     {product.name}
                   </h2>
                 </div>
-                <div className="flex items-center justify-between gap-4 mt-2">
-                  <p className="font-raleway font-bold text-[17px] text-gray-800">
+                <div className="flex items-center justify-between mt-2">
+                  <p className="font-raleway font-bold text-[4.5vw] text-gray-800">
                     {product.price.toFixed(2)}dt
                   </p>
                   <AddToCartButton product={product} />
