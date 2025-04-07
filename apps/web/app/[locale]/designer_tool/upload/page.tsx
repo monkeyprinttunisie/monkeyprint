@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import useImageStore from "@/store/imageStore";
 import { useState, useEffect } from "react";
 import { products } from "@/productOptions";
-
+import RecentUploads from "@/components/recent_uploads";
 interface UploadResponse {
     ufsUrl: string;
 }
@@ -65,7 +65,7 @@ export default function Page() {
 
         // Method 1: Set selectedImages for previewProduct to detect
         localStorage.setItem("selectedImages", JSON.stringify([uploadedFile.ufsUrl]));
-        localStorage.setItem("createNewDesign", "false"); // Add to existing design if any
+        localStorage.setItem("createNewDesign", "false");
 
         // Method 2: Also pass via URL for direct loading
         const zoneParam = targetZoneId ? `&zoneId=${targetZoneId}` : '';
@@ -76,5 +76,14 @@ export default function Page() {
         );
     };
 
-    return <UploaderComponent handleUploadComplete={handleUploadComplete} />;
+    return (
+        <div className="flex flex-col h-screen bg-gray-50">
+            <div className="flex-grow justify-center items-center pt-12 m-2 ">
+                <UploaderComponent handleUploadComplete={handleUploadComplete} />
+            </div>
+            <div className="w-full px-4 py-6  ">
+                <RecentUploads />
+            </div>
+        </div>
+    );
 }

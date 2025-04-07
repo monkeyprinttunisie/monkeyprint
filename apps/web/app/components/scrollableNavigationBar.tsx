@@ -1,45 +1,49 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import IconButton from "@/components/iconButton";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import IconButton from "./iconButton";
 
 export default function ScrollableNav() {
-  const [activeLink, setActiveLink] = useState<string>("");
   const pathname = usePathname();
-  const handleLinkClick = (link: string) => {
-    setActiveLink(link);
-    localStorage.setItem("activeNavLink", link);
-  };
+  const router = useRouter();
+  const [activeLink, setActiveLink] = useState<string>("products");
+
+  // Update with pathname dependency
   useEffect(() => {
-    const path = pathname?.split("/").filter(Boolean);
-    const currentSection = path?.[2];
-    if (currentSection) {
-      if (pathname.includes("products/previewProduct")) {
-        setActiveLink("products");
-        localStorage.setItem("activeNavLink", "products");
-      } else if (currentSection && ["products", "color", "text", "upload", "cliparts", "library", "recent-uploads", "ai-generation"].includes(currentSection)) {
-        setActiveLink(currentSection);
-        localStorage.setItem("activeNavLink", currentSection);
-      }
-      else {
-        // Fallback to localStorage if no path match
-        const savedLink = localStorage.getItem("activeNavLink");
-        if (savedLink) {
-          setActiveLink(savedLink);
-        }
-      }
+    // Read from localStorage whenever path changes
+    const savedLink = localStorage.getItem("activeNavLink");
+    if (savedLink) {
+      setActiveLink(savedLink);
     }
+
+    // Listen for localStorage changes from other components
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "activeNavLink") {
+        setActiveLink(e.newValue || "products");
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, [pathname]);
+
+  const handleLinkClick = (linkName: string) => {
+    setActiveLink(linkName);
+    localStorage.setItem("activeNavLink", linkName);
+  };
 
   return (
     <div className="">
       <nav className="w-full h-[9.5vh] bg-white shadow-lg fixed bottom-0 left-0 z-50 pt-1">
-        <div className="flex justify-between overflow-x-auto py-2 gap-4 whitespace-nowrap scrollbar-thin scrollbar-thumb-white scrollbar-track-transparent px-4 w-full">
+        <div className="flex justify-start overflow-x-auto py-2 gap-4 whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-4 w-full">
           <Link href="/designer_tool/products">
             <div
               onClick={() => handleLinkClick("products")}
-              className={` rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center  ${activeLink === "products" ? "bg-[#ECF1FF]" : ""}`}
+              className={`rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center ${activeLink === "products" ? "bg-[#ECF1FF]" : ""}`}
             >
               <IconButton
                 iconSrc="/icons/product_icon.svg"
@@ -51,25 +55,60 @@ export default function ScrollableNav() {
           <Link href="/designer_tool/color">
             <div
               onClick={() => handleLinkClick("color")}
-              className={` rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center  ${activeLink === "color" ? "bg-[#ECF1FF]" : ""}`}
+              className={`rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center ${activeLink === "color" ? "bg-[#ECF1FF]" : ""}`}
             >
               <IconButton iconSrc="/icons/color_icon.svg" altText="Color Icon" />
             </div>
           </Link>
 
-          <Link href="/designer_tool/text">
-            <div
-              onClick={() => handleLinkClick("text")}
-              className={` rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center  ${activeLink === "text" ? "bg-[#ECF1FF]" : ""}`}
-            >
-              <IconButton iconSrc="/icons/text_icon.svg" altText="Text Icon" />
-            </div>
-          </Link>
+          <div
+            onClick={() => {
+              handleLinkClick("text");
+
+              // if we're already on preview page
+              if (pathname.includes("products/previewProduct")) {
+                localStorage.setItem("activeNavLink", "text");
+
+                // Add a timestamp to make each event unique
+                const event = new CustomEvent("activateTextEditor", {
+                  detail: {
+                    source: 'navBar',
+                    timestamp: Date.now()
+                  }
+                });
+
+                window.dispatchEvent(event);
+                console.log("Text editor activation event dispatched", Date.now());
+
+                setTimeout(() => {
+                  const refreshEvent = new CustomEvent("refreshTextEditor");
+                  window.dispatchEvent(refreshEvent);
+                }, 50);
+              } else {
+                //if we're not in preview page 
+                alert("Please select a product first to use the text editor");
+                // Reset the active link to previous state
+                const savedLink = localStorage.getItem("activeNavLink");
+                if (savedLink && savedLink !== "text") {
+                  setActiveLink(savedLink);
+                }
+              }
+            }}
+
+          >
+
+            <IconButton
+              iconSrc="/icons/text_icon.svg"
+              altText="Text Icon"
+              classN={`rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center ${activeLink === "text" ? "bg-[#ECF1FF]" : ""}`}
+
+            />
+          </div>
 
           <Link href="/designer_tool/upload">
             <div
               onClick={() => handleLinkClick("upload")}
-              className={` rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center  ${activeLink === "upload" ? "bg-[#ECF1FF]" : ""}`}
+              className={`rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center ${activeLink === "upload" ? "bg-[#ECF1FF]" : ""}`}
             >
               <IconButton
                 iconSrc="/icons/upload_icon.svg"
@@ -81,7 +120,7 @@ export default function ScrollableNav() {
           <Link href="/designer_tool/cliparts">
             <div
               onClick={() => handleLinkClick("cliparts")}
-              className={` rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center  ${activeLink === "cliparts" ? "bg-[#ECF1FF]" : ""}`}
+              className={`rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center ${activeLink === "cliparts" ? "bg-[#ECF1FF]" : ""}`}
             >
               <IconButton
                 iconSrc="/icons/cliparts_icon.svg"
@@ -102,18 +141,6 @@ export default function ScrollableNav() {
             </div>
           </Link>
 
-          <Link href="/designer_tool/recent-uploads">
-            <div
-              onClick={() => handleLinkClick("recent-uploads")}
-              className={` rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center  ${activeLink === "recent-uploads" ? "bg-[#ECF1FF]" : ""}`}
-            >
-              <IconButton
-                iconSrc="/icons/recentUpload_icon.svg"
-                altText="Recent Uploads Icon"
-              />
-            </div>
-          </Link>
-
           <Link href="/designer_tool/ai-generation">
             <div
               onClick={() => handleLinkClick("ai-generation")}
@@ -129,6 +156,4 @@ export default function ScrollableNav() {
       </nav>
     </div>
   );
-};
-
-
+}
