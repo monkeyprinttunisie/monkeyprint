@@ -17,6 +17,9 @@ importers:
       tailwind-scrollbar:
         specifier: ^4.0.1
         version: 4.0.1(react@19.0.0)(tailwindcss@4.0.9)
+      tailwindcss:
+        specifier: ^4.0.9
+        version: 4.0.9
       uploadthing:
         specifier: ^7.5.2
         version: 7.5.2(next@15.1.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(tailwindcss@4.0.9)
