@@ -174,6 +174,11 @@ export interface ProductResponse {
   error?: string;
 }
 
+export interface PaginationProps {
+  take: number;
+  skip: number;
+}
+
 // Order related types
 export interface ShippingAddress {
   country: string;
@@ -195,7 +200,7 @@ export interface OrderItem extends CartItem {
 
 export interface Order {
   id: string;
-  userId?: string | null; // Change this to accept null as well
+  userId?: string | null;
   status: OrderStatus;
   totalPrice: number;
   shippingMethod: ShippingMethod;
@@ -213,4 +218,5 @@ export interface OrderResponse {
   orders?: Order[];
   error?: string;
 }
+
 

@@ -228,3 +228,20 @@ export async function getCategoriesByType(
     return { success: false, error: `Failed to fetch ${type} categories` };
   }
 }
+
+export async function getCategoriesByTypeWithPagination(type: CategoryType) {
+  const firstFourCategories = await db.category.findMany({
+    where: { type },
+    take: 4,
+  });
+
+  return firstFourCategories;
+}
+
+export async function getCategoryProductCount(categoryId: string) {
+  return await db.productCategory.count({
+    where: {
+      categoryId: categoryId,
+    },
+  });
+}
