@@ -23,7 +23,7 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} dir={locale === "tn" ? "rtl" : "ltr"} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
