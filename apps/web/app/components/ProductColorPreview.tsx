@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { products } from "@/productOptions";
@@ -37,42 +35,22 @@ export default function ProductColorPreview() {
 
     // Apply color from localStorage
     useEffect(() => {
-        if (!isClient || !containerRef.current) return;
+        if (!isClient) return;
 
         // Check for new applied color
         const checkForColor = () => {
             const appliedColor = localStorage.getItem('appliedProductColor');
-            if (appliedColor && appliedColor !== colorApplied) {
-                // Create or get overlay element
-                let colorOverlay = document.getElementById('product-color-overlay');
-                if (!colorOverlay) {
-                    colorOverlay = document.createElement('div');
-                    colorOverlay.id = 'product-color-overlay';
-                    colorOverlay.style.position = 'absolute';
-                    colorOverlay.style.top = '0';
-                    colorOverlay.style.left = '0';
-                    colorOverlay.style.width = '100%';
-                    colorOverlay.style.height = '100%';
-                    colorOverlay.style.pointerEvents = 'none';
-                    colorOverlay.style.mixBlendMode = 'multiply';
-                    if (containerRef.current) {
-                        containerRef.current.appendChild(colorOverlay);
-                    }
-                }
-
-                // Apply the color
-                colorOverlay.style.backgroundColor = appliedColor;
+            if (appliedColor) {
                 setColorApplied(appliedColor);
                 console.log("Applied color to product:", appliedColor);
             }
         };
 
-        // Check immediately and set up polling
         checkForColor();
         const intervalId = setInterval(checkForColor, 500);
 
         return () => clearInterval(intervalId);
-    }, [isClient, colorApplied]);
+    }, [isClient]);
 
     // Toggle view between front and back
     const toggleView = () => {
@@ -85,15 +63,17 @@ export default function ProductColorPreview() {
     if (!product) return <div>No product selected</div>;
 
     return (
-        <div ref={containerRef} className="relative w-full h-[50vh]">
+        <div ref={containerRef} className="relative w-full h-[50vh] ml-[3vw]">
+
             <img
                 src={product.images[view]}
                 alt={product.name}
                 className="max-w-full max-h-full object-contain"
-            />
+                style={{ backgroundColor: colorApplied || 'transparent' }}
 
+            />
             {/* View toggle */}
-            <div className="flex justify-center gap-10 pt-4 ">
+            <div className="flex justify-center gap-10 pt-4 mr-[5vw] ">
                 <button onClick={toggleView} className="flex justify-center w-12 h-12">
                     <img src="/icons/arrow_left.svg" alt="Previous" className="w-5 h-5" />
                 </button>
