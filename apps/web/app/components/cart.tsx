@@ -163,7 +163,7 @@ export default function Cart() {
                     Total{" "}
                   </span>
                   <span className="font-raleway font-bold text-[18px] text-[#202020]">
-                    {totalPrice}dt
+                    {totalPrice.toFixed(3)}dt
                   </span>
                 </p>
               </span>

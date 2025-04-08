@@ -14,17 +14,19 @@ export default function ContactInfoForm({
   onSave,
   onCancel,
 }: ContactInfoFormProps) {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
 
   useEffect(() => {
     if (initialData) {
-      setFirstName(initialData.firstName || "");
-      setLastName(initialData.lastName || "");
+      setName(initialData.name || "");
       setPhone(initialData.phone || "");
       setEmail(initialData.email || "");
+      setAddress(initialData.address || "");
+      setCity(initialData.city || "");
     }
   }, [initialData]);
 
@@ -32,10 +34,12 @@ export default function ContactInfoForm({
     e.preventDefault();
 
     onSave({
-      firstName,
-      lastName,
+      name,
       phone,
-      email: email || undefined, // Only include if not empty
+      email: email || undefined,
+      country: "Tunisia",
+      address,
+      city,
     });
   };
 
@@ -44,36 +48,17 @@ export default function ContactInfoForm({
       {/* First Name Field */}
       <div className="space-y-1">
         <label
-          htmlFor="firstName"
+          htmlFor="name"
           className="font-nunito text-sm font-medium text-gray-700"
         >
-          First Name
+          Full Name
         </label>
         <input
           type="text"
-          id="firstName"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           placeholder="Enter your first name"
-          required
-          className="w-full px-3 py-2 focus:outline-none bg-[#F1F4FE] rounded-[9px]"
-        />
-      </div>
-
-      {/* Last Name Field */}
-      <div className="space-y-1">
-        <label
-          htmlFor="lastName"
-          className="font-nunito text-sm font-medium text-gray-700"
-        >
-          Last Name
-        </label>
-        <input
-          type="text"
-          id="lastName"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          placeholder="Enter your last name"
           required
           className="w-full px-3 py-2 focus:outline-none bg-[#F1F4FE] rounded-[9px]"
         />
@@ -114,6 +99,70 @@ export default function ContactInfoForm({
           placeholder="Enter your email"
           className="w-full px-3 py-2 focus:outline-none bg-[#F1F4FE] rounded-[9px]"
         />
+      </div>
+
+      {/* Address Field */}
+      <div className="space-y-1">
+        <label
+          htmlFor="address"
+          className="font-nunito text-sm font-medium text-gray-700"
+        >
+          Address
+        </label>
+        <input
+          type="text"
+          id="address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          placeholder="Enter your address"
+          required
+          className="w-full px-3 py-2 focus:outline-none bg-[#F1F4FE] rounded-[9px]"
+        />
+      </div>
+
+      {/* City Field */}
+      <div className="space-y-1">
+        <label
+          htmlFor="city"
+          className="font-nunito text-sm font-medium text-gray-700"
+        >
+          Town or City
+        </label>
+        <select
+          id="city"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          required
+          className="w-full px-3 py-2 focus:outline-none bg-[#F1F4FE] rounded-[9px] h-[40px] appearance-none"
+        >
+          <option value="" disabled>
+            Select your city
+          </option>
+          <option value="Tunis">Tunis</option>
+          <option value="Ariana">Ariana</option>
+          <option value="Ben Arous">Ben Arous</option>
+          <option value="Manouba">Manouba</option>
+          <option value="Nabeul">Nabeul</option>
+          <option value="Zaghouan">Zaghouan</option>
+          <option value="Bizerte">Bizerte</option>
+          <option value="Béja">Béja</option>
+          <option value="Jendouba">Jendouba</option>
+          <option value="Kef">Kef</option>
+          <option value="Siliana">Siliana</option>
+          <option value="Sousse">Sousse</option>
+          <option value="Monastir">Monastir</option>
+          <option value="Mahdia">Mahdia</option>
+          <option value="Sfax">Sfax</option>
+          <option value="Kairouan">Kairouan</option>
+          <option value="Kasserine">Kasserine</option>
+          <option value="Sidi Bouzid">Sidi Bouzid</option>
+          <option value="Gabès">Gabès</option>
+          <option value="Medenine">Medenine</option>
+          <option value="Tataouine">Tataouine</option>
+          <option value="Gafsa">Gafsa</option>
+          <option value="Tozeur">Tozeur</option>
+          <option value="Kebili">Kebili</option>
+        </select>
       </div>
 
       {/* Save Button */}

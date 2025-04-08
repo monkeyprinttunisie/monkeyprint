@@ -62,7 +62,7 @@ export interface IProductData {
   price: number;
   imageUrl: string;
   stock?: number;
-  categoryIds?: string[]; // Added categoryIds field
+  categoryIds?: string[]; 
 }
 
 export interface CartItem {
@@ -179,19 +179,13 @@ export interface PaginationProps {
   skip: number;
 }
 
-// Order related types
-export interface ShippingAddress {
-  country: string;
-  address: string;
-  city: string;
-  postcode: string;
-}
-
 export interface ContactInfo {
-  firstName: string;
-  lastName: string;
+  name: string;
   phone: string;
   email?: string;
+  country?: string;
+  address: string;
+  city: string;
 }
 
 export interface OrderItem extends CartItem {
@@ -206,7 +200,6 @@ export interface Order {
   shippingMethod: ShippingMethod;
   shippingFee: number;
   items: OrderItem[];
-  shippingAddress?: ShippingAddress;
   contactInfo?: ContactInfo;
   createdAt: Date;
   updatedAt: Date;

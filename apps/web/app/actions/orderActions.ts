@@ -1,13 +1,7 @@
 "use server";
 
 import { db } from "@monkeyprint/db";
-import {
-  CartItem,
-  ShippingAddress,
-  ContactInfo,
-  OrderResponse,
-  Order,
-} from "@/types";
+import { CartItem, ContactInfo, OrderResponse, Order } from "@/types";
 import { revalidatePath } from "next/cache";
 import { ShippingMethod, OrderStatus } from "@monkeyprint/db";
 
@@ -21,7 +15,6 @@ function convertPrismaOrderToOrder(prismaOrder: any): Order {
     shippingMethod: prismaOrder.shippingMethod,
     shippingFee: prismaOrder.shippingFee,
     items: prismaOrder.items,
-    shippingAddress: prismaOrder.shippingAddress,
     contactInfo: prismaOrder.contactInfo,
     createdAt: prismaOrder.createdAt,
     updatedAt: prismaOrder.updatedAt,
@@ -30,7 +23,6 @@ function convertPrismaOrderToOrder(prismaOrder: any): Order {
 
 export async function createOrder(
   cartItems: CartItem[],
-  shippingAddress: ShippingAddress,
   contactInfo: ContactInfo,
   shippingMethod: ShippingMethod
 ): Promise<OrderResponse> {
@@ -52,20 +44,14 @@ export async function createOrder(
       shippingMethod,
       shippingFee,
       status: OrderStatus.PENDING,
-      shippingAddress: {
-        create: {
-          country: shippingAddress.country,
-          address: shippingAddress.address,
-          city: shippingAddress.city,
-          postcode: shippingAddress.postcode,
-        },
-      },
       contactInfo: {
         create: {
-          firstName: contactInfo.firstName,
-          lastName: contactInfo.lastName,
+          name: contactInfo.name,
           phone: contactInfo.phone,
           email: contactInfo.email || null,
+          country: "Tunisia",
+          address: contactInfo.address,
+          city: contactInfo.city,
         },
       },
       items: {
@@ -79,12 +65,13 @@ export async function createOrder(
       },
     };
 
+    console.log("Order data being sent:", JSON.stringify(orderData, null, 2));
+
     // Create order with the clean data object
     const prismaOrder = await db.order.create({
       data: orderData,
       include: {
         items: true,
-        shippingAddress: true,
         contactInfo: true,
       },
     });
@@ -106,7 +93,10 @@ export async function createOrder(
     return { success: true, order: convertPrismaOrderToOrder(prismaOrder) };
   } catch (error) {
     console.error("Error creating order:", error);
-    return { success: false, error: "Failed to create order" };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to create order",
+    };
   }
 }
 
@@ -116,7 +106,6 @@ export async function getOrders(): Promise<OrderResponse> {
       where: { isDeleted: false },
       include: {
         items: true,
-        shippingAddress: true,
         contactInfo: true,
       },
       orderBy: {
@@ -141,7 +130,6 @@ export async function getOrderById(id: string): Promise<OrderResponse> {
       where: { id, isDeleted: false },
       include: {
         items: true,
-        shippingAddress: true,
         contactInfo: true,
       },
     });
@@ -167,7 +155,6 @@ export async function updateOrderStatus(
       data: { status },
       include: {
         items: true,
-        shippingAddress: true,
         contactInfo: true,
       },
     });
