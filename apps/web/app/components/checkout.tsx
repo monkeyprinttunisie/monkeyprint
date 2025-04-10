@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CartItem, ShippingAddress, ContactInfo } from "@/types";
+import { CartItem, ContactInfo } from "@/types";
 import { ShippingMethod } from "@monkeyprint/db";
 import BottomSheet from "@/components/SlideUpPanel";
-import ShippingAddressForm from "@/components/ShippingAddressPanel";
 import ContactInfoForm from "@/components/ContactInfoPanel";
 import { createOrder } from "@/actions/orderActions";
 import OrderSummary from "@/components/OrderSummary";
@@ -17,7 +16,7 @@ interface CheckoutProps {
   onShippingMethodChange: (method: ShippingMethod) => void;
   shippingMethod: ShippingMethod;
   setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsOrderComplete: React.Dispatch<React.SetStateAction<boolean>>; // Add this
+  setIsOrderComplete: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function Checkout({
@@ -33,15 +32,9 @@ export default function Checkout({
   const [isShippingAddressSheetOpen, setIsShippingAddressSheetOpen] =
     useState(false);
   const [isContactInfoSheetOpen, setIsContactInfoSheetOpen] = useState(false);
-  const [shippingAddress, setShippingAddress] =
-    useState<ShippingAddress | null>(null);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderSummary, setOrderSummary] = useState<any>(null);
-  const handleShippingAddressSave = (data: ShippingAddress) => {
-    setShippingAddress(data);
-    setIsShippingAddressSheetOpen(false);
-  };
 
   const handleContactInfoSave = (data: ContactInfo) => {
     setContactInfo(data);
@@ -49,7 +42,7 @@ export default function Checkout({
   };
 
   const handleBuy = async () => {
-    if (!shippingAddress || !contactInfo) {
+    if (!contactInfo) {
       alert("Please complete shipping address and contact information.");
       setIsProcessing(false);
       return;
@@ -60,7 +53,6 @@ export default function Checkout({
     try {
       const result = await createOrder(
         cart,
-        shippingAddress,
         contactInfo,
         shippingMethod
       );
@@ -91,7 +83,6 @@ export default function Checkout({
         <OrderSummary
           order={orderSummary}
           cart={cart}
-          shippingAddress={shippingAddress!}
           contactInfo={contactInfo!}
           shippingMethod={shippingMethod}
         />
@@ -119,35 +110,9 @@ export default function Checkout({
               Payment
             </h1>
           </div>
-          {/* Shipping Address Section */}
-          <div
-            className="w-full h-[70px] mb-4 bg-[#F1F4FE] rounded-[10px] p-4 flex justify-between items-center"
-            onClick={() => setIsShippingAddressSheetOpen(true)}
-          >
-            <div>
-              <h2 className="font-raleway font-bold font-raleway text-[17px] text-[#202020]">
-                Shipping Address
-              </h2>
-              {shippingAddress ? (
-                <p className="font-nunito text-[13px] pr-[2vw] text-gray-900">
-                  {shippingAddress.address}, {shippingAddress.city}
-                </p>
-              ) : (
-                <p className="font-nunito text-[13px] text-gray-900">
-                  Tap to add
-                </p>
-              )}
-            </div>
-            <div className="flex-shrink-0 w-[30px] h-[30px] flex items-center justify-center">
-              <img
-                src="/icons/edit-button.svg"
-                className="w-full h-full object-contain translate-y-2"
-              />
-            </div>
-          </div>
           {/* Contact Information Section */}
           <div
-            className="w-full h-[70px] mb-4 bg-[#F1F4FE] rounded-[10px] p-4 flex justify-between items-center"
+            className="w-full mb-4 bg-[#F1F4FE] rounded-[10px] p-4 flex justify-between items-center"
             onClick={() => setIsContactInfoSheetOpen(true)}
           >
             <div>
@@ -156,8 +121,8 @@ export default function Checkout({
               </h2>
               {contactInfo ? (
                 <p className="font-nunito text-[13px] text-gray-900">
-                  {contactInfo.firstName} {contactInfo.lastName},{" "}
-                  {contactInfo.phone}
+                  {contactInfo.name} • {contactInfo.phone} •{" "}
+                  {contactInfo.address}, {contactInfo.city}
                 </p>
               ) : (
                 <p className="font-nunito text-[13px] text-gray-900">
@@ -296,17 +261,6 @@ export default function Checkout({
             onClick={handleBuy}
             className="hidden"
           ></button>
-          <BottomSheet
-            isOpen={isShippingAddressSheetOpen}
-            onClose={() => setIsShippingAddressSheetOpen(false)}
-            title="Shipping Address"
-          >
-            <ShippingAddressForm
-              initialData={shippingAddress || undefined}
-              onSave={handleShippingAddressSave}
-              onCancel={() => setIsShippingAddressSheetOpen(false)}
-            />
-          </BottomSheet>
           <BottomSheet
             isOpen={isContactInfoSheetOpen}
             onClose={() => setIsContactInfoSheetOpen(false)}

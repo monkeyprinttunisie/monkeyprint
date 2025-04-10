@@ -145,17 +145,17 @@ enum ShippingMethod {
 }
 
 model Order {
-  id             String         @id @default(uuid())
-  userId         String?
-  status         OrderStatus    @default(PENDING)
-  totalPrice     Float
-  shippingMethod ShippingMethod @default(STANDARD)
-  shippingFee    Float
-  items          OrderItem[]
-  contactInfo    ContactInfo?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  isDeleted      Boolean        @default(false)
+  id              String           @id @default(uuid())
+  userId          String?
+  status          OrderStatus      @default(PENDING)
+  totalPrice      Float
+  shippingMethod  ShippingMethod   @default(STANDARD)
+  shippingFee     Float
+  items           OrderItem[]
+  contactInfo     ContactInfo?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  isDeleted       Boolean          @default(false)
 }
 
 model OrderItem {

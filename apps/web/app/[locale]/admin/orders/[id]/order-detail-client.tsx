@@ -207,26 +207,21 @@ export default function OrderDetailClient({ id }: OrderDetailClientProps) {
             Shipping Information
           </h3>
           <div className="border rounded-lg p-4">
-            {order.shippingAddress ? (
+            {order.contactInfo ? (
               <>
                 <p className="font-nunito font-medium mb-1">Address</p>
                 <p className="font-nunito text-gray-600 mb-3">
-                  {order.shippingAddress.address}
+                  {order.contactInfo.address}
                 </p>
 
                 <p className="font-nunito font-medium mb-1">City</p>
                 <p className="font-nunito text-gray-600 mb-3">
-                  {order.shippingAddress.city}
-                </p>
-
-                <p className="font-nunito font-medium mb-1">Postcode</p>
-                <p className="font-nunito text-gray-600 mb-3">
-                  {order.shippingAddress.postcode}
+                  {order.contactInfo.city}
                 </p>
 
                 <p className="font-nunito font-medium mb-1">Country</p>
                 <p className="font-nunito text-gray-600">
-                  {order.shippingAddress.country}
+                  {order.contactInfo.country}
                 </p>
               </>
             ) : (
@@ -246,7 +241,7 @@ export default function OrderDetailClient({ id }: OrderDetailClientProps) {
               <>
                 <p className="font-nunito font-medium mb-1">Name</p>
                 <p className="font-nunito text-gray-600 mb-3">
-                  {order.contactInfo.firstName} {order.contactInfo.lastName}
+                  {order.contactInfo.name}
                 </p>
 
                 <p className="font-nunito font-medium mb-1">Phone</p>

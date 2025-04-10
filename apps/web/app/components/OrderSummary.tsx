@@ -1,6 +1,6 @@
 // OrderSummary.tsx
 import { useRouter } from "next/navigation";
-import { CartItem, ShippingAddress, ContactInfo, Order } from "@/types";
+import { CartItem, /* ShippingAddress, */ ContactInfo, Order } from "@/types";
 import { ShippingMethod } from "@monkeyprint/db";
 
 interface OrderSummaryProps {
@@ -9,7 +9,7 @@ interface OrderSummaryProps {
     cartItems?: CartItem[];
   } | null;
   cart: CartItem[];
-  shippingAddress: ShippingAddress;
+  /* shippingAddress: ShippingAddress; */
   contactInfo: ContactInfo;
   shippingMethod: ShippingMethod;
 }
@@ -17,7 +17,7 @@ interface OrderSummaryProps {
 export default function OrderSummary({
   order,
   cart,
-  shippingAddress,
+  /* shippingAddress, */
   contactInfo,
   shippingMethod,
 }: OrderSummaryProps) {
@@ -104,14 +104,12 @@ export default function OrderSummary({
             Shipping Details
           </h3>
           <div className="font-nunito text-[14px]">
-            <p className="font-nunito">
-              {contactInfo.firstName} {contactInfo.lastName}
-            </p>
-            <p>{shippingAddress.address}</p>
-            <p>
-              {shippingAddress.city}, {shippingAddress.postcode}
-            </p>
-            <p>{shippingAddress.country}</p>
+            <p className="font-nunito">{contactInfo.name}</p>
+            <p>{contactInfo.address}</p>
+            {/* <p>
+              {contactInfo.city}, {contactInfo.postcode}
+            </p> */}
+            <p>{contactInfo.country}</p>
             <p className="mt-1">Phone: {contactInfo.phone}</p>
             <p>Email: {contactInfo.email}</p>
           </div>
