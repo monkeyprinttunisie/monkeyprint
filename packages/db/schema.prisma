@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
@@ -32,6 +32,7 @@ model User {
   passwordResetToken   String?   @unique
   passwordResetExpires DateTime?
   isDeleted            Boolean   @default(false)
+  Store                Store[]
 }
 
 model Account {
@@ -100,9 +101,9 @@ model Category {
   isDeleted        Boolean            @default(false)
 
   // Explanation of the hierarchy:
-  // - If `parentId` is null, this is a **Target Category** (top-level category).
-  // - If `parentId` points to a Target Category, this is a **Product Category**.
-  // - If `parentId` points to a Product Category, this is a **Subproduct Category**.
+  // - If parentId is null, this is a *Target Category* (top-level category).
+  // - If parentId points to a Target Category, this is a *Product Category*.
+  // - If parentId points to a Product Category, this is a *Subproduct Category*.
 }
 
 model CategoryRelation {
@@ -170,13 +171,27 @@ model OrderItem {
 }
 
 model ContactInfo {
-  id        String  @id @default(uuid())
-  orderId   String  @unique
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  name      String
-  phone     String
-  email     String?
-  country   String @default("Tunisia")
-  address   String
-  city      String
+  id      String  @id @default(uuid())
+  orderId String  @unique
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  name    String
+  phone   String
+  email   String?
+  country String  @default("Tunisia")
+  address String
+  city    String
+}
+
+model Store {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String   @unique
+  url       String?
+  image     String?
+  wallet    Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
