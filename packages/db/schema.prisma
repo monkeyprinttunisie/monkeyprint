@@ -145,17 +145,19 @@ enum ShippingMethod {
 }
 
 model Order {
-  id              String           @id @default(uuid())
-  userId          String?
-  status          OrderStatus      @default(PENDING)
-  totalPrice      Float
-  shippingMethod  ShippingMethod   @default(STANDARD)
-  shippingFee     Float
-  items           OrderItem[]
-  contactInfo     ContactInfo?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  isDeleted       Boolean          @default(false)
+  id             String         @id @default(uuid())
+  storeId        String
+  status         OrderStatus    @default(PENDING)
+  totalPrice     Float
+  shippingMethod ShippingMethod @default(STANDARD)
+  shippingFee    Float
+  items          OrderItem[]
+  contactInfo    ContactInfo?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  isDeleted      Boolean        @default(false)
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 
 model OrderItem {
@@ -193,5 +195,6 @@ model Store {
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Order Order[]
 }
