@@ -24,8 +24,6 @@
     "no_cliparts":"No clipart found",
     "fantasy":"Fantasy",
     "anime":"Anime"
-    
-  
   },
   "ColorPage":{
     "title":"Colors",
@@ -35,5 +33,17 @@
     "no_results_desc":"Try a different search term or check your spelling",
     "apply":"Apply",
     "no_colors":"No colors found"
+    "apply": "Apply",
+    "login": "Go to the login page"
+  },
+  "LoginPage": {
+    "title": "Login",
+    "subTitle": "Good to see you back!",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "oAuthMessage": "OR Continue with",
+    "regiterMessage": "Create An Account",
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot Password"
   }
 }

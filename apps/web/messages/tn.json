@@ -24,7 +24,6 @@
     "anime": "أنمي",
     "fantasy": "خيال",
     "no_cliparts": "ما فماش قصاصات فنية"
-
   },
   "ColorPage": {
     "title": "ألوان",
@@ -34,5 +33,17 @@
     "no_results_desc": "!جرب كلمة بحث أخرى أو تأكد من الإملاء",
     "apply": "استعملها",
     "no_colors": "ما فماش ألوان"
+    "apply": "استعملها",
+    "login": "login اعمل"
+  },
+  "LoginPage": {
+    "title": "أهلا بيك",
+    "subTitle": "شهل غيبة؟ خليت علينا بلاصة",
+    "emailPlaceholder": "إمايل متاعك",
+    "passwordPlaceholder": "كلمة السّر",
+    "oAuthMessage": "او أدخل بل",
+    "regiterMessage": "جديد معانا؟",
+    "signUp": "سجّل",
+    "forgotPassword": "نسيت كلمة السّر؟"
   }
 }

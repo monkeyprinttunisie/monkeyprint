@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -14,24 +15,183 @@ enum Role {
 }
 
 model User {
-  id                   String    @id @default(uuid())
+  id                   String    @id @default(cuid())
+  name                 String? //store name
+  firstName            String? // Owner's first name
+  lastName             String? // Owner's last name
   email                String    @unique
-  username             String    @unique
-  password             String
+  emailVerified        DateTime?
+  password             String?
+  image                String?
+  phoneNumber          String? // phone number with country code
   role                 Role      @default(DROPSHIPPING)
+  accounts             Account[]
+  sessions             Session[]
   createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
   passwordResetToken   String?   @unique
   passwordResetExpires DateTime?
   isDeleted            Boolean   @default(false)
+  Store                Store[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  name        String   @db.VarChar(255)
-  description String?  @db.Text
+  id          String            @id @default(uuid())
+  name        String            @db.VarChar(255)
+  description String?           @db.Text
   price       Float
-  imageUrl    String   @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
+  imageUrl    String            @db.Text
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  isDeleted   Boolean           @default(false)
+  stock       Int?              @default(0)
+  categories  ProductCategory[]
+  orderItems  OrderItem[]
+}
+
+model Category {
+  id               String             @id @default(uuid())
+  name             String // Name of the category (e.g., "Clothing", "Mugs")
+  type             CategoryType // Added enum to differentiate categories
+  parentId         String? // Self-referencing to create hierarchy
+  parentCategories CategoryRelation[] @relation("ChildToParent")
+  childCategories  CategoryRelation[] @relation("ParentToChild")
+  products         ProductCategory[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  isDeleted        Boolean            @default(false)
+
+  // Explanation of the hierarchy:
+  // - If parentId is null, this is a *Target Category* (top-level category).
+  // - If parentId points to a Target Category, this is a *Product Category*.
+  // - If parentId points to a Product Category, this is a *Subproduct Category*.
+}
+
+model CategoryRelation {
+  parentId String
+  childId  String
+  parent   Category @relation("ParentToChild", fields: [parentId], references: [id])
+  child    Category @relation("ChildToParent", fields: [childId], references: [id])
+
+  @@id([parentId, childId])
+}
+
+enum CategoryType {
+  TARGET // Top-level categories (Male, Female, All)
+  PRODUCT // Mid-level categories (Clothing, Mugs)
+  SUBPRODUCT // Low-level categories (T-shirts, Hoodies, Magic Mugs)
+}
+
+model ProductCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId])
+}
+
+enum OrderStatus {
+  CANCELED
+  CONFIRMED
+  PRINTED
+  FULFILLED
+  PAID
+  PENDING
+}
+
+enum ShippingMethod {
+  STANDARD
+  EXPRESS
+}
+
+model Order {
+  id              String           @id @default(uuid())
+  userId          String?
+  status          OrderStatus      @default(PENDING)
+  totalPrice      Float
+  shippingMethod  ShippingMethod   @default(STANDARD)
+  shippingFee     Float
+  items           OrderItem[]
+  contactInfo     ContactInfo?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  isDeleted       Boolean          @default(false)
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+  name      String
+  imageUrl  String
+}
+
+model ContactInfo {
+  id      String  @id @default(uuid())
+  orderId String  @unique
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  name    String
+  phone   String
+  email   String?
+  country String  @default("Tunisia")
+  address String
+  city    String
+}
+
+model Store {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String   @unique
+  url       String?
+  image     String?
+  wallet    Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
