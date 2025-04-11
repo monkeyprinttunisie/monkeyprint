@@ -184,3 +184,18 @@ export async function deleteOrder(id: string): Promise<OrderResponse> {
     return { success: false, error: "Failed to delete order" };
   }
 }
+
+export async function getOredersByUserId(userId: string) {
+  const orders = await db.order.findMany({
+    where: { id: userId },
+    include: {
+      items: true,
+      contactInfo: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return orders;
+}
