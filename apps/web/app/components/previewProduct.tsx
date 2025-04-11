@@ -2,12 +2,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { products } from "@/productOptions";
-import DesignZone from "./designZone";
-import TextEditorToolbar from "./textEditorToolbar";
-import EditableText from "./editableText";
+import DesignZone from "@/components/designZone";
+import TextEditorToolbar from "@/components/textEditorToolbar";
+import EditableText from "@/components/editableText";
 import { useCallback } from "react";
-
-export default function PreviewProduct() {
+interface PreviewProductProps {
+    mode?: string; // Add the 'mode' prop to the component's type definition
+}
+export default function PreviewProduct({ mode }: PreviewProductProps) {
     // === Initialization and state ===
     const [isClient, setIsClient] = useState(false);
 
@@ -16,8 +18,7 @@ export default function PreviewProduct() {
     const [productId, setProductId] = useState<string | null>(null);
     const [view, setView] = useState<'front' | 'back'>('front');
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const pathname = usePathname();
-    const router = useRouter();
+  
 
     // Design zone states
     const [activeZoneId, setActiveZoneId] = useState<string | null>(null);
@@ -188,7 +189,7 @@ export default function PreviewProduct() {
             const redirectFlag = localStorage.getItem("redirectToTextEditor");
             if (redirectFlag === "true") {
                 console.log("Activating text editor from localStorage flag");
-                localStorage.removeItem("redirectToTextEditor"); // Clear the flag
+                localStorage.removeItem("redirectToTextEditor");
                 handleTextEditorActivation(new CustomEvent("activateTextEditor", { detail: { source: 'storage' } }));
                 return;
             }

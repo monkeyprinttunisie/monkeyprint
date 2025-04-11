@@ -9,6 +9,30 @@
     "title": "Recent Uploads",
     "no_uploads": "No uploads yet",
     "upload": "Upload Image",
+    "apply": "Apply"
+  },
+  "ClipartPage":{
+    "free":"Free",
+    "premium":"Premium",
+      "title":"Clipart",
+    "all_categories":"Categories",
+    "search":"Search",
+    "search_placeholder":"Search clipart",
+    "no_results":"No results found",
+    "no_results_desc":"Try a different search term or check your spelling",
+    "apply":"Apply",
+    "no_cliparts":"No clipart found",
+    "fantasy":"Fantasy",
+    "anime":"Anime"
+  },
+  "ColorPage":{
+    "title":"Colors",
+    "search":"Search",
+    "search_placeholder":"Search colors",
+    "no_results":"No results found",
+    "no_results_desc":"Try a different search term or check your spelling",
+    "apply":"Apply",
+    "no_colors":"No colors found"
     "apply": "Apply",
     "login": "Go to the login page"
   },

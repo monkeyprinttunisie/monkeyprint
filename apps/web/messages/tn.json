@@ -9,6 +9,30 @@
     "title": "تصاور استعملتهم",
     "no_uploads": "ما عندكش تصويرة",
     "upload": "أختار تصويرة ",
+    "apply": "استعملها"
+  },
+  "ClipartPage": {
+    "free": "مجاني",
+    "premium": "مدفوع",
+    "title": "قصاصات فنية",
+    "all_categories": "الأصناف",
+    "search": "بحث",
+    "search_placeholder": "ابحث في القصاصات الفنية",
+    "no_results": "ما فماش نتائج",
+    "no_results_desc": "!جرب كلمة بحث أخرى أو تأكد من الإملاء",
+    "apply": "استعملها",
+    "anime": "أنمي",
+    "fantasy": "خيال",
+    "no_cliparts": "ما فماش قصاصات فنية"
+  },
+  "ColorPage": {
+    "title": "ألوان",
+    "search": "بحث",
+    "search_placeholder": "ابحث في الألوان",
+    "no_results": "ما فماش نتائج",
+    "no_results_desc": "!جرب كلمة بحث أخرى أو تأكد من الإملاء",
+    "apply": "استعملها",
+    "no_colors": "ما فماش ألوان"
     "apply": "استعملها",
     "login": "login اعمل"
   },
