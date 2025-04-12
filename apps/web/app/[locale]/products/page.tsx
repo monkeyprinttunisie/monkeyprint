@@ -50,6 +50,39 @@ const AddProduct: React.FC = () => {
     "base64"
   );
 
+  useEffect(() => {
+    // Check if we have a pending product
+    const pendingProduct = localStorage.getItem("pendingProduct");
+    if (pendingProduct) {
+      try {
+        const parsedProduct = JSON.parse(pendingProduct);
+        setName(parsedProduct.name || "");
+        setDescription(parsedProduct.description || "");
+        setPrice(parsedProduct.price || "");
+        setStock(parsedProduct.stock || "");
+        setSelectedTargetCategories(parsedProduct.targetCategories || []);
+        setSelectedProductCategory(parsedProduct.productCategory || "");
+        setSelectedSubproductCategories(
+          parsedProduct.subproductCategories || []
+        );
+
+        // Clear the stored product data
+        localStorage.removeItem("pendingProduct");
+      } catch (error) {
+        console.error("Error parsing pending product:", error);
+      }
+    }
+
+    // Check if we have a design image
+    const designImage = localStorage.getItem("productDesignImage");
+    if (designImage) {
+      setImageUrl(designImage);
+
+      // Clear the stored design image
+      localStorage.removeItem("productDesignImage");
+    }
+  }, []);
+
   const handleUploadComplete = async (res: any) => {
     if (res && res.length > 0) {
       const uploadedFile = res[0];
@@ -270,18 +303,60 @@ const AddProduct: React.FC = () => {
 
           <div className="space-y-3 pt-2">
             <label className="block text-sm font-medium">Product Image</label>
-            <UploaderComponent handleUploadComplete={handleUploadComplete} />
-            {imageUrl && (
-              <div className="w-full mt-4 rounded-lg overflow-hidden bg-gray-50 flex justify-center">
-                <Image
-                  src={imageUrl}
-                  alt="Product Image"
-                  width={300}
-                  height={300}
-                  className="h-[200px] w-auto object-contain my-2"
-                />
-              </div>
-            )}
+
+            <div className="flex flex-col space-y-4">
+              <button
+                type="button"
+                onClick={() => {
+                  // Save current form data in localStorage
+                  localStorage.setItem(
+                    "pendingProduct",
+                    JSON.stringify({
+                      name,
+                      description,
+                      price,
+                      stock,
+                      targetCategories: selectedTargetCategories,
+                      productCategory: selectedProductCategory,
+                      subproductCategories: selectedSubproductCategories,
+                    })
+                  );
+
+                  // Set a flag indicating we're coming from product creation
+                  localStorage.setItem("designForProduct", "true");
+
+                  // Navigate to designer tool
+                  window.location.href = "/designer_tool/products";
+                }}
+                className="w-full p-4 bg-blue-600 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Create Design for Product
+              </button>
+
+              {imageUrl && (
+                <div className="w-full mt-4 rounded-lg overflow-hidden bg-gray-50 flex justify-center">
+                  <Image
+                    src={imageUrl}
+                    alt="Product Image"
+                    width={300}
+                    height={300}
+                    className="h-[200px] w-auto object-contain my-2"
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
