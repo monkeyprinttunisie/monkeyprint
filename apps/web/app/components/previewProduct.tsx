@@ -7,7 +7,11 @@ import TextEditorToolbar from "./textEditorToolbar";
 import EditableText from "./editableText";
 import { useCallback } from "react";
 
-export default function PreviewProduct() {
+interface PreviewProductProps {
+  mode?: string; // Add the 'mode' prop to the component's type definition
+}
+
+export default function PreviewProduct({ mode }: PreviewProductProps) {
   // === Initialization and state ===
   const [isClient, setIsClient] = useState(false);
 
@@ -16,8 +20,6 @@ export default function PreviewProduct() {
   const [productId, setProductId] = useState<string | null>(null);
   const [view, setView] = useState<"front" | "back">("front");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const pathname = usePathname();
-  const router = useRouter();
 
   // Design zone states
   const [activeZoneId, setActiveZoneId] = useState<string | null>(null);
@@ -33,7 +35,7 @@ export default function PreviewProduct() {
   const [designImages, setDesignImages] = useState<
     Array<{
       url: string;
-      position: { x: number; y: number };
+      position: { x: number, y: number };
       size: number;
       rotation: number;
       isSelected: boolean;
@@ -45,7 +47,7 @@ export default function PreviewProduct() {
   const [designTexts, setDesignTexts] = useState<
     Array<{
       content: string;
-      position: { x: number; y: number };
+      position: { x: number, y: number };
       size: number;
       rotation: number;
       fontFamily: string;
