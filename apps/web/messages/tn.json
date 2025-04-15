@@ -32,8 +32,7 @@
     "no_results": "ما فماش نتائج",
     "no_results_desc": "!جرب كلمة بحث أخرى أو تأكد من الإملاء",
     "apply": "استعملها",
-    "no_colors": "ما فماش ألوان"
-    "apply": "استعملها",
+    "no_colors": "ما فماش ألوان",
     "login": "login اعمل"
   },
   "LoginPage": {

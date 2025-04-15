@@ -32,8 +32,7 @@
     "no_results":"No results found",
     "no_results_desc":"Try a different search term or check your spelling",
     "apply":"Apply",
-    "no_colors":"No colors found"
-    "apply": "Apply",
+    "no_colors":"No colors found",
     "login": "Go to the login page"
   },
   "LoginPage": {
