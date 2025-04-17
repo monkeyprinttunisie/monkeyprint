@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 import { openDB } from "idb";
 
 // API keys for image generation and background removal services
-const IMAGEPIG_API_KEY = "6d5cb3dd-1c9e-472d-9db3-c7dedc3d1fb9";
-const REMOVE_BG_API_KEY = "osmqvo6JbXSTHtK1H6h9s5PZ";
+const IMAGEPIG_API_KEY = "d68df09a-dc33-4c99-ac79-b843d4f282e1";
+const REMOVE_BG_API_KEY = "gZmBYu4uSsDF8HS4giRHj3rA";
 
 // IndexedDB configuration
 const DB_NAME = "monkeyprint-db";
