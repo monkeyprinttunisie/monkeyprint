@@ -32,8 +32,7 @@
     "no_results": "ما فماش نتائج",
     "no_results_desc": "!جرب كلمة بحث أخرى أو تأكد من الإملاء",
     "apply": "استعملها",
-    "no_colors": "ما فماش ألوان"
-    "apply": "استعملها",
+    "no_colors": "ما فماش ألوان",
     "login": "login اعمل"
   },
   "LoginPage": {
@@ -45,5 +44,15 @@
     "regiterMessage": "جديد معانا؟",
     "signUp": "سجّل",
     "forgotPassword": "نسيت كلمة السّر؟"
-  }
+  },
+  "WalletStats": {
+    "total": "المجموع",
+    "delivered": "وصلو",
+    "returned": "رجعو",
+    "shipping": "الشحن"
+  },
+  "WalletPage": {
+    "transactions":" شوف المعاملات",
+    "no_transactions":"ما فماش معاملات",
+    "wallet":" محفظتي"}
 }

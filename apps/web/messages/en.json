@@ -32,8 +32,7 @@
     "no_results":"No results found",
     "no_results_desc":"Try a different search term or check your spelling",
     "apply":"Apply",
-    "no_colors":"No colors found"
-    "apply": "Apply",
+    "no_colors":"No colors found",
     "login": "Go to the login page"
   },
   "LoginPage": {
@@ -45,5 +44,16 @@
     "regiterMessage": "Create An Account",
     "signUp": "Sign Up",
     "forgotPassword": "Forgot Password"
+  },
+  "WalletStats":{
+    "total":"Total",
+    "delivered":"Delivered",
+    "returned":"Returned",
+    "shipping":"Shipping"
+  },
+  "WalletPage":{
+    "transactions":" View Transactions",
+    "no_transactions":"No transactions found",
+    "wallet":" My Wallet"
   }
 }
