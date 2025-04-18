@@ -44,5 +44,15 @@
     "regiterMessage": "جديد معانا؟",
     "signUp": "سجّل",
     "forgotPassword": "نسيت كلمة السّر؟"
-  }
+  },
+  "WalletStats": {
+    "total": "المجموع",
+    "delivered": "وصلو",
+    "returned": "رجعو",
+    "shipping": "الشحن"
+  },
+  "WalletPage": {
+    "transactions":" شوف المعاملات",
+    "no_transactions":"ما فماش معاملات",
+    "wallet":" محفظتي"}
 }

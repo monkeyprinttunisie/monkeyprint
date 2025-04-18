@@ -190,11 +190,19 @@ model Store {
   name      String   @unique
   url       String?
   image     String?
-  wallet    Float    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
-
+  wallet    Wallet?
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   Order Order[]
 }
+model Wallet {
+  id             String   @id @default(uuid())
+  storeId        String   @unique
+  Total        Float    @default(0)       
+  Delivered Float    @default(0)         
+  Returned  Float    @default(0)        
+  store          Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+

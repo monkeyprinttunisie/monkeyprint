@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import "@/globals.css";
 import MenuWrapper from "@/components/menuWrapper";
 import { StoreProvider } from "@/providers/StoreProvider";
+import { SessionProvider } from "next-auth/react";
 
 export default async function LocaleLayout({
   children,
@@ -29,11 +30,13 @@ export default async function LocaleLayout({
       <body suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
-          <StoreProvider>
-            {children}
-            <MenuWrapper />
-          </StoreProvider>
-          </Suspense> 
+            <SessionProvider>
+              <StoreProvider>
+                {children}
+                <MenuWrapper />
+              </StoreProvider>
+            </SessionProvider>
+          </Suspense>
         </NextIntlClientProvider>
       </body>
     </html>

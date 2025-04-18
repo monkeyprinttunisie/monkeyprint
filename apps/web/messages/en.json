@@ -44,5 +44,16 @@
     "regiterMessage": "Create An Account",
     "signUp": "Sign Up",
     "forgotPassword": "Forgot Password"
+  },
+  "WalletStats":{
+    "total":"Total",
+    "delivered":"Delivered",
+    "returned":"Returned",
+    "shipping":"Shipping"
+  },
+  "WalletPage":{
+    "transactions":" View Transactions",
+    "no_transactions":"No transactions found",
+    "wallet":" My Wallet"
   }
 }
