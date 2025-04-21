@@ -26,14 +26,11 @@
     "no_cliparts": "ما فماش قصاصات فنية"
   },
   "ColorPage": {
-    "title": "ألوان",
-    "search": "بحث",
-    "search_placeholder": "ابحث في الألوان",
-    "no_results": "ما فماش نتائج",
-    "no_results_desc": "!جرب كلمة بحث أخرى أو تأكد من الإملاء",
-    "apply": "استعملها",
+    "color": "اختار لون",
     "no_colors": "ما فماش ألوان",
-    "login": "login اعمل"
+    "resetColor": "رجع اللون الأصلي",
+    "add": "زيد لون",
+    "remove": "فسخ اللون"
   },
   "LoginPage": {
     "title": "أهلا بيك",
@@ -52,7 +49,8 @@
     "shipping": "الشحن"
   },
   "WalletPage": {
-    "transactions":" شوف المعاملات",
-    "no_transactions":"ما فماش معاملات",
-    "wallet":" محفظتي"}
+    "transactions": " شوف المعاملات",
+    "no_transactions": "ما فماش معاملات",
+    "wallet": " محفظتي"
+  }
 }

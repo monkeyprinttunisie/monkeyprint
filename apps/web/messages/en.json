@@ -11,29 +11,26 @@
     "upload": "Upload Image",
     "apply": "Apply"
   },
-  "ClipartPage":{
-    "free":"Free",
-    "premium":"Premium",
-      "title":"Clipart",
-    "all_categories":"Categories",
-    "search":"Search",
-    "search_placeholder":"Search clipart",
-    "no_results":"No results found",
-    "no_results_desc":"Try a different search term or check your spelling",
-    "apply":"Apply",
-    "no_cliparts":"No clipart found",
-    "fantasy":"Fantasy",
-    "anime":"Anime"
+  "ClipartPage": {
+    "free": "Free",
+    "premium": "Premium",
+    "title": "Clipart",
+    "all_categories": "Categories",
+    "search": "Search",
+    "search_placeholder": "Search clipart",
+    "no_results": "No results found",
+    "no_results_desc": "Try a different search term or check your spelling",
+    "apply": "Apply",
+    "no_cliparts": "No clipart found",
+    "fantasy": "Fantasy",
+    "anime": "Anime"
   },
-  "ColorPage":{
-    "title":"Colors",
-    "search":"Search",
-    "search_placeholder":"Search colors",
-    "no_results":"No results found",
-    "no_results_desc":"Try a different search term or check your spelling",
-    "apply":"Apply",
-    "no_colors":"No colors found",
-    "login": "Go to the login page"
+  "ColorPage": {
+    "color": "Color",
+    "add": "Add",
+    "resetColor": "Reset Color",
+    "remove": "Remove",
+    "no_colors": "No colors found"
   },
   "LoginPage": {
     "title": "Login",
@@ -45,15 +42,15 @@
     "signUp": "Sign Up",
     "forgotPassword": "Forgot Password"
   },
-  "WalletStats":{
-    "total":"Total",
-    "delivered":"Delivered",
-    "returned":"Returned",
-    "shipping":"Shipping"
+  "WalletStats": {
+    "total": "Total",
+    "delivered": "Delivered",
+    "returned": "Returned",
+    "shipping": "Shipping"
   },
-  "WalletPage":{
-    "transactions":" View Transactions",
-    "no_transactions":"No transactions found",
-    "wallet":" My Wallet"
+  "WalletPage": {
+    "transactions": " View Transactions",
+    "no_transactions": "No transactions found",
+    "wallet": " My Wallet"
   }
 }
