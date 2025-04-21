@@ -176,7 +176,6 @@ const AlphaSlider: React.FC<AlphaSliderProps> = ({ color, value, onChange }) => 
         };
     }, []);
     const { h, s, l } = hexToHsl(color);
-    const pointerPosition = `${value}%`;
     const pointerColor = `rgba(${parseInt(color.slice(1, 3), 16)}, ${parseInt(color.slice(3, 5), 16)}, ${parseInt(color.slice(5, 7), 16)}, ${value / 100})`;
 
     return (
@@ -229,7 +228,20 @@ export default function ColorPage() {
     const searchParams = useSearchParams();
 
     // State for the admin panel colors
-    const [adminColors, setAdminColors] = useState(defaultColors);
+
+    // Load admin colors from localStorage or use defaults
+    const [adminColors, setAdminColors] = useState<string[]>(() => {
+        // Only run in client-side
+        if (typeof window !== 'undefined') {
+            const savedColors = localStorage.getItem('adminColors');
+            return savedColors ? JSON.parse(savedColors) : defaultColors;
+        }
+        return defaultColors;
+    });
+    // Save admin colors to localStorage when they change
+    useEffect(() => {
+        localStorage.setItem('adminColors', JSON.stringify(adminColors));
+    }, [adminColors]);
 
     // Product state
     const [productColor, setProductColor] = useState<string | null>(null);
@@ -240,7 +252,7 @@ export default function ColorPage() {
     // Applied color state
     const [isColorApplied, setIsColorApplied] = useState(false);
 
-    // Modify the handleColorSelect function to apply color immediately
+    // apply color to product
     const handleColorSelect = (color: string) => {
         setSelectedColor(color);
 
@@ -287,22 +299,7 @@ export default function ColorPage() {
         }
     }, [searchParams, router]);
 
-    // Apply color to product
-    const applyColorToProduct = () => {
-        const finalColor = colorOpacity < 100
-            ? getColorWithOpacity()
-            : selectedColor;
 
-        setProductColor(finalColor);
-        setIsColorApplied(true);
-        // to keep selected color 
-        localStorage.setItem('appliedProductColor', finalColor);
-
-        // Close the color panel after applying
-        setShowColorPanel(false);
-
-        console.log(`Applied color: ${finalColor}`);
-    };
 
     // Add color from super admin to admin panel
     const addColorToAdminPanel = () => {
@@ -341,7 +338,19 @@ export default function ColorPage() {
         const b = parseInt(selectedColor.slice(5, 7), 16);
         return `rgba(${r}, ${g}, ${b}, ${colorOpacity / 100})`;
     };
+    // function to reset product color 
+    const resetProductColor = () => {
+        setProductColor(null);
 
+        localStorage.removeItem('appliedProductColor');
+
+        // Close the color panel if open
+        if (showColorPanel) {
+            setShowColorPanel(false);
+        }
+
+        console.log("Product color reset");
+    };
     // Handle slider change for opacity
     const handleOpacityChange = (value: number) => {
         setColorOpacity(value);
@@ -380,7 +389,7 @@ export default function ColorPage() {
                         Admin
                     </button>
                     <button
-                        className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl px-8 py-1.5 text-sm font-medium transition-all focus:outline-none ${activeTab === 'super-admin'
+                        className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl  w-[48vw] h-[5vh] text-sm font-medium transition-all focus:outline-none ${activeTab === 'super-admin'
                             ? 'bg-blue-500 text-white shadow-sm'
                             : 'text-gray-500 hover:text-gray-900'
                             }`}
@@ -397,17 +406,35 @@ export default function ColorPage() {
                     {/* Preview Product Display */}
                     <div className="rounded-lg p-7 h-[70vh] flex flex-col items-center justify-center relative">
                         {productId && (
-                            <ProductColorPreview />
+                            <ProductColorPreview color={productColor} />
                         )}
 
-                        {/* Color Panel Toggle Button */}
-                        <button
-                            onClick={toggleColorPanel}
-                            className="mt-18 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg"
-                        >
-                            Choose Color
-                        </button>
+                        <div className="flex flex-col items-center mt-4 h-[100px]">
+                            {/* Color Panel Toggle Button */}
+                            <button
+                                onClick={toggleColorPanel}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full"
+                            >
+                                {t("color")}
+                            </button>
+
+                            {/* the reset button */}
+                            <div className="h-[48px] flex items-center justify-center mt-2">
+                                {productColor && (
+                                    <button
+                                        onClick={resetProductColor}
+                                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-full flex items-center"
+                                    >
+                                        <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        {t("resetColor")}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </div>
+
 
                     {/* Color Panel Popup */}
                     <AnimatePresence>
@@ -455,25 +482,29 @@ export default function ColorPage() {
                                             </div>
 
                                             {/* Color grid */}
-                                            <div className="w-3/4 rounded-lg mb-8 h-10"> {/* Added fixed height and background */}
+                                            <div className="w-3/4 rounded-lg mb-8 h-10">
                                                 <div
                                                     className="grid grid-cols-5 gap-2 max-h-28 overflow-y-auto pl-1 pb-1"
                                                     style={{ scrollbarWidth: 'thin' }} /* For Firefox */
                                                 >
-                                                    {adminColors.map((color, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className={`h-7 w-7 rounded-full cursor-pointer mb-1 ${selectedColor === color ? "ring-2 ring-offset-1 ring-blue-500" : ""}`}
-                                                            style={{ backgroundColor: color }}
-                                                            onClick={() => handleColorSelect(color)}
-                                                        />
-                                                    ))}
+                                                    {adminColors.length > 0 ? (
+                                                        adminColors.map((color, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className={`h-7 w-7 rounded-full cursor-pointer mb-1 ${selectedColor === color ? "ring-2 ring-offset-1 ring-blue-500" : ""}`}
+                                                                style={{ backgroundColor: color }}
+                                                                onClick={() => handleColorSelect(color)}
+                                                            />
+                                                        ))
+                                                    ) : (
+                                                        <div className="col-span-5 flex items-center justify-center h-full m-5">
+                                                            <p className="text-gray-500 text-center">{t("no_colors")}</p>
+                                                        </div>
+                                                    )}
                                                 </div>
-
-
-
                                             </div>
                                         </div>
+
                                     </div>
                                 </motion.div>
                             </>
@@ -489,7 +520,7 @@ export default function ColorPage() {
                         {/* Preview Product Display */}
                         <div className="rounded-lg p-4 h-[50vh] flex items-center justify-center relative">
                             {productId && (
-                                <ProductColorPreview />
+                                <ProductColorPreview color={productColor} />
                             )}
                         </div>
 
@@ -600,15 +631,23 @@ export default function ColorPage() {
                                     onClick={addColorToAdminPanel}
                                     className="flex justify-center items-center w-[30vw] text-white bg-blue-600 hover:bg-blue-700 p-2 rounded-full"
                                 >
-                                    <h1 className="">Add</h1>
+                                    <h1 className="">{t("add")}</h1>
                                 </button>
                                 <button
                                     onClick={removeColorFromAdminPanel}
                                     className="flex justify-center items-center w-[30vw] text-white bg-[#DC060A] hover:bg-red-800 p-2 rounded-full"
                                 >
-                                    <h1 className="">Remove</h1>
+                                    <h1 className="">{t("remove")}</h1>
                                 </button>
+                                {/* Reset Color Button */}
+
                             </div>
+                            <button
+                                onClick={resetProductColor}
+                                className="flex justify-center items-center text-gray-700 bg-gray-200 hover:bg-gray-300 p-3 rounded-full"
+                            >
+                                {t("resetColor")}
+                            </button>
                         </div>
                     </div>
                 </div>

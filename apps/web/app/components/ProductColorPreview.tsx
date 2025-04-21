@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { products } from "@/productOptions";
-
-export default function ProductColorPreview() {
+interface ProductColorPreviewProps {
+    color?: string | null;
+}
+export default function ProductColorPreview({ color }: ProductColorPreviewProps) {
     const [isClient, setIsClient] = useState(false);
     const searchParams = useSearchParams();
     const [productId, setProductId] = useState<string | null>(null);
@@ -32,7 +34,20 @@ export default function ProductColorPreview() {
             }
         }
     }, [isClient, searchParams]);
+    useEffect(() => {
+        if (!isClient) return;
 
+        if (color !== undefined) {
+            // Use the color from props
+            setColorApplied(color);
+        } else {
+            // Fall back to localStorage if no prop is provided
+            const appliedColor = localStorage.getItem('appliedProductColor');
+            if (appliedColor) {
+                setColorApplied(appliedColor);
+            }
+        }
+    }, [color, isClient]);
     // Apply color from localStorage
     useEffect(() => {
         if (!isClient) return;
@@ -63,22 +78,30 @@ export default function ProductColorPreview() {
     if (!product) return <div>No product selected</div>;
 
     return (
-        <div ref={containerRef} className="relative w-full h-[50vh] ml-[3vw]">
+        <div ref={containerRef} className="flex flex-col items-center w-full mt-5">
+            {/* our product image*/}
+            <div className="relative w-full h-[40vh] flex items-center justify-center ">
+                <img
+                    src={product.images[view]}
+                    alt={product.name}
+                    className="max-w-full max-h-full object-contain"
+                    style={{ backgroundColor: colorApplied || 'transparent' }}
+                />
+            </div>
 
-            <img
-                src={product.images[view]}
-                alt={product.name}
-                className="max-w-full max-h-full object-contain"
-                style={{ backgroundColor: colorApplied || 'transparent' }}
-
-            />
-            {/* View toggle */}
-            <div className="flex justify-center gap-10 pt-4 mr-[5vw] ">
-                <button onClick={toggleView} className="flex justify-center w-12 h-12">
-                    <img src="/icons/arrow_left.svg" alt="Previous" className="w-5 h-5" />
+            {/* View toggle buttons */}
+            <div className="flex justify-center gap-10 mt- w-full">
+                <button
+                    onClick={() => setView('front')}
+                    className={`flex justify-center w-12 h-12 ${view === 'front'}`}
+                >
+                    <img src="/icons/arrow_left.svg" alt="Front" className="w-5 h-5" />
                 </button>
-                <button onClick={toggleView} className="flex justify-center w-12 h-12">
-                    <img src="/icons/arrow_right.svg" alt="Next" className="w-5 h-5" />
+                <button
+                    onClick={() => setView('back')}
+                    className={`flex justify-center w-12 h-12 ${view === 'back'}`}
+                >
+                    <img src="/icons/arrow_right.svg" alt="Back" className="w-5 h-5" />
                 </button>
             </div>
         </div>
