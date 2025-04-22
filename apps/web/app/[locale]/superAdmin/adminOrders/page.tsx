@@ -4,7 +4,7 @@ import { columns } from "./columns";
 import { DataTable } from "@/components/ui/dataTable/data-table";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { getOrders, getOredersByStoreId } from "@/actions/orderActions";
+import { getOrders, getOrdersByStoreId } from "@/actions/orderActions";
 import { OrderWithItems } from "@/actions/orderActions";
 import { orderItemsColumn } from "./orderItemsColumn";
 
@@ -17,7 +17,7 @@ export default function AdminOrders() {
     const fetchOrders = async () => {
       if (storeId) {
         // Fetch orders for the specific store ID
-        const orderData = await getOredersByStoreId(storeId);
+        const orderData = await getOrdersByStoreId(storeId);
         setOrders(orderData);
       } else {
         // Fetch all orders if no store ID is provided
