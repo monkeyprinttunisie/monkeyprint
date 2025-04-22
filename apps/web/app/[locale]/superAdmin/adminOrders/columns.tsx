@@ -1,6 +1,5 @@
 "use client";
 
-import { Order } from "@monkeyprint/db";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,10 +16,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { OrderWithItems } from "@/actions/orderActions";
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
-export const columns: ColumnDef<Order>[] = [
+const storeCache = new Map<string, { id: string; name: string }>();
+export const columns: ColumnDef<OrderWithItems>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -42,12 +43,15 @@ export const columns: ColumnDef<Order>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+    enableColumnFilter: false,
   },
   {
+    id: "ref",
     accessorKey: "id",
     header: "Ref",
   },
   {
+    id: "store name",
     accessorKey: "storeId",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Store Name" />
@@ -57,13 +61,35 @@ export const columns: ColumnDef<Order>[] = [
 
       useEffect(() => {
         const fetchStoreName = async () => {
-          const storeData = await getStoreById(row.getValue("storeId"));
-          setName(storeData?.name || null);
+          const storeId = row.getValue("store name") as string;
+          if (storeCache.has(storeId)) {
+            // Use cached data if available
+            setName(storeCache.get(storeId)?.name || null);
+          } else {
+            // Fetch data and cache it
+            const storeData = await getStoreById(storeId);
+            if (storeData) {
+              storeCache.set(storeId, storeData);
+              setName(storeData.name || null);
+            }
+          }
         };
         fetchStoreName();
       }, [row]);
 
       return <div>{name}</div>;
+    },
+    filterFn: (row, columnId, filterValue) => {
+      const storeId = row.getValue(columnId) as string;
+      if (storeCache.has(storeId)) {
+        // Use cached data for filtering
+        const storeData = storeCache.get(storeId);
+        return (
+          storeData?.name?.toLowerCase().includes(filterValue.toLowerCase()) ||
+          false
+        );
+      }
+      return false; // If not cached, assume no match
     },
   },
   {
@@ -83,12 +109,30 @@ export const columns: ColumnDef<Order>[] = [
                   ? "bg-green-500"
                   : status === "PRINTED"
                     ? "bg-blue-500"
-                    : "bg-red-500"
+                    : status === "FULFILLED"
+                      ? "bg-purple-500"
+                      : "bg-red-500"
             }`}
           />
           {status as string}
         </div>
       );
+    },
+  },
+  {
+    id: "price",
+    accessorKey: "totalPrice",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Price" />
+    ),
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("price"));
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "TND",
+      }).format(amount);
+
+      return <div className="text-right font-medium">{formatted}</div>;
     },
   },
   {
@@ -128,6 +172,45 @@ export const columns: ColumnDef<Order>[] = [
     },
   },
   {
+    id: "shipping method",
+    accessorKey: "shippingMethod",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Shipping Method" />
+    ),
+  },
+  {
+    id: "shipping fee",
+    accessorKey: "shippingFee",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Shipping Fee" />
+    ),
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("shipping fee"));
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "TND",
+      }).format(amount);
+
+      return <div className="font-medium">{formatted}</div>;
+    },
+  },
+  {
+    id: "items",
+    accessorKey: "items",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Items" />
+    ),
+    cell: ({ row }) => (
+      <Button
+        variant="outline"
+        className=""
+        onClick={row.getToggleExpandedHandler()} // Toggle expanded state
+      >
+        {row.getIsExpanded() ? "Collapse" : "View Items"} {/* Dynamic label */}
+      </Button>
+    ),
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const order = row.original;
@@ -149,12 +232,17 @@ export const columns: ColumnDef<Order>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>Pay customer</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={row.getToggleExpandedHandler()} // Toggle expanded state
+            >
+              {row.getIsExpanded() ? "Collapse" : "View details"}{" "}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
     },
     enableSorting: false,
     enableHiding: false,
+    enableColumnFilter: false,
   },
 ];
