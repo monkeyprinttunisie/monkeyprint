@@ -63,7 +63,7 @@ export default function RecentUploads() {
 
             // Set active nav link
             localStorage.setItem("activeNavLink", "products");
-            
+
             // Dispatch storage event to notify other components
             if (typeof window !== 'undefined') {
                 window.dispatchEvent(new Event('storage'));
@@ -86,7 +86,7 @@ export default function RecentUploads() {
                         images.map((image, index) => (
                             <div
                                 key={index}
-                                className={`cursor-pointer relative group bg-white p-3 rounded-lg shadow-md ${selectedIndices.includes(index)}`}
+                                className={`cursor-pointer relative group bg-white p-2 rounded-lg shadow-md ${selectedIndices.includes(index)}`}
                                 onClick={() => handleImageClick(index)}
                             >
                                 <div className="relative aspect-square w-full overflow-hidden rounded-md">
@@ -108,7 +108,7 @@ export default function RecentUploads() {
 
                                     {/* Checkmark for selected image */}
                                     {selectedIndices.includes(index) && (
-                                        <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="absolute inset-0 flex items-center justify-center ">
                                             <svg
                                                 className="w-12 h-12 text-white"
                                                 fill="none"

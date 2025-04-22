@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import UploaderComponent from "@/components/UploaderComponent";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { createProduct } from "@/actions/productActions";
 import { useCategoryStore } from "@/store/useCategoryStore";
+import { toast } from "react-hot-toast";
 
 const AddProduct: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -21,6 +21,7 @@ const AddProduct: React.FC = () => {
   const [selectedSubproductCategories, setSelectedSubproductCategories] =
     useState<string[]>([]);
 
+  const router = useRouter();
   const targetCategories = useCategoryStore((state) => state.targetCategories);
   const productCategories = useCategoryStore(
     (state) => state.productCategories
@@ -28,6 +29,7 @@ const AddProduct: React.FC = () => {
   const subproductCategories = useCategoryStore(
     (state) => state.subproductCategories
   );
+
   // Get only subproduct categories for the selected product category
   const filteredSubproductCategories = subproductCategories.filter((cat) => {
     return (
@@ -50,23 +52,38 @@ const AddProduct: React.FC = () => {
     "base64"
   );
 
-  const handleUploadComplete = async (res: any) => {
-    if (res && res.length > 0) {
-      const uploadedFile = res[0];
+  useEffect(() => {
+    // Check if we have a pending product
+    const pendingProduct = localStorage.getItem("pendingProduct");
+    if (pendingProduct) {
+      try {
+        const parsedProduct = JSON.parse(pendingProduct);
+        setName(parsedProduct.name || "");
+        setDescription(parsedProduct.description || "");
+        setPrice(parsedProduct.price || "");
+        setStock(parsedProduct.stock || "");
+        setSelectedTargetCategories(parsedProduct.targetCategories || []);
+        setSelectedProductCategory(parsedProduct.productCategory || "");
+        setSelectedSubproductCategories(
+          parsedProduct.subproductCategories || []
+        );
 
-      if (uploadedFile && uploadedFile.ufsUrl) {
-        setImageUrl(uploadedFile.ufsUrl);
-      } else {
-        console.error("Uploaded file object or ufsUrl is missing");
+        // Clear the stored product data
+        localStorage.removeItem("pendingProduct");
+      } catch (error) {
+        console.error("Error parsing pending product:", error);
       }
-    } else {
-      console.error("Upload response is empty or malformed");
     }
-  };
 
-  const handleUploadError = (error: any) => {
-    console.error("Image Upload Error:", error);
-  };
+    // Check if we have a design image
+    const designImage = localStorage.getItem("productDesignImage");
+    if (designImage) {
+      setImageUrl(designImage);
+
+      // Clear the stored design image
+      localStorage.removeItem("productDesignImage");
+    }
+  }, []);
 
   const handleModal = () => {
     setIsOpen(!isOpen);
@@ -108,14 +125,12 @@ const AddProduct: React.FC = () => {
         setSelectedProductCategory("");
         setSelectedSubproductCategories([]);
         handleModal(); // Close modal
-        alert("Product created successfully");
+        toast.success("Product created successfully");
       } else {
-        console.error("Failed to save product:", response.error);
-        alert(`Failed to create product: ${response.error}`);
+        toast.error(`Failed to create product: ${response.error}`);
       }
     } catch (error) {
-      console.error("Error while saving the product:", error);
-      alert("Error while saving the product");
+      toast.error("Error while saving the product");
     } finally {
       setIsLoading(false);
     }
@@ -137,6 +152,58 @@ const AddProduct: React.FC = () => {
         ? prev.filter((id) => id !== categoryId)
         : [...prev, categoryId]
     );
+  };
+
+  // Handler for "Create Design for Product" button
+  const handleCreateDesign = () => {
+    if (selectedTargetCategories.length === 0) {
+      console.log(
+        "No target categories selected. Please select at least one target category."
+      );
+      // No target category selected, show error message
+      toast.error(
+        "Please select at least one target category before creating a design"
+      );
+      return;
+    }
+
+    // Save the current product data to localStorage
+    const productData = {
+      name,
+      description,
+      price,
+      stock,
+      targetCategories: selectedTargetCategories,
+      productCategory: selectedProductCategory,
+      subproductCategories: selectedSubproductCategories,
+    };
+
+    localStorage.setItem("pendingProduct", JSON.stringify(productData));
+
+    // Also save the target categories for mockup selection
+    localStorage.setItem(
+      "designTargetCategories",
+      JSON.stringify(selectedTargetCategories)
+    );
+
+    // Also save the target category NAMES for mockup selection
+    const targetCategoryNames = selectedTargetCategories
+      .map((id) => {
+        const category = targetCategories.find((c) => c.id === id);
+        return category ? category.name : "";
+      })
+      .filter((name) => name); // Filter out empty names
+
+    localStorage.setItem(
+      "designTargetCategoryNames",
+      JSON.stringify(targetCategoryNames)
+    );
+    
+    // Set flag that we're designing for a product
+    localStorage.setItem("designForProduct", "true");
+
+    // Navigate to the designer tool
+    router.push("/designer_tool/products");
   };
 
   return (
@@ -270,16 +337,46 @@ const AddProduct: React.FC = () => {
 
           <div className="space-y-3 pt-2">
             <label className="block text-sm font-medium">Product Image</label>
-            <UploaderComponent handleUploadComplete={handleUploadComplete} />
-            {imageUrl && (
-              <div className="w-full mt-4 rounded-lg overflow-hidden bg-gray-50 flex justify-center">
-                <Image
+
+            {imageUrl ? (
+              <div className="relative w-full h-64 border rounded-lg overflow-hidden">
+                <img
                   src={imageUrl}
-                  alt="Product Image"
-                  width={300}
-                  height={300}
-                  className="h-[200px] w-auto object-contain my-2"
+                  alt="Product"
+                  className="w-full h-full object-contain"
                 />
+                <button
+                  type="button"
+                  onClick={() => setImageUrl("")}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <button
+                  type="button"
+                  onClick={handleCreateDesign}
+                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-md mb-3"
+                >
+                  Create Design for Product
+                </button>
+                <p className="text-sm text-gray-500 mb-2">or</p>
+                {/* Your existing upload button code */}
               </div>
             )}
           </div>
@@ -290,7 +387,7 @@ const AddProduct: React.FC = () => {
               disabled={isLoading || !name || !price || !imageUrl}
               className="w-full py-3 bg-blue-500 text-white rounded-lg text-lg font-medium shadow-md"
             >
-              {isLoading ? "Saving..." : "Save Product"}
+              {isLoading ? "Creating..." : "Create Product"}
             </button>
           </div>
         </form>

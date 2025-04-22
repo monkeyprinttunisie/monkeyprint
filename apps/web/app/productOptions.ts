@@ -6,8 +6,8 @@ export const products: Record<string, ProductOption> = {
     name: "T-Shirt",
     description: "it's a white tshirt that...",
     images: {
-      front: "/images/frontTshirt.png",
-      back: "/images/backTshirt.png",
+      front: "/images/frontSweatshirt.png",
+      back: "/images/backSweatshirt.png",
 
     },
     designZones: {
@@ -16,9 +16,9 @@ export const products: Record<string, ProductOption> = {
           id: "frontChest",
           name: "Front Print Area",
           x: 0, 
-          y: -20,
-          width: 150, 
-          height: 250, 
+          y: -40,
+          width: 250, 
+          height: 400, 
           rotation: 0,
           maxImagesAllowed: 5
         }

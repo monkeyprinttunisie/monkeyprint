@@ -6,6 +6,8 @@ import { Suspense } from "react";
 import "@/globals.css";
 import MenuWrapper from "@/components/menuWrapper";
 import { StoreProvider } from "@/providers/StoreProvider";
+import { Toaster } from "react-hot-toast";
+import { SessionProvider } from "next-auth/react";
 
 export default async function LocaleLayout({
   children,
@@ -25,15 +27,24 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} dir={locale === "tn" ? "rtl" : "ltr"} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
-          <StoreProvider>
-            {children}
-            <MenuWrapper />
-          </StoreProvider>
-          </Suspense> 
+          <Suspense
+            fallback={
+              <div className="min-h-screen flex items-center justify-center">
+                Loading...
+              </div>
+            }
+          >
+            <SessionProvider>
+              <StoreProvider>
+                {children}
+                <Toaster position="top-center" />
+                <MenuWrapper />
+              </StoreProvider>
+            </SessionProvider>
+          </Suspense>
         </NextIntlClientProvider>
       </body>
     </html>
