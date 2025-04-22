@@ -197,6 +197,7 @@ model Store {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   Order Order[]
 }
+
 model Wallet {
   id             String   @id @default(uuid())
   storeId        String   @unique
