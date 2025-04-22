@@ -185,7 +185,7 @@ export async function deleteOrder(id: string): Promise<OrderResponse> {
   }
 }
 
-export async function getOredersByStoreId(
+export async function getOrdersByStoreId(
   storeId: string
 ): Promise<OrderWithItems[]> {
   const orders = await db.order.findMany({
