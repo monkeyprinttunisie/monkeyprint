@@ -14,8 +14,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DataTableColumnHeader } from "../../../components/ui/dataTable/dataTableColumnHeader";
+import { DataTableColumnHeader } from "@/components/ui/dataTable/dataTableColumnHeader";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "@/../i18n/navigation";
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
@@ -100,7 +101,11 @@ export const columns: ColumnDef<Store>[] = [
               Copy store ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/superAdmin/adminOrders?id=${store.id}`}>
+                View store orders
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>Pay customer</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,4 +1,5 @@
 import { CategoryType, OrderStatus, ShippingMethod } from "@monkeyprint/db";
+import { OrderWithItems } from "./actions/orderActions";
 
 // types.ts
 export interface DesignZone {
@@ -62,7 +63,7 @@ export interface IProductData {
   price: number;
   imageUrl: string;
   stock?: number;
-  categoryIds?: string[]; 
+  categoryIds?: string[];
 }
 
 export interface CartItem {
@@ -207,9 +208,7 @@ export interface Order {
 
 export interface OrderResponse {
   success: boolean;
-  order?: Order;
-  orders?: Order[];
+  order?: OrderWithItems;
+  orders?: OrderWithItems[];
   error?: string;
 }
-
-

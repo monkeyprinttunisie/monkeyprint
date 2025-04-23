@@ -1,9 +1,13 @@
 "use server";
 
-import { db } from "@monkeyprint/db";
+import { db, Prisma } from "@monkeyprint/db";
 import { CartItem, ContactInfo, OrderResponse, Order } from "@/types";
 import { revalidatePath } from "next/cache";
 import { ShippingMethod, OrderStatus } from "@monkeyprint/db";
+
+export type OrderWithItems = Prisma.OrderGetPayload<{
+  include: { items: true; contactInfo: true };
+}>;
 
 // Helper function to convert Prisma order to your Order type
 function convertPrismaOrderToOrder(prismaOrder: any): Order {
@@ -102,7 +106,7 @@ export async function createOrder(
 
 export async function getOrders(): Promise<OrderResponse> {
   try {
-    const prismaOrders = await db.order.findMany({
+    const orders = await db.order.findMany({
       where: { isDeleted: false },
       include: {
         items: true,
@@ -112,10 +116,6 @@ export async function getOrders(): Promise<OrderResponse> {
         createdAt: "desc",
       },
     });
-
-    const orders = prismaOrders.map((order) =>
-      convertPrismaOrderToOrder(order)
-    );
 
     return { success: true, orders };
   } catch (error) {
@@ -183,4 +183,21 @@ export async function deleteOrder(id: string): Promise<OrderResponse> {
     console.error("Error deleting order:", error);
     return { success: false, error: "Failed to delete order" };
   }
+}
+
+export async function getOrdersByStoreId(
+  storeId: string
+): Promise<OrderWithItems[]> {
+  const orders = await db.order.findMany({
+    where: { storeId: storeId },
+    include: {
+      items: true,
+      contactInfo: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return orders;
 }
