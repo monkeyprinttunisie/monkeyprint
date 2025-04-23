@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import SignIn from "@/components/oAuthSignInButton";
 import Uploader from "@/components/Uploader";
 import { registerSchema } from "@monkeyprint/utils/zod";
@@ -21,9 +20,9 @@ export default function RegisterPage() {
     confirmPassword: "",
     firstName: "",
     lastName: "",
-    name: "", // Store name
+    name: "",
     phoneNumber: "",
-    storeImage: "",
+    image: "",
     role: roleOptions[0].value,
   });
 
@@ -38,7 +37,7 @@ export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [countryCode, setCountryCode] = useState("+1");
+  const [countryCode] = useState("+216");
 
   // Upload state
   const [imageUrl, setImageUrl] = useState<string>("");
@@ -62,7 +61,7 @@ export default function RegisterPage() {
         setImageUrl(uploadedFile.ufsUrl);
         setFormData({
           ...formData,
-          storeImage: uploadedFile.ufsUrl,
+          image: uploadedFile.ufsUrl,
         });
       }
     }
@@ -140,7 +139,7 @@ export default function RegisterPage() {
         body: JSON.stringify({
           ...formData,
           phoneNumber: fullPhoneNumber,
-          storeImage: imageUrl || formData.storeImage,
+          image: imageUrl || formData.image,
         }),
       });
 
@@ -327,7 +326,7 @@ export default function RegisterPage() {
                       <img
                         src="/icons/down-arrow-icon.svg"
                         alt="Select country code"
-                        className="mx-2 w-4 h-2" 
+                        className="mx-2 w-4 h-2"
                       />
                     </div>
                   </div>
