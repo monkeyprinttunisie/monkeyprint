@@ -52,5 +52,9 @@
     "transactions": " شوف المعاملات",
     "no_transactions": "ما فماش معاملات",
     "wallet": " محفظتي"
+  },
+  "HistoryPage": {
+    "Delivered": "وصلو",
+    "Paid": "خلصو"
   }
 }
