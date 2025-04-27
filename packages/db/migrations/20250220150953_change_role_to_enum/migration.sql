@@ -1,12 +1,15 @@
 /*
-  Warnings:
-
-  - The `role` column on the `User` table would be dropped and recreated. This will lead to data loss if there is data in the column.
-
-*/
+ Warnings:
+ 
+ - The `role` column on the `User` table would be dropped and recreated. This will lead to data loss if there is data in the column.
+ 
+ */
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('DROPSHIPPING', 'ECOMMERCE_WEBSITE', 'DESIGNER_TOOL');
-
+CREATE TYPE "Role" AS ENUM (
+  'DROPFULFILLED',
+  'ECOMMERCE_WEBSITE',
+  'DESIGNER_TOOL'
+);
 -- AlterTable
 ALTER TABLE "User" DROP COLUMN "role",
-ADD COLUMN     "role" "Role" NOT NULL DEFAULT 'DROPSHIPPING';
+  ADD COLUMN "role" "Role" NOT NULL DEFAULT 'DROPFULFILLED';

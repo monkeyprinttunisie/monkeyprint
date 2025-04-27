@@ -181,16 +181,18 @@ export interface PaginationProps {
 }
 
 export interface ContactInfo {
+  id: string;
   name: string;
+  orderId: string;
   phone: string;
-  email?: string;
-  country?: string;
+  email: string | null;
+  country: string;
   address: string;
   city: string;
 }
-
 export interface OrderItem extends CartItem {
   orderId: string;
+  productId: string;
 }
 
 export interface Order {
@@ -201,9 +203,11 @@ export interface Order {
   shippingMethod: ShippingMethod;
   shippingFee: number;
   items: OrderItem[];
-  contactInfo?: ContactInfo;
+  contactInfo: ContactInfo | null;
   createdAt: Date;
   updatedAt: Date;
+  storeId: string; 
+  isDeleted: boolean;
 }
 
 export interface OrderResponse {
