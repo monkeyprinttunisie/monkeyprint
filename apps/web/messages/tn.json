@@ -56,5 +56,14 @@
   "HistoryPage": {
     "Delivered": "وصلو",
     "Paid": "خلصو"
+  },
+  "ProductDetail": {
+    "productNotFound":"مفماش منتج",
+    "noDescription":"ما فماش وصف",
+    "back":"رجوع",
+    "categories":"الأصناف",
+    "productDetails":"تفاصيل المنتج",
+    "description":"الوصف"
+ 
   }
 }
