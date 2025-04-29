@@ -56,5 +56,13 @@
   "HistoryPage": {
     "Delivered": "Delivered",
     "Paid": "Paid"
+  },
+  "ProductDetail": {
+    "productNotFound": "Product Not Found",
+    "back": "Back",
+    "noDescription": "No Description",
+    "categories": "Categories",
+    "productDetails": "Product Details",
+    "description": "Description"
   }
 }

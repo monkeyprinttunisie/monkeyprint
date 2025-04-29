@@ -4,7 +4,7 @@ import { AddToCartButton } from "@/components/addToCartButton";
 import { useProductStore } from "@/store/useProductStore";
 import CategoriesFilter from "@/components/categoriesFilter";
 import { useEffect, useState } from "react";
-
+import Link from "next/link";
 export default function ProductHome() {
   const filteredProducts = useProductStore((state) => state.filteredProducts);
   const loading = useProductStore((state) => state.loading);
@@ -82,13 +82,17 @@ export default function ProductHome() {
           ) : (
             filteredProducts.map((product) => (
               <div key={product.id} className="p-2 flex flex-col">
-                <div className="p-1.5 bg-white shadow-md shadow-[rgba(0,0,0,0.1)] rounded-[9px]">
-                  <img
-                    className="w-[100%] h-[26vh] rounded-[9px]"
-                    src={product.imageUrl}
-                    alt={product.name}
-                  />
-                </div>
+                <Link href={`/products/listProducts/${product.id}`} className="cursor-pointer">
+                  <div className="p-1.5 bg-white shadow-md shadow-[rgba(0,0,0,0.1)] rounded-[9px]">
+                    <img
+                      className="w-[100%] h-[26vh] rounded-[9px]"
+                      src={product.imageUrl}
+                      alt={product.name}
+                      width={200}
+                      height={200}
+                    />
+                  </div>
+                </Link>
                 <div className="text-left">
                   <h2 className="mt-3 font-nunito font-normal text-[16px] leading-[16px] text-gray-800">
                     {product.name}
