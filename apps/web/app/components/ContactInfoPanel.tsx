@@ -34,9 +34,11 @@ export default function ContactInfoForm({
     e.preventDefault();
 
     onSave({
+      id: initialData?.id || `temp-${Date.now()}`,
       name,
+      orderId: initialData?.orderId || "pending",
       phone,
-      email: email || undefined,
+      email: email || null,
       country: "Tunisia",
       address,
       city,
