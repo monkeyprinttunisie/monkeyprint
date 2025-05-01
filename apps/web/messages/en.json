@@ -1,9 +1,38 @@
 {
-  "HomePage": {
+  "Page": {
     "title": "Hello world!",
     "login": "Go to the login page",
     "designer_tool": "customize your products",
     "default_designer_Page": "get started !  "
+  },
+  "HomePage": {
+    "functionalities": " MP Functionalities",
+    "whyMP": "Why MP ",
+    "templates": "Templates Preview",
+    "steps": "Steps to Create",
+    "Dpartners": "  Our Delivery Partners",
+    "login": "Log in",
+    "register": "Sign Up",
+    "createSell": "Create and Sell",
+    "customP": "Custom Products",
+    "products": "1000+ products",
+    "globalD": "Global Delivery",
+    "getStarted": " Get started for free",
+    "free": "100% Free to use",
+    "quality": "Quality Products",
+    "p1": "We partner with the best manufacturers to ensure your products meet the highest quality standards.",
+    "business": "Business Growth",
+    "p2": "MonkeyPrint helps you scale your business without the hassle of inventory management.",
+    "p3": "Browse our professionally designed templates to kickstart your product creation journey",
+    "popular": "Popular",
+    "design": "Preview Design",
+    "pro": "Professional design for your products",
+    "inspire": "See More Inspirations",
+    "how": "How It Works",
+    "p4": "Follow these simple steps to start your print-on-demand business with MonkeyPrint",
+    "start": "Start Your Journey Today",
+    "p5": "We've partnered with leading logistics providers to ensure your products reach customers worldwide",
+    "p6": "Our network of delivery partners ensures your products reach customers in over 150 countries worldwide."
   },
   "RecentUploads": {
     "title": "Recent Uploads",
