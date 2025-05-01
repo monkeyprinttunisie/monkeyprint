@@ -4,10 +4,15 @@ import { useRouter } from "next/navigation";
 import SignIn from "@/components/oAuthSignInButton";
 import { useTranslations } from "next-intl";
 import { Link } from "@/../i18n/navigation";
+import { useUserActions } from "@/store/useUserStore";
+// Import types from our store instead of Prisma directly
+import { User, Store, StoreType } from "@/store/storeStore";
 
 export default function LoginPage() {
   const t = useTranslations("LoginPage");
   const [error, setError] = useState<string | null>(null);
+  // Get the actions from our user store
+  const { setUser, setCurrentStore, setStoreRole } = useUserActions();
   const router = useRouter();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -23,11 +28,20 @@ export default function LoginPage() {
       body: JSON.stringify({ email, password }),
     });
 
+    const data = await response.json();
+
     if (response.ok) {
+      // Save user to the store
+      setUser(data.user as User);
+
+      // If the user has a store, save it
+      if (data.store) {
+        setCurrentStore(data.store as Store);
+        setStoreRole(data.storeRole as StoreType);
+      }
       router.push("/profile");
     } else {
       // Handle errors
-      const data = await response.json();
       setError(data.error || "Something went wrong. Please try again.");
     }
   }
@@ -64,9 +78,7 @@ export default function LoginPage() {
           />
         </div>
         <div className="self-start my-3 ml-2 text-sm text-[#004CFF]">
-          <Link href="/auth/forgotPassword">
-            {t("forgotPassword") + "?"}
-          </Link>
+          <Link href="/auth/forgotPassword">{t("forgotPassword") + "?"}</Link>
         </div>
         <button
           type="submit"

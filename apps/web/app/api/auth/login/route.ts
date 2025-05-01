@@ -1,19 +1,58 @@
+import { NextRequest, NextResponse } from "next/server";
 import { signIn } from "@/auth";
+import { db } from "@monkeyprint/db";
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await req.json();
-    await signIn("credentials", { email, password, redirect: false });
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
-  } catch (error) {
-    if ((error as { type: string }).type === "CredentialsSignin") {
-      return new Response(JSON.stringify({ error: "Invalid credentials." }), {
-        status: 401,
-      });
-    } else {
-      return new Response(JSON.stringify({ error: "Something went wrong." }), {
-        status: 500,
-      });
+    const { email, password } = await request.json();
+
+    // Use Next Auth's signIn function
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false, // Don't redirect, return JSON instead
+    });
+
+    // If sign in succeeded, fetch additional user data including store info
+    const user = await db.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        name: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        image: true,
+        role: true,
+        StoreCollaborator: {
+          include: {
+            store: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
+    // Get primary store (if any)
+    const primaryStoreRelation = user.StoreCollaborator[0];
+
+    // Remove sensitive data before sending to client
+    const { StoreCollaborator, ...safeUser } = user;
+
+    // Return user and store info
+    return NextResponse.json({
+      user: safeUser,
+      store: primaryStoreRelation?.store || null,
+      storeRole: primaryStoreRelation?.role || null,
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return NextResponse.json(
+      { error: "Authentication failed" },
+      { status: 500 }
+    );
   }
 }
