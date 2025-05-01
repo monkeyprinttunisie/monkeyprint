@@ -52,5 +52,18 @@
     "transactions": " View Transactions",
     "no_transactions": "No transactions found",
     "wallet": " My Wallet"
+  },
+  "Team": {
+    "team": "Team",
+    "addCollaborator": "Add Collaborator",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "actions": "Actions",
+    "edit": "Edit",
+    "remove": "Remove",
+    "removing": "Removing...",
+    "noCollaboratorsYet": "No team members yet",
+    "addYourFirstTeamMember": "Add your first team member to start collaborating"
   }
 }
