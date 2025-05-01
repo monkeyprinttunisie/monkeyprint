@@ -58,13 +58,20 @@ export async function POST(req: Request) {
       if (name) {
         store = await tx.store.create({
           data: {
-            userId: newUser.id,
             name: name,
             image: image || null,
             url: storeUrl,
           },
         });
 
+        // Create store relations
+        await tx.storeUserRelation.create({
+          data: {
+            storeId: store.id,
+            userId: newUser.id,
+            role: "OWNER",
+          },
+        });
         // Create wallet for the store
         await tx.wallet.create({
           data: {

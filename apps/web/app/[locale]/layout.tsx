@@ -8,6 +8,7 @@ import MenuWrapper from "@/components/menuWrapper";
 import { StoreProvider } from "@/providers/StoreProvider";
 import { Toaster } from "react-hot-toast";
 import { SessionProvider } from "next-auth/react";
+import { SessionSyncProvider } from "@/providers/SessionSyncProvider";
 
 export default async function LocaleLayout({
   children,
@@ -38,11 +39,13 @@ export default async function LocaleLayout({
             }
           >
             <SessionProvider>
-              <StoreProvider>
-                {children}
-                <Toaster position="top-center" />
-                <MenuWrapper />
-              </StoreProvider>
+              <SessionSyncProvider>
+                <StoreProvider>
+                  {children}
+                  <Toaster position="top-center" />
+                  <MenuWrapper />
+                </StoreProvider>
+              </SessionSyncProvider>
             </SessionProvider>
           </Suspense>
         </NextIntlClientProvider>
