@@ -14,6 +14,11 @@ enum Role {
   DESIGNER_TOOL
 }
 
+enum StoreType {
+  COLLABORATOR
+  OWNER
+}
+
 model User {
   id                   String    @id @default(cuid())
   name                 String? //store name
@@ -32,7 +37,8 @@ model User {
   passwordResetToken   String?   @unique
   passwordResetExpires DateTime?
   isDeleted            Boolean   @default(false)
-  Store                Store[]
+
+  StoreCollaborator StoreUserRelation[]
 }
 
 model Account {
@@ -186,7 +192,6 @@ model ContactInfo {
 
 model Store {
   id        String   @id @default(uuid())
-  userId    String
   name      String   @unique
   url       String?
   image     String?
@@ -194,8 +199,9 @@ model Store {
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
   wallet    Wallet?
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   Order     Order[]
+
+  StoreCollaborator StoreUserRelation[]
 }
 
 model Wallet {
@@ -205,4 +211,17 @@ model Wallet {
   Delivered Float  @default(0)
   Returned  Float  @default(0)
   store     Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+model StoreUserRelation {
+  storeId   String
+  userId    String
+  role      StoreType @default(COLLABORATOR)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([storeId, userId])
 }
