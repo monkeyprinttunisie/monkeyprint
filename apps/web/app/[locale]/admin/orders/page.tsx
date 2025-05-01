@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   getOrders,
   updateOrderStatus,
   deleteOrder,
+  OrderWithItems,
 } from "@/actions/orderActions";
-import { Order } from "@/types";
+import { Order } from "@monkeyprint/db";
 
 enum OrderStatus {
   CANCELED = "CANCELED",
@@ -19,7 +21,7 @@ enum OrderStatus {
 }
 export default function OrdersPage() {
   const router = useRouter();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderWithItems[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -216,10 +218,12 @@ export default function OrdersPage() {
                     key={item.id}
                     className="w-10 h-10 rounded bg-gray-100 overflow-hidden"
                   >
-                    <img
+                    <Image
                       src={item.imageUrl}
                       alt={item.name}
                       className="w-full h-full object-cover"
+                      width={200}
+                      height={200}
                     />
                   </div>
                 ))}

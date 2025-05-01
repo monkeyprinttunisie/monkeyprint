@@ -53,6 +53,7 @@
     "no_transactions": "No transactions found",
     "wallet": " My Wallet"
   },
+  
   "Team": {
     "team": "Team",
     "addCollaborator": "Add Collaborator",
@@ -65,5 +66,18 @@
     "removing": "Removing...",
     "noCollaboratorsYet": "No team members yet",
     "addYourFirstTeamMember": "Add your first team member to start collaborating"
+  
+  "HistoryPage": {
+    "Delivered": "Delivered",
+    "Paid": "Paid"
+  },
+
+  "ProductDetail": {
+    "productNotFound": "Product Not Found",
+    "back": "Back",
+    "noDescription": "No Description",
+    "categories": "Categories",
+    "productDetails": "Product Details",
+    "description": "Description"
   }
 }

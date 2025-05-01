@@ -8,8 +8,15 @@ const nextConfig: NextConfig = {
     UPLOADTHING_REGIONS: process.env.UPLOADTHING_REGIONS,
   },
   images: {
-    domains: ["c6ha9vzzh0.ufs.sh", "ufs.sh", "utfs.io"],
+    domains: ["c6ha9vzzh0.ufs.sh", "ufs.sh", "utfs.io", "app-dynamicmockups-psd-engine-production.s3.eu-central-1.amazonaws.com", "s3.eu-central-1.amazonaws.com",],
     unoptimized: process.env.NODE_ENV === "development",
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'app-dynamicmockups-psd-engine-production.s3.eu-central-1.amazonaws.com',
+        pathname: '/**',
+      },
+    ],
   },
   eslint: {
     ignoreDuringBuilds: true,
