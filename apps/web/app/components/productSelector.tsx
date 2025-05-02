@@ -12,11 +12,10 @@ interface ProductSelectorProps {
 const ProductSelector: React.FC<ProductSelectorProps> = ({ onButtonClick }) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
-    const [activeLink, setActiveLink] = useState<string>("");
 
     const toggleOptions = () => setIsOpen(prev => !prev);
 
-    const t = useTranslations("HomePage");
+    const t = useTranslations("Page");
 
     const router = useRouter();
     const handleProductClick = (productId: string) => {
@@ -27,10 +26,6 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({ onButtonClick }) => {
     };
     const handleDoubleClick = (productId: string) => {
         router.push(`/designer_tool/products/previewProduct?product=${productId}`);
-    };
-
-    const handleLinkClick = (link: string) => {
-        setActiveLink(link);
     };
 
     useEffect(() => {
@@ -46,7 +41,11 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({ onButtonClick }) => {
                 onClick={toggleOptions}
                 className="w-full flex items-center justify-center text-gray-700 font-semibold bg-[#004CFF] hover:bg-blue-200 transition"
             >
-                <img src="/icons/slide.svg" alt="Choose Product" className="w-4 h-4" />
+                <img
+                    src="/icons/slide.svg"
+                    alt={isOpen ? "Close Options" : "Choose Product"}
+                    className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                />
             </button>
 
             <AnimatePresence>
@@ -140,10 +139,10 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({ onButtonClick }) => {
                                 className="flex items-center justify-center"
                             >
                                 <IconButton
-                                    iconSrc="/icons/casque.svg"
-                                    altText="Casque Icon"
-                                    onClick={() => handleProductClick('casque')}
-                                    classN={`w-9 h-9 flex items-center justify-center rounded-full mr-[4vw] ${selectedProduct === "casque"
+                                    iconSrc="/icons/toteBag_icon.png"
+                                    altText="tote bag Icon"
+                                    onClick={() => handleProductClick('toteBag')}
+                                    classN={`w-9 h-9 flex items-center justify-center rounded-full mr-[4vw] ${selectedProduct === "toteBag"
                                         ? "border-2 border-[#004CFF]"
                                         : ""
                                         }`}
@@ -155,10 +154,10 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({ onButtonClick }) => {
                                 className="flex items-center justify-center"
                             >
                                 <IconButton
-                                    iconSrc="/icons/casque.svg"
+                                    iconSrc="/icons/pillow_icon.png"
                                     altText="Casque Icon"
-                                    onClick={() => handleProductClick('casque')}
-                                    classN={`w-9 h-9 flex items-center justify-center rounded-full mr-[4vw] ${selectedProduct === "casque"
+                                    onClick={() => handleProductClick('pillow')}
+                                    classN={`w-9 h-9 flex items-center justify-center rounded-full mr-[4vw] ${selectedProduct === "pillow"
                                         ? "border-2 border-[#004CFF]"
                                         : ""
                                         }`}
@@ -223,7 +222,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({ onButtonClick }) => {
                             You selected: {selectedProduct}
                         </h2>
                         <h1>{products[selectedProduct].description} </h1>
-                        <Link href={`/designer_tool/products/previewProduct?product=${selectedProduct}`}>
+                        <Link href={`/designer_tool/previewProduct?product=${selectedProduct}`}>
                             <button className="bg-blue-500 text-white text-xs p-[5vw]  py-2 rounded-full bg-gradient-to-r from-[#004CFF] to-[#3471FF] mt-[15vh]">
                                 Edit
                             </button>
