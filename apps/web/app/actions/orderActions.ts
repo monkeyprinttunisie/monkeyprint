@@ -165,6 +165,52 @@ export async function getOrderById(id: string): Promise<OrderResponse> {
   }
 }
 
+export async function getOrdersByPhoneNumber(phoneNumber: string) {
+  try {
+    // Find the contact info with this phone number
+    const contactInfos = await db.contactInfo.findMany({
+      where: {
+        phone: phoneNumber,
+      },
+      select: {
+        orderId: true,
+      },
+    });
+
+    if (contactInfos.length === 0) {
+      return {
+        success: false,
+        error: "No orders found with this phone number",
+      };
+    }
+
+    // Get all orders by these order IDs
+    const orderIds = contactInfos.map((info) => info.orderId);
+
+    const orders = await db.order.findMany({
+      where: {
+        id: { in: orderIds },
+        isDeleted: false,
+      },
+      include: {
+        items: true,
+        contactInfo: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return {
+      success: true,
+      orders: orders.map((order) => convertPrismaOrderToOrder(order)),
+    };
+  } catch (error) {
+    console.error("Error fetching orders by phone number:", error);
+    return { success: false, error: "Failed to fetch orders" };
+  }
+}
+
 export async function updateOrderStatus(
   id: string,
   status: OrderStatus

@@ -27,6 +27,8 @@ const ChatContainer: React.FC = () => {
   const [optionsVisible, setOptionsVisible] = useState(false);
   const [currentOptions, setCurrentOptions] = useState<any[]>([]);
 
+  const { loading, sendMessage } = useChatbot();
+
   useEffect(() => {
     if (messages.length === 0) {
       // Add initial greeting message directly to the UI without server call
@@ -38,6 +40,11 @@ const ChatContainer: React.FC = () => {
             text: "Create a new order",
             type: "action",
           },
+          {
+            id: "order_issues",
+            text: "Order Issues",
+            type: "action",
+          },
         ]
       );
     }
@@ -45,23 +52,60 @@ const ChatContainer: React.FC = () => {
 
   // Handle options display
   useEffect(() => {
-    // Find the last message with options
-    const lastMessageWithOptions = [...messages]
-      .reverse()
-      .find(
-        (message) =>
-          message.sender === "bot" &&
-          message.options &&
-          message.options.length > 0
-      );
+    // Always hide options when loading
+    if (loading) {
+      setOptionsVisible(false);
+      return;
+    }
 
-    if (lastMessageWithOptions?.options) {
-      setCurrentOptions(lastMessageWithOptions.options);
+    // Find the last message from the bot
+    const lastBotMessage = [...messages]
+      .reverse()
+      .find((message) => message.sender === "bot");
+
+    if (!lastBotMessage) {
+      setOptionsVisible(false);
+      return;
+    }
+
+    // Define intents that SHOULD show options panel
+    const showOptionsForIntents = [
+      "GREETING",
+      "CATEGORY_SELECTION",
+      "PRODUCT_SELECTION",
+      "CONTINUE_OR_COMPLETE",
+      "SHIPPING_METHOD",
+      "CONFIRMATION",
+      "ORDER_SELECTION",
+      "ISSUE_TYPE_SELECTION",
+      "ISSUE_CONFIRMATION",
+    ];
+
+    // Only show options if:
+    // 1. The message has options array AND
+    // 2. Either the intent is in our whitelist OR there's no intent (which means it's a general options display)
+    const hasOptions =
+      lastBotMessage.options && lastBotMessage.options.length > 0;
+    const hasAllowedIntent =
+      !lastBotMessage.intent ||
+      showOptionsForIntents.includes(lastBotMessage.intent);
+
+    if (hasOptions && hasAllowedIntent) {
+      // Use type assertion to tell TypeScript that options is definitely defined here
+      // Or use the non-null assertion operator (!)
+      setCurrentOptions(lastBotMessage.options!);
       setOptionsVisible(true);
     } else {
       setOptionsVisible(false);
     }
-  }, [messages]);
+  }, [messages, loading]);
+
+  const handleOptionSelect = (option: Option) => {
+    // Immediately hide the panel
+    setOptionsVisible(false);
+    // Then send the message
+    sendMessage(option.text, option.id);
+  };
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -154,7 +198,24 @@ const ChatContainer: React.FC = () => {
             <ChatBubble key={message.id} message={message} />
           ))
         )}
-
+        {loading && (
+          <div className="flex items-center my-4">
+            <div className="ml-3 flex space-x-1">
+              <div
+                className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0ms" }}
+              ></div>
+              <div
+                className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
+                style={{ animationDelay: "150ms" }}
+              ></div>
+              <div
+                className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
+                style={{ animationDelay: "300ms" }}
+              ></div>
+            </div>
+          </div>
+        )}
         {temporaryCart && temporaryCart.length > 0 && (
           <div className="my-4 p-3 border border-blue-200 bg-white rounded-lg shadow-sm">
             <h3 className="font-semibold mb-2">Your Current Cart</h3>
@@ -224,36 +285,75 @@ const ChatContainer: React.FC = () => {
       </div>
 
       {/* Options Panel */}
-      <SlideUpPanel
-        isOpen={optionsVisible}
-        onClose={() => setOptionsVisible(false)}
-        title={getPanelTitle()}
-        disableBackdropBlur={true}
-      >
-        <div className="flex flex-col space-y-3">
-          {currentOptions.map((option) => (
-            <div key={option.id}>
-              {option.type === "product" ? (
-                <ChatOptionProduct
-                  option={option}
-                  onClose={() => setOptionsVisible(false)}
-                />
-              ) : (
-                <ChatOptionButton
-                  option={option}
-                  onClose={() => setOptionsVisible(false)}
-                />
-              )}
-            </div>
-          ))}
-          <button
-            onClick={() => setOptionsVisible(false)}
-            className="w-full py-3 bg-blue-600 text-white rounded-md font-medium mt-4"
-          >
-            Next
-          </button>
-        </div>
-      </SlideUpPanel>
+      <div className="translate-y-[0vh]">
+        <SlideUpPanel
+          isOpen={optionsVisible}
+          onClose={() => setOptionsVisible(false)}
+          title={getPanelTitle()}
+          disableBackdropBlur={true}
+        >
+          <div className="flex flex-col space-y-3">
+            {currentOptions.map((option) => (
+              <div key={option.id}>
+                {option.type === "product" ? (
+                  <button
+                    onClick={() => handleOptionSelect(option)}
+                    className="w-full text-left p-3 rounded-md border border-gray-200 bg-white hover:bg-gray-50"
+                  >
+                    <div className="flex items-center">
+                      {option.imageUrl && (
+                        <img
+                          src={option.imageUrl}
+                          alt={option.text}
+                          className="w-16 h-16 object-cover rounded mr-3"
+                        />
+                      )}
+                      <div>
+                        <div className="font-medium">{option.text}</div>
+                        {option.price !== undefined && (
+                          <div className="text-sm text-gray-600">
+                            {option.price.toFixed(2)} DT
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleOptionSelect(option)}
+                    className={`w-full text-left px-4 py-3 rounded-md border flex items-center ${
+                      option.type === "action" && option.id === "confirm"
+                        ? "bg-green-50 border-green-200 text-green-700"
+                        : option.type === "action" && option.id === "cancel"
+                          ? "bg-red-50 border-red-200 text-red-700"
+                          : "bg-blue-50 border-blue-200 text-blue-700"
+                    }`}
+                  >
+                    <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M20 6L9 17L4 12"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    {option.text}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </SlideUpPanel>
+      </div>
     </div>
   );
 };

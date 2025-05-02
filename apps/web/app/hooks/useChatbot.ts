@@ -115,11 +115,42 @@ export const useChatbot = () => {
     }
   };
 
+  const uploadImage = async (imageUrl: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/chat/upload-image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ imageUrl }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        addBotMessage(data.message);
+      } else {
+        addBotMessage(
+          "Sorry, there was an error processing your image. Please try again or describe the issue instead."
+        );
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      addBotMessage(
+        "Sorry, there was an error processing your image. Please try again or describe the issue instead."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     messages,
     loading,
     error,
     sendMessage: handleSendMessage,
     submitContactInfo,
+    uploadImage,
   };
 };
