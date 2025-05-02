@@ -61,7 +61,7 @@ const TextEditorToolbar: React.FC<TextEditorToolbarProps> = ({
     ]
 
     return (
-        <div className="fixed bottom-20 left-0 w-full z-50 p-3">
+        <div className="fixed bottom-15 left-0 w-full z-50 p-3">
             <div
                 className="flex h-[15vh] w-full bg-no-repeat bg-contain justify-center items-center mx-auto"
                 style={{
