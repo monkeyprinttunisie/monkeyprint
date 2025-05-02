@@ -62,7 +62,7 @@ export default function ClipartsPage() {
       // Navigate to preview with the first selected image as parameter
       const targetProduct = productId || localStorage.getItem("selectedProduct")
       router.push(
-        `/designer_tool/products/previewProduct?product=${targetProduct}&image=${encodeURIComponent(selectedCliparts[0].imageUrl)}`,
+        `/designer_tool/previewProduct?product=${targetProduct}&image=${encodeURIComponent(selectedCliparts[0].imageUrl)}`,
       )
     } catch (error) {
       console.error("Error applying selected cliparts:", error)
@@ -184,7 +184,7 @@ export default function ClipartsPage() {
 
         {/* Apply button  */}
         {filteredCliparts.length > 0 && (
-          <div className="fixed bottom-12 left-0 right-0 flex justify-center p-6 z-10">
+          <div className="fixed bottom-15 left-0 right-0 flex justify-center p-6 z-10">
             <button
               onClick={handleApplyClick}
               disabled={selectedClipartIds.length === 0}

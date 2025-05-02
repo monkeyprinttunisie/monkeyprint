@@ -72,7 +72,7 @@ export default function Page() {
         localStorage.setItem("activeNavLink", "products");
 
         router.push(
-            `/designer_tool/products/previewProduct?product=${selectedProduct}&image=${encodeURIComponent(uploadedFile.ufsUrl)}${zoneParam}`
+            `/designer_tool/previewProduct?product=${selectedProduct}&image=${encodeURIComponent(uploadedFile.ufsUrl)}${zoneParam}`
         );
     };
 

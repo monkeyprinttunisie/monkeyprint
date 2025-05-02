@@ -338,8 +338,8 @@ export default function ImageGenerator() {
       const targetIndices =
         baseOnSelected && selectedImageIndex !== null
           ? Array.from({ length: 4 })
-              .map((_, i) => i)
-              .filter((i) => i !== selectedImageIndex)
+            .map((_, i) => i)
+            .filter((i) => i !== selectedImageIndex)
           : [0, 1, 2, 3]; // All indices if not based on selected
 
       console.log(
@@ -578,7 +578,7 @@ export default function ImageGenerator() {
 
       // Navigate to preview
       router.push(
-        `/designer_tool/products/previewProduct?product=${selectedProduct}`
+        `/designer_tool/previewProduct?product=${selectedProduct}`
       );
     } catch (error) {
       console.error("Error applying selected image:", error);
