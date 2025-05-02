@@ -15,10 +15,10 @@ export const products: Record<string, ProductOption> = {
         {
           id: "frontChest",
           name: "Front Print Area",
-          x: 0, 
+          x: 0,
           y: -40,
-          width: 250, 
-          height: 400, 
+          width: 250,
+          height: 400,
           rotation: 0,
           maxImagesAllowed: 5
         }
@@ -136,6 +136,76 @@ export const products: Record<string, ProductOption> = {
           y: -30,
           width: 250,
           height: 300,
+          rotation: 0,
+          maxImagesAllowed: 5
+        }
+      ]
+    }
+  },
+  toteBag: {
+    id: "toteBag",
+    name: "Tote Bag",
+    description: "it's a trendy tote bag that...",
+    images: {
+      front: "/images/tote bag.png",
+      back: "/images/tote bag.png",
+    },
+    designZones: {
+      front: [
+        {
+          id: "frontChest",
+          name: "Front Print Area",
+          x: 0,
+          y: 0,
+          width: 120,
+          height: 140,
+          rotation: 0,
+          maxImagesAllowed: 5
+        }
+      ],
+      back: [
+        {
+          id: "backCenter",
+          name: "Back Print Area",
+          x: 0,
+          y: 0,
+          width: 120,
+          height: 140,
+          rotation: 0,
+          maxImagesAllowed: 5
+        }
+      ]
+    }
+  },
+  pillow: {
+    id: "pillow",
+    name: "Pillow",
+    description: "it's a white pillow that...",
+    images: {
+      front: "/images/pillow.png",
+      back: "/images/pillow.png",
+    },
+    designZones: {
+      front: [
+        {
+          id: "frontChest",
+          name: "Front Print Area",
+          x: 7,
+          y: -30,
+          width: 270,
+          height: 200,
+          rotation: 0,
+          maxImagesAllowed: 5
+        }
+      ],
+      back: [
+        {
+          id: "backCenter",
+          name: "Back Print Area",
+          x: 7,
+          y: -30,
+          width: 270,
+          height: 200,
           rotation: 0,
           maxImagesAllowed: 5
         }
