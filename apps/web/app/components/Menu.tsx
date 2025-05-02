@@ -12,7 +12,7 @@ export default function Menu() {
 
   return (
     <div className="fixed bottom-0 left-0 h-[8vh] right-0 bg-white shadow-lg p-4 flex justify-around items-center">
-      <Link href="/products/listProducts" className="text-gray-900">
+      <Link href="/home" className="text-gray-900">
         <img
           src={
             pathname === "/products/listProducts"
@@ -25,7 +25,7 @@ export default function Menu() {
         />
       </Link>
 
-      <Link href="/wishlist" className="text-gray-900">
+      {/* <Link href="/wishlist" className="text-gray-900">
         <img
           src={
             pathname === "/wishlist"
@@ -36,9 +36,9 @@ export default function Menu() {
           width="24"
           height="24"
         />
-      </Link>
+      </Link> */}
 
-      <Link href="/categories" className="text-gray-800">
+      <Link href="/chat" className="text-gray-800">
         <img
           src={
             pathname === "/categories"
