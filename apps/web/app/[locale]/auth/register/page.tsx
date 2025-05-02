@@ -7,7 +7,7 @@ import Uploader from "@/components/Uploader";
 import { registerSchema } from "@monkeyprint/utils/zod";
 import { z } from "zod";
 const roleOptions = [
-  { label: "Full Pack (Drop Shipping)", value: "DROPSHIPPING" },
+  { label: "Full Pack (Drop Shipping)", value: "DROPFULFILLED" },
   { label: "Ecommerce + Designer Tool", value: "ECOMMERCE_WEBSITE" },
   { label: "Designer Tool Only", value: "DESIGNER_TOOL" },
 ];
@@ -173,11 +173,10 @@ export default function RegisterPage() {
       {/* Success notification */}
       {message && (
         <div
-          className={`fixed top-6 left-0 right-0 mx-auto w-5/6 max-w-sm p-3 rounded-lg text-sm  z-50 shadow-md ${
-            message.includes("success")
+          className={`fixed top-6 left-0 right-0 mx-auto w-5/6 max-w-sm p-3 rounded-lg text-sm  z-50 shadow-md ${message.includes("success")
               ? "bg-green-100 text-green-800"
               : "bg-red-100 text-red-800"
-          }`}
+            }`}
         >
           {message}
         </div>

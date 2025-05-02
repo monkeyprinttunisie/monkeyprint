@@ -7,12 +7,14 @@ interface BottomSheetProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  disableBackdropBlur?: boolean;
 }
 
 export default function BottomSheet({
   isOpen,
   onClose,
   title,
+  disableBackdropBlur = false,
   children,
 }: BottomSheetProps) {
   const [isVisible, setIsVisible] = useState(false);
@@ -39,7 +41,7 @@ export default function BottomSheet({
       }`}
     >
       <div
-        className={`absolute inset-0 backdrop-blur-[4.55px] bg-[rgba(0,66,224,0.12)] transition-all duration-200 ${
+        className={`absolute inset-0 transition-all duration-200  ${disableBackdropBlur ? "" : " backdrop-blur-[4.55px] bg-[rgba(0,66,224,0.12)]"}  ${
           isOpen ? "opacity-100" : "opacity-0"
         }`}
         onClick={onClose}

@@ -9,7 +9,7 @@ export type OrderWithItems = Prisma.OrderGetPayload<{
   include: { items: true; contactInfo: true };
 }>;
 
-// Helper function to convert Prisma order to your Order type
+// convert Prisma order to your Order type
 function convertPrismaOrderToOrder(prismaOrder: any): Order {
   return {
     id: prismaOrder.id,
@@ -18,10 +18,30 @@ function convertPrismaOrderToOrder(prismaOrder: any): Order {
     totalPrice: prismaOrder.totalPrice,
     shippingMethod: prismaOrder.shippingMethod,
     shippingFee: prismaOrder.shippingFee,
-    items: prismaOrder.items,
-    contactInfo: prismaOrder.contactInfo,
+    items: prismaOrder.items.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      orderId: item.orderId,
+      productId: item.productId,
+      quantity: item.quantity,
+      price: item.price,
+      imageUrl: item.imageUrl,
+      stock: 0, 
+    })),
+    contactInfo: prismaOrder.contactInfo ? {
+      id: prismaOrder.contactInfo.id,
+      name: prismaOrder.contactInfo.name,
+      orderId: prismaOrder.contactInfo.orderId,
+      email: prismaOrder.contactInfo.email,
+      phone: prismaOrder.contactInfo.phone,
+      country: prismaOrder.contactInfo.country,
+      address: prismaOrder.contactInfo.address,
+      city: prismaOrder.contactInfo.city,
+    } : null,
     createdAt: prismaOrder.createdAt,
     updatedAt: prismaOrder.updatedAt,
+     storeId: prismaOrder.storeId || null,
+    isDeleted: prismaOrder.isDeleted || false,
   };
 }
 
@@ -145,12 +165,58 @@ export async function getOrderById(id: string): Promise<OrderResponse> {
   }
 }
 
+export async function getOrdersByPhoneNumber(phoneNumber: string) {
+  try {
+    // Find the contact info with this phone number
+    const contactInfos = await db.contactInfo.findMany({
+      where: {
+        phone: phoneNumber,
+      },
+      select: {
+        orderId: true,
+      },
+    });
+
+    if (contactInfos.length === 0) {
+      return {
+        success: false,
+        error: "No orders found with this phone number",
+      };
+    }
+
+    // Get all orders by these order IDs
+    const orderIds = contactInfos.map((info) => info.orderId);
+
+    const orders = await db.order.findMany({
+      where: {
+        id: { in: orderIds },
+        isDeleted: false,
+      },
+      include: {
+        items: true,
+        contactInfo: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return {
+      success: true,
+      orders: orders.map((order) => convertPrismaOrderToOrder(order)),
+    };
+  } catch (error) {
+    console.error("Error fetching orders by phone number:", error);
+    return { success: false, error: "Failed to fetch orders" };
+  }
+}
+
 export async function updateOrderStatus(
   id: string,
   status: OrderStatus
 ): Promise<OrderResponse> {
   try {
-    const prismaOrder = await db.order.update({
+    const order = await db.order.update({
       where: { id },
       data: { status },
       include: {
@@ -162,7 +228,7 @@ export async function updateOrderStatus(
     revalidatePath("/orders");
     revalidatePath(`/admin/orders/${id}`);
 
-    return { success: true, order: convertPrismaOrderToOrder(prismaOrder) };
+    return { success: true, order };
   } catch (error) {
     console.error("Error updating order status:", error);
     return { success: false, error: "Failed to update order status" };

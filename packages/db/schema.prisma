@@ -9,7 +9,7 @@ datasource db {
 }
 
 enum Role {
-  DROPSHIPPING
+  DROPFULFILLED
   ECOMMERCE_WEBSITE
   DESIGNER_TOOL
 }
@@ -29,7 +29,7 @@ model User {
   password             String?
   image                String?
   phoneNumber          String? // phone number with country code
-  role                 Role      @default(DROPSHIPPING)
+  role                 Role      @default(DROPFULFILLED)
   accounts             Account[]
   sessions             Session[]
   createdAt            DateTime  @default(now())

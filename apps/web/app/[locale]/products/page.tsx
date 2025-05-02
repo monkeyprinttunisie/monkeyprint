@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { createProduct } from "@/actions/productActions";
 import { useCategoryStore } from "@/store/useCategoryStore";
 import { toast } from "react-hot-toast";
+import { useUploadThing } from "@/uploadthing";
 
 const AddProduct: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -20,6 +21,7 @@ const AddProduct: React.FC = () => {
     useState<string>("");
   const [selectedSubproductCategories, setSelectedSubproductCategories] =
     useState<string[]>([]);
+  const { startUpload } = useUploadThing("productImage");
 
   const router = useRouter();
   const targetCategories = useCategoryStore((state) => state.targetCategories);
@@ -52,6 +54,55 @@ const AddProduct: React.FC = () => {
     "base64"
   );
 
+  const transferImageIfNeeded = async (url: string): Promise<string> => {
+    // Check if this is a DynamicMockups URL
+    if (
+      url.includes(
+        "app-dynamicmockups-psd-engine-production.s3.eu-central-1.amazonaws.com"
+      )
+    ) {
+      try {
+        console.log("Transferring DynamicMockups image to UploadThing...");
+
+        // Fetch the image
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch image: ${response.statusText}`);
+        }
+
+        // Convert to blob
+        const imageBlob = await response.blob();
+
+        // Create a File object from the blob
+        const file = new File(
+          [imageBlob],
+          `transferred-mockup-${Date.now()}.png`,
+          { type: "image/png" }
+        );
+
+        // Upload to UploadThing using the same hook used in previewProduct
+        const uploadResult = await startUpload([file]);
+
+        if (!uploadResult || uploadResult.length === 0) {
+          throw new Error("Failed to upload image to UploadThing");
+        }
+
+        // Get the new URL
+        const newUrl = uploadResult[0].ufsUrl;
+        console.log("Image transferred successfully:", newUrl);
+
+        return newUrl;
+      } catch (error) {
+        console.error("Error transferring image:", error);
+        // If transfer fails, return the original URL
+        return url;
+      }
+    }
+
+    // If not a DynamicMockups URL, return as is
+    return url;
+  };
+
   useEffect(() => {
     // Check if we have a pending product
     const pendingProduct = localStorage.getItem("pendingProduct");
@@ -79,7 +130,6 @@ const AddProduct: React.FC = () => {
     const designImage = localStorage.getItem("productDesignImage");
     if (designImage) {
       setImageUrl(designImage);
-
       // Clear the stored design image
       localStorage.removeItem("productDesignImage");
     }
@@ -94,6 +144,13 @@ const AddProduct: React.FC = () => {
     setIsLoading(true);
 
     try {
+      const processedImageUrl = await transferImageIfNeeded(imageUrl);
+      // Use the processed image URL instead of the original
+      if (processedImageUrl !== imageUrl) {
+        console.log("Using transferred image URL:", processedImageUrl);
+        setImageUrl(processedImageUrl); // Update the state with the new URL
+      }
+
       // Combine all selected categories
       const categoryIds = [
         ...selectedTargetCategories,
@@ -109,7 +166,7 @@ const AddProduct: React.FC = () => {
         name,
         description,
         price: Number(price),
-        imageUrl,
+        imageUrl: processedImageUrl,
         stock: Number(stock),
         categoryIds,
       });
@@ -176,6 +233,7 @@ const AddProduct: React.FC = () => {
       targetCategories: selectedTargetCategories,
       productCategory: selectedProductCategory,
       subproductCategories: selectedSubproductCategories,
+      needsTransfer: true,
     };
 
     localStorage.setItem("pendingProduct", JSON.stringify(productData));
@@ -198,7 +256,7 @@ const AddProduct: React.FC = () => {
       "designTargetCategoryNames",
       JSON.stringify(targetCategoryNames)
     );
-    
+
     // Set flag that we're designing for a product
     localStorage.setItem("designForProduct", "true");
 
@@ -207,7 +265,7 @@ const AddProduct: React.FC = () => {
   };
 
   return (
-    <div className="px-4 pt-6 pb-[8.5vh] w-full  mx-auto">
+    <div className="px-4 pt-6 pb-[8.5vh] w-full mx-auto">
       <div className="bg-white rounded-xl p-4">
         <h3 className="text-xl font-bold mb-4 text-center">Add New Product</h3>
         <form onSubmit={handleSubmit} className="space-y-4">

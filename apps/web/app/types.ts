@@ -1,6 +1,31 @@
 import { CategoryType, OrderStatus, ShippingMethod } from "@monkeyprint/db";
 import { OrderWithItems } from "./actions/orderActions";
 
+export interface ChatMessage {
+  id: string;
+  sender: "user" | "bot";
+  content: string;
+  timestamp: Date;
+}
+
+export interface ChatOrder {
+  id: string;
+  items: ChatOrderItem[];
+  totalPrice: number;
+  shippingMethod: "STANDARD" | "EXPRESS";
+  contactInfo: ContactInfo;
+}
+
+export interface ChatOrderItem {
+  productId: string;
+  quantity: number;
+  price: number;
+  name: string;
+  imageUrl: string;
+}
+
+
+
 // types.ts
 export interface DesignZone {
   id: string;
@@ -181,16 +206,18 @@ export interface PaginationProps {
 }
 
 export interface ContactInfo {
+  id: string;
   name: string;
+  orderId: string;
   phone: string;
-  email?: string;
-  country?: string;
+  email: string | null;
+  country: string;
   address: string;
   city: string;
 }
-
 export interface OrderItem extends CartItem {
   orderId: string;
+  productId: string;
 }
 
 export interface Order {
@@ -201,9 +228,11 @@ export interface Order {
   shippingMethod: ShippingMethod;
   shippingFee: number;
   items: OrderItem[];
-  contactInfo?: ContactInfo;
+  contactInfo: ContactInfo | null;
   createdAt: Date;
   updatedAt: Date;
+  storeId: string; 
+  isDeleted: boolean;
 }
 
 export interface OrderResponse {
