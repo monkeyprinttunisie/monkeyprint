@@ -8,7 +8,7 @@ import EditableText from "@/components/editableText";
 import { useCallback } from "react";
 
 interface PreviewProductProps {
-  mode?: string; // Add the 'mode' prop to the component's type definition
+  mode?: string;
 }
 
 export default function PreviewProduct({ mode }: PreviewProductProps) {
@@ -81,6 +81,7 @@ export default function PreviewProduct({ mode }: PreviewProductProps) {
   }, []);
 
   useEffect(() => {
+
     // Listen for the custom deselection event
     const handleDeselectAll = () => {
       // Deselect all images by updating their isSelected property
@@ -236,13 +237,13 @@ export default function PreviewProduct({ mode }: PreviewProductProps) {
         return;
       }
 
-            const redirectFlag = localStorage.getItem("redirectToTextEditor");
-            if (redirectFlag === "true") {
-                console.log("Activating text editor from localStorage flag");
-                localStorage.removeItem("redirectToTextEditor"); // Clear the flag
-                handleTextEditorActivation(new CustomEvent("activateTextEditor", { detail: { source: 'storage' } }));
-                return;
-            }
+      const redirectFlag = localStorage.getItem("redirectToTextEditor");
+      if (redirectFlag === "true") {
+        console.log("Activating text editor from localStorage flag");
+        localStorage.removeItem("redirectToTextEditor"); // Clear the flag
+        handleTextEditorActivation(new CustomEvent("activateTextEditor", { detail: { source: 'storage' } }));
+        return;
+      }
 
       const activeNavLink = localStorage.getItem("activeNavLink");
       if (activeNavLink === "text") {
@@ -504,8 +505,8 @@ export default function PreviewProduct({ mode }: PreviewProductProps) {
           // Get zone for constraints
           const zone = productId
             ? products[productId].designZones[view].find(
-                (z) => z.id === selectedImage.zoneId
-              )
+              (z) => z.id === selectedImage.zoneId
+            )
             : null;
 
           // Calculate max size based on zone
@@ -816,8 +817,8 @@ export default function PreviewProduct({ mode }: PreviewProductProps) {
         // Get zone for constraints
         const zone = productId
           ? products[productId].designZones[view].find(
-              (z) => z.id === selectedImage.zoneId
-            )
+            (z) => z.id === selectedImage.zoneId
+          )
           : null;
 
         // Calculate max size based on zone
@@ -958,14 +959,7 @@ export default function PreviewProduct({ mode }: PreviewProductProps) {
     }
   };
 
-  const handleTextResizeTouchStart = (e: React.TouchEvent, index: number) => {
-    e.stopPropagation();
-    if (e.touches.length === 1) {
-      setIsResizing(true);
-      setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-      setInitialSize(designTexts[index].size);
-    }
-  };
+
 
   const handleRotateTouchStart = (e: React.TouchEvent, index: number) => {
     e.stopPropagation();
@@ -985,26 +979,7 @@ export default function PreviewProduct({ mode }: PreviewProductProps) {
     }
   };
 
-  // Text control handlers
-  const handleTextResizeStart = (e: React.MouseEvent, index: number) => {
-    e.stopPropagation();
-    setIsResizing(true);
-    setDragStart({ x: e.clientX, y: e.clientY });
-    setInitialSize(designTexts[index].size);
-  };
 
-  const handleTextRotateStart = (e: React.MouseEvent, index: number) => {
-    e.stopPropagation();
-    setIsRotating(true);
-    setInitialRotation(designTexts[index].rotation);
-    const textElement = document.getElementById(`design-text-${index}`);
-    if (textElement) {
-      const rect = textElement.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      setDragStart({ x: e.clientX - centerX, y: e.clientY - centerY });
-    }
-  };
 
   // === ELEMENT OPERATIONS ===
   // Remove image
@@ -1097,6 +1072,67 @@ export default function PreviewProduct({ mode }: PreviewProductProps) {
     }
   };
 
+  // apply color chosen
+  useEffect(() => {
+    if (!isClient) return;
+
+    // Initial color check
+    const applyStoredColor = () => {
+      const appliedColor = localStorage.getItem('appliedProductColor');
+
+      // Find the product container
+      const productContainer = containerRef.current?.querySelector('.relative.w-full.h-\\[60vh\\]');
+
+      if (productContainer) {
+        // Check if we already have a color overlay
+        let colorOverlay = productContainer.querySelector('.product-color-overlay');
+
+        // If no overlay exists yet, create one
+        if (!colorOverlay) {
+          colorOverlay = document.createElement('div');
+          colorOverlay.className = 'product-color-overlay absolute inset-0';
+
+          // Insert before the image so it's behind it
+          productContainer.insertBefore(colorOverlay, productContainer.firstChild);
+        }
+
+        // Set the color and positioning to match ProductColorPreview
+        (colorOverlay as HTMLElement).style.backgroundColor = appliedColor || 'transparent';
+        (colorOverlay as HTMLElement).style.height = '75%';
+        (colorOverlay as HTMLElement).style.width = '65%';
+        (colorOverlay as HTMLElement).style.top = '12%';
+        (colorOverlay as HTMLElement).style.left = '18%';
+        (colorOverlay as HTMLElement).style.position = 'absolute';
+        (colorOverlay as HTMLElement).style.zIndex = '0';
+      }
+    };
+    // Apply color immediately
+    applyStoredColor();
+
+    // Set up event listener for color changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'appliedProductColor') {
+        applyStoredColor();
+      }
+    };
+
+    // Create a custom event listener for immediate updates within the app
+    const handleColorUpdate = () => {
+      applyStoredColor();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('productColorChanged', handleColorUpdate);
+
+    // Set up polling as a fallback mechanism
+    const intervalId = setInterval(applyStoredColor, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('productColorChanged', handleColorUpdate);
+      clearInterval(intervalId);
+    };
+  }, [isClient]);
   // === RENDER ===
   // For hydration safety
   if (!isClient) {
@@ -1124,11 +1160,14 @@ export default function PreviewProduct({ mode }: PreviewProductProps) {
         onTouchEnd={handleMouseUp}
       >
         {/* Product background */}
-        <img
-          src={product.images[view]}
-          alt={`${product.name} ${view}`}
-          className="w-full h-full absolute top-0 left-0"
-        />
+        <div className="relative w-full h-[60vh]  mt-[2vh] flex items-center justify-center">
+          <img
+            src={product.images[view]}
+            alt={`${product.name} ${view} product`}
+            className="max-w-full max-h-full object-contain"
+            style={{ opacity: 0.99 }}
+          />
+        </div>
 
         {/* Design zones with their contained images and text */}
         {currentZones.map((zone) => (
@@ -1297,11 +1336,10 @@ export default function PreviewProduct({ mode }: PreviewProductProps) {
             <button
               key={zone.id}
               onClick={() => handleZoneSelect(zone.id)}
-              className={`px-3 py-1 m-1 text-sm rounded ${
-                zone.id === activeZoneId
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-800"
-              }`}
+              className={`px-3 py-1 m-1 text-sm rounded ${zone.id === activeZoneId
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-800"
+                }`}
             >
               {zone.name}
             </button>

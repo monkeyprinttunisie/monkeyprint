@@ -21,29 +21,7 @@ const defaultColors = [
     "#BDB76B", // Dark Khaki
 ];
 
-// Pastel colors palette
-const pastelColors = [
-    "#FFB6C1", // Light Pink
-    "#FFD700", // Gold
-    "#87CEFA", // Light Sky Blue
-    "#98FB98", // Pale Green
-    "#E6E6FA", // Lavender
-    "#FFA07A", // Light Salmon
-    "#F0E68C", // Khaki
-    "#F5DEB3", // Wheat
-];
 
-// Earth tone colors palette
-const earthToneColors = [
-    "#8B4513", // Saddle Brown
-    "#A0522D", // Sienna
-    "#CD853F", // Peru
-    "#D2B48C", // Tan
-    "#556B2F", // Dark Olive Green
-    "#6B8E23", // Olive Drab
-    "#BDB76B", // Dark Khaki
-    "#F5F5DC", // Beige
-];
 const grayScaleColors = [
     "#BFBFBF",
     "#B2B2B2", "#A6A6A6", "#999999", "#808080", "#666666", "#4D4D4D", "#333333", "#1A1A1A", "#000000"
@@ -218,17 +196,41 @@ const AlphaSlider: React.FC<AlphaSliderProps> = ({ color, value, onChange }) => 
 };
 export default function ColorPage() {
     // State for the color picker
-    const [selectedColor, setSelectedColor] = useState("#000000");
+    const [adminSelectedColor, setAdminSelectedColor] = useState("#000000");
+    const [superAdminSelectedColor, setSuperAdminSelectedColor] = useState("#000000");
     const [colorOpacity, setColorOpacity] = useState(100);
     const [productId, setProductId] = useState<string | null>(null);
     const [showColorPanel, setShowColorPanel] = useState(false);
+    const [adminProductColor, setAdminProductColor] = useState<string | null>(null);
+    const [superAdminProductColor, setSuperAdminProductColor] = useState<string | null>(null);
     const t = useTranslations("ColorPage");
 
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // State for the admin panel colors
-
+    const getSelectedColor = () => {
+        return activeTab === 'admin' ? adminSelectedColor : superAdminSelectedColor;
+    };
+    const getCurrentProductColor = () => {
+        return activeTab === 'admin' ? adminProductColor : superAdminProductColor;
+    };
+    const setCurrentProductColor = (color: string | null) => {
+        if (activeTab === 'admin') {
+            setAdminProductColor(color);
+            if (color) {
+                localStorage.setItem('adminProductColor', color);
+            } else {
+                localStorage.removeItem('adminProductColor');
+            }
+        } else {
+            setSuperAdminProductColor(color);
+            if (color) {
+                localStorage.setItem('superAdminProductColor', color);
+            } else {
+                localStorage.removeItem('superAdminProductColor');
+            }
+        }
+    };
     // Load admin colors from localStorage or use defaults
     const [adminColors, setAdminColors] = useState<string[]>(() => {
         // Only run in client-side
@@ -254,28 +256,44 @@ export default function ColorPage() {
 
     // apply color to product
     const handleColorSelect = (color: string) => {
-        setSelectedColor(color);
+        // Update the appropriate state based on active tab
+        if (activeTab === 'admin') {
+            setAdminSelectedColor(color);
+        } else {
+            setSuperAdminSelectedColor(color);
+        }
 
-        // Apply color immediately
+        // Apply color with opacity if needed
         const finalColor = colorOpacity < 100
             ? `rgba(${parseInt(color.slice(1, 3), 16)}, ${parseInt(color.slice(3, 5), 16)}, ${parseInt(color.slice(5, 7), 16)}, ${colorOpacity / 100})`
             : color;
 
-        setProductColor(finalColor);
+        // Set the appropriate product color
+        setCurrentProductColor(finalColor);
+
+        // Update the current tab's localStorage key
+        const colorKey = activeTab === 'admin' ? 'adminProductColor' : 'superAdminProductColor';
+        localStorage.setItem(colorKey, finalColor);
+
+        // Also update the generic key for the ProductColorPreview component
         localStorage.setItem('appliedProductColor', finalColor);
-        console.log(`Applied color: ${finalColor}`);
     };
     const handleGridColorSelect = (color: string) => {
-        setSelectedColor(color);
+        // Same pattern as handleColorSelect
+        if (activeTab === 'admin') {
+            setAdminSelectedColor(color);
+        } else {
+            setSuperAdminSelectedColor(color);
+        }
 
-        // Apply color immediately
         const finalColor = colorOpacity < 100
             ? `rgba(${parseInt(color.slice(1, 3), 16)}, ${parseInt(color.slice(3, 5), 16)}, ${parseInt(color.slice(5, 7), 16)}, ${colorOpacity / 100})`
             : color;
 
-        setProductColor(finalColor);
+        setCurrentProductColor(finalColor);
+        const colorKey = activeTab === 'admin' ? 'adminProductColor' : 'superAdminProductColor';
+        localStorage.setItem(colorKey, finalColor);
         localStorage.setItem('appliedProductColor', finalColor);
-        console.log(`Applied color: ${finalColor}`);
     };
     // Initialize product from URL params
     useEffect(() => {
@@ -299,57 +317,88 @@ export default function ColorPage() {
         }
     }, [searchParams, router]);
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
 
+        const adminColor = localStorage.getItem('adminProductColor');
+        if (adminColor) {
+            setAdminProductColor(adminColor);
+        }
+
+        const superAdminColor = localStorage.getItem('superAdminProductColor');
+        if (superAdminColor) {
+            setSuperAdminProductColor(superAdminColor);
+        }
+
+        // Set the initial applied color based on active tab
+        const initialColorKey = activeTab === 'admin' ? 'adminProductColor' : 'superAdminProductColor';
+        const initialColor = localStorage.getItem(initialColorKey);
+        if (initialColor) {
+            localStorage.setItem('appliedProductColor', initialColor);
+        }
+    }, []);
 
     // Add color from super admin to admin panel
     const addColorToAdminPanel = () => {
-        if (!adminColors.includes(selectedColor)) {
-            const newColors = [...adminColors, selectedColor];
+        if (!adminColors.includes(superAdminSelectedColor)) {
+            const newColors = [...adminColors, superAdminSelectedColor];
             setAdminColors(newColors);
-            console.log("Added color:", selectedColor, "New colors:", newColors);
+            console.log("Added color:", superAdminSelectedColor, "New colors:", newColors);
         } else {
-            console.log("Color already exists in admin panel:", selectedColor);
+            console.log("Color already exists in admin panel:", superAdminSelectedColor);
         }
     };
 
     // Remove color from admin panel
     const removeColorFromAdminPanel = () => {
-        if (adminColors.includes(selectedColor)) {
-            const newColors = adminColors.filter(color => color !== selectedColor);
+        const currentColor = getSelectedColor();
+        if (adminColors.includes(currentColor)) {
+            const newColors = adminColors.filter(color => color !== currentColor);
             setAdminColors(newColors);
 
             if (newColors.length > 0) {
                 // Select the first available color in the updated list
-                setSelectedColor(newColors[0]);
+                if (activeTab === 'admin') {
+                    setAdminSelectedColor(newColors[0]);
+                } else {
+                    setSuperAdminSelectedColor(newColors[0]);
+                }
             } else {
                 // If no colors left, set to a default color
-                setSelectedColor("#000000");
+                if (activeTab === 'admin') {
+                    setAdminSelectedColor("#000000");
+                } else {
+                    setSuperAdminSelectedColor("#000000");
+                }
             }
         }
         else {
-            console.log("Color not found in admin panel:", selectedColor);
+            console.log("Color not found in admin panel:", currentColor);
         }
     };
 
     // Convert hex to rgba for opacity
     const getColorWithOpacity = () => {
-        const r = parseInt(selectedColor.slice(1, 3), 16);
-        const g = parseInt(selectedColor.slice(3, 5), 16);
-        const b = parseInt(selectedColor.slice(5, 7), 16);
+        const currentColor = getSelectedColor();
+        const r = parseInt(currentColor.slice(1, 3), 16);
+        const g = parseInt(currentColor.slice(3, 5), 16);
+        const b = parseInt(currentColor.slice(5, 7), 16);
         return `rgba(${r}, ${g}, ${b}, ${colorOpacity / 100})`;
     };
+
     // function to reset product color 
     const resetProductColor = () => {
-        setProductColor(null);
+        setCurrentProductColor(null);
 
-        localStorage.removeItem('appliedProductColor');
+        const colorKey = activeTab === 'admin' ? 'adminProductColor' : 'superAdminProductColor';
+        localStorage.removeItem(colorKey);
+        localStorage.setItem('appliedProductColor', ''); // Clear the current display
 
-        // Close the color panel if open
         if (showColorPanel) {
             setShowColorPanel(false);
         }
 
-        console.log("Product color reset");
+        console.log("Product color reset for", activeTab);
     };
     // Handle slider change for opacity
     const handleOpacityChange = (value: number) => {
@@ -372,8 +421,25 @@ export default function ColorPage() {
     };
     const previewColor = colorOpacity < 100
         ? getColorWithOpacity()
-        : selectedColor;
-    const displayColorText = selectedColor;
+        : getSelectedColor();
+    const displayColorText = getSelectedColor();
+    useEffect(() => {
+        // When tab changes, update the displayed color
+        const colorKey = activeTab === 'admin' ? 'adminProductColor' : 'superAdminProductColor';
+        const storedColor = localStorage.getItem(colorKey);
+
+        if (storedColor) {
+            // Update the applied color in localStorage for the ProductColorPreview component
+            localStorage.setItem('appliedProductColor', storedColor);
+        } else {
+            localStorage.removeItem('appliedProductColor');
+        }
+
+        // Trigger a custom event to notify components of color change
+        const colorEvent = new Event('productColorChanged');
+        window.dispatchEvent(colorEvent);
+    }, [activeTab]);
+
     return (
         <div className="container mx-auto p-4">
             {/*tabs */}
@@ -475,7 +541,7 @@ export default function ColorPage() {
                                                 <div className="flex flex-col items-center">
                                                     <div
                                                         className="h-16 w-16 rounded shadow-md mb-2"
-                                                        style={{ backgroundColor: selectedColor }}
+                                                        style={{ backgroundColor: adminSelectedColor }}
                                                     />
                                                     <span className="text-sm text-gray-800">{displayColorText}</span>
                                                 </div>
@@ -491,7 +557,7 @@ export default function ColorPage() {
                                                         adminColors.map((color, index) => (
                                                             <div
                                                                 key={index}
-                                                                className={`h-7 w-7 rounded-full cursor-pointer mb-1 ${selectedColor === color ? "ring-2 ring-offset-1 ring-blue-500" : ""}`}
+                                                                className={`h-7 w-7 rounded-full cursor-pointer mb-1 ${adminSelectedColor === color ? "ring-2 ring-offset-1 ring-blue-500" : ""}`}
                                                                 style={{ backgroundColor: color }}
                                                                 onClick={() => handleColorSelect(color)}
                                                             />
@@ -529,14 +595,14 @@ export default function ColorPage() {
 
 
                             {/* Color Picker */}
-                            <div className="mb-4">
+                            <div className="mb-5">
                                 {/* Color grid */}
                                 <div className="rounded" >
                                     <div className="flex w-full ">
                                         {grayScaleColors.map((color, index) => (
                                             <div
                                                 key={`gray-${index}`}
-                                                className={`h-6 flex-1 cursor-pointer ${selectedColor === color ? "ring-2 ring-white ring-inset" : ""}`}
+                                                className={`h-6 w-2 flex-1 cursor-pointer ${superAdminSelectedColor === color ? "ring-2 ring-white ring-inset" : ""}`}
                                                 style={{ backgroundColor: color }}
                                                 onClick={() => handleGridColorSelect(color)}
                                             />
@@ -547,7 +613,7 @@ export default function ColorPage() {
                                             {row.map((color, colIndex) => (
                                                 <div
                                                     key={`grid-${rowIndex}-${colIndex}`}
-                                                    className={`h-6 w-6 flex-1 cursor-pointer ${selectedColor === color ? "ring-1 ring-white ring-inset" : ""}`}
+                                                    className={`h-7 w-2 flex-1 cursor-pointer ${superAdminSelectedColor === color ? "ring-1 ring-white ring-inset" : ""}`}
                                                     style={{ backgroundColor: color }}
                                                     onClick={() => handleGridColorSelect(color)}
                                                 />
@@ -557,7 +623,7 @@ export default function ColorPage() {
                                 </div>
 
                                 {/* Selected color highlight outline */}
-                                {selectedColor && (
+                                {superAdminSelectedColor && (
                                     <div className="relative">
                                         <div
                                             className="absolute pointer-events-none border-2 border-white transform -translate-x-1/2 -translate-y-1/2"
@@ -582,7 +648,7 @@ export default function ColorPage() {
                                     {/* Alpha Slider Component */}
                                     <div className="flex-grow">
                                         <AlphaSlider
-                                            color={selectedColor}
+                                            color={superAdminSelectedColor}
                                             value={colorOpacity}
                                             onChange={handleOpacityChange}
                                         />
@@ -616,7 +682,7 @@ export default function ColorPage() {
                                             {adminColors.map((color, index) => (
                                                 <div
                                                     key={index}
-                                                    className={`h-7 w-7 rounded-full cursor-pointer mb-1 ${selectedColor === color ? "ring-2 ring-offset-1 ring-blue-500" : ""}`}
+                                                    className={`h-7 w-7 rounded-full cursor-pointer mb-1 ${superAdminSelectedColor === color ? "ring-2 ring-offset-1 ring-blue-500" : ""}`}
                                                     style={{ backgroundColor: color }}
                                                     onClick={() => handleGridColorSelect(color)}
                                                 />

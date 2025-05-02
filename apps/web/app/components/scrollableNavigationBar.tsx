@@ -25,16 +25,16 @@ export default function ScrollableNav() {
     } else if (pathname.includes("/designer_tool/cliparts")) {
       setActiveLink("cliparts");
       localStorage.setItem("activeNavLink", "cliparts");
-    } else if (pathname.includes("/designer_tool/library")) {
-      setActiveLink("library");
-      localStorage.setItem("activeNavLink", "library");
-    } else if (pathname.includes("/designer_tool/ai-generation")) {
+    }  else if (pathname.includes("/designer_tool/ai-generation")) {
       setActiveLink("ai-generation");
       localStorage.setItem("activeNavLink", "ai-generation");
     }
-
+    else if (pathname.includes("/designer_tool/previewProduct")) {
+      setActiveLink("preview");
+      localStorage.setItem("activeNavLink", "preview");
+    }
     // Special case for text editor - only keep this active if explicitly set by clicking
-    if (pathname.includes("products/previewProduct") && localStorage.getItem("activeNavLink") === "text") {
+    if (pathname.includes("/previewProduct") && localStorage.getItem("activeNavLink") === "text") {
       setActiveLink("text");
     }
   }, [pathname]);
@@ -77,7 +77,32 @@ export default function ScrollableNav() {
               />
             </div>
           </Link>
+          <div
+            onClick={() => {
+              handleLinkClick("preview");
+              const selectedProduct = localStorage.getItem('selectedProduct');
+              if (selectedProduct) {
+                router.push(`/designer_tool/previewProduct?product=${selectedProduct}`);
+              } else {
+                alert("Please select a product first");
+                // Reset the active link to previous state
+                const savedLink = localStorage.getItem("activeNavLink");
+                if (savedLink && savedLink !== "preview") {
+                  setActiveLink(savedLink);
+                } else {
+                  // Default to products if no saved link
+                  setActiveLink("products");
+                }
+              }
+            }}
+          >
+            <IconButton
+              iconSrc="/icons/preview_icon.png"
+              altText="Preview Icon"
+              classN={`preview-button rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center ${activeLink === "preview" ? "bg-[#ECF1FF]" : ""}`}
 
+            />
+          </div>
           <Link href="/designer_tool/color">
             <div
               onClick={() => handleLinkClick("color")}
@@ -93,7 +118,7 @@ export default function ScrollableNav() {
               handleLinkClick("text");
 
               // if we're already on preview page
-              if (pathname.includes("products/previewProduct")) {
+              if (pathname.includes("/previewProduct")) {
                 localStorage.setItem("activeNavLink", "text");
 
                 // Add a timestamp to make each event unique
@@ -152,18 +177,6 @@ export default function ScrollableNav() {
               <IconButton
                 iconSrc="/icons/cliparts_icon.svg"
                 altText="Cliparts Icon"
-              />
-            </div>
-          </Link>
-
-          <Link href="/designer_tool/library">
-            <div
-              onClick={() => handleLinkClick("library")}
-              className={`library-button rounded pt-1.5 h-[6vh] w-[15vw] flex items-center justify-center ${activeLink === "library" ? "bg-[#ECF1FF]" : ""}`}
-            >
-              <IconButton
-                iconSrc="/icons/library_icon.svg"
-                altText="Library Icon"
               />
             </div>
           </Link>
