@@ -1,6 +1,31 @@
 import { CategoryType, OrderStatus, ShippingMethod } from "@monkeyprint/db";
 import { OrderWithItems } from "./actions/orderActions";
 
+export interface ChatMessage {
+  id: string;
+  sender: "user" | "bot";
+  content: string;
+  timestamp: Date;
+}
+
+export interface ChatOrder {
+  id: string;
+  items: ChatOrderItem[];
+  totalPrice: number;
+  shippingMethod: "STANDARD" | "EXPRESS";
+  contactInfo: ContactInfo;
+}
+
+export interface ChatOrderItem {
+  productId: string;
+  quantity: number;
+  price: number;
+  name: string;
+  imageUrl: string;
+}
+
+
+
 // types.ts
 export interface DesignZone {
   id: string;
