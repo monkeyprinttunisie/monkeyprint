@@ -16,7 +16,25 @@ export default function ProductColorPreview({ color }: ProductColorPreviewProps)
     useEffect(() => {
         setIsClient(true);
     }, []);
+    useEffect(() => {
+        if (!isClient) return;
 
+        const handleColorChanged = () => {
+            const appliedColor = localStorage.getItem('appliedProductColor');
+            if (appliedColor) {
+                setColorApplied(appliedColor);
+            } else {
+                setColorApplied(null);
+            }
+        };
+
+        // Listen for the custom event
+        window.addEventListener('productColorChanged', handleColorChanged);
+
+        return () => {
+            window.removeEventListener('productColorChanged', handleColorChanged);
+        };
+    }, [isClient]);
     // Get product from URL or localStorage
     useEffect(() => {
         if (!isClient) return;
@@ -67,10 +85,7 @@ export default function ProductColorPreview({ color }: ProductColorPreviewProps)
         return () => clearInterval(intervalId);
     }, [isClient]);
 
-    // Toggle view between front and back
-    const toggleView = () => {
-        setView(view === 'front' ? 'back' : 'front');
-    };
+
 
     if (!isClient) return null;
 
@@ -80,13 +95,27 @@ export default function ProductColorPreview({ color }: ProductColorPreviewProps)
     return (
         <div ref={containerRef} className="flex flex-col items-center w-full mt-5">
             {/* our product image*/}
-            <div className="relative w-full h-[40vh] flex items-center justify-center ">
-                <img
-                    src={product.images[view]}
-                    alt={product.name}
-                    className="max-w-full max-h-full object-contain"
-                    style={{ backgroundColor: colorApplied || 'transparent' }}
-                />
+            <div className="relative w-full h-full flex items-center justify-center">
+                <div className="relative" style={{ display: 'inline-block' }}>
+                    {/* Colored background  */}
+                    <div
+                        className="absolute inset-0"
+                        style={{
+                            backgroundColor: colorApplied || 'transparent',
+                            height:"90%",
+                            width:"90%",
+                            top: "9%",
+                            left: "5%",
+                        }}
+                    />
+
+                    {/* Original transparent image */}
+                    <img
+                        src={product.images[view]}
+                        alt={product.name}
+                        className="max-w-full max-h-full object-contain relative"
+                    />
+                </div>
             </div>
 
             {/* View toggle buttons */}
