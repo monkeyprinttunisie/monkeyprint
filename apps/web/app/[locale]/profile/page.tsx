@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import SignOut from "@/components/signOutButton";
+import { Link } from "@/../i18n/navigation";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -12,8 +13,9 @@ export default async function ProfilePage() {
   // If the user is signed in, display the success message with their username
   return (
     <div>
-      <h1>User signed in successfully!</h1>
-      <p>Welcome, {session.user.email}!</p>
+      <Link href="/team" className="text-blue-500">
+        Go to Team Page
+      </Link>
       <SignOut />
     </div>
   );
