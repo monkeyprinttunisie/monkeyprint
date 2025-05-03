@@ -6,8 +6,8 @@ import { getOrders } from "@/actions/orderActions"
 import { useSession } from "next-auth/react"
 import { Printer, ChevronDown, ChevronUp } from "lucide-react"
 
-export default function InvoicePage({ params }: { params: { id: string } }) {
-    const id = params.id
+export default async function InvoicePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params; // Await the params Promise to resolve the id
     const router = useRouter()
     const { data: session } = useSession()
     const [orders, setOrders] = useState<any[]>([])

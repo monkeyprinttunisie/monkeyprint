@@ -36,7 +36,7 @@ export default function OrderDetailClient({ id }: OrderDetailClientProps) {
     try {
       const response = await getOrderById(id);
       if (response.success && response.order) {
-        setOrder(response.order);
+        setOrder(response.order as unknown as Order);
       } else {
         setError(response.error || "Failed to fetch order");
       }
@@ -52,7 +52,7 @@ export default function OrderDetailClient({ id }: OrderDetailClientProps) {
     try {
       const response = await updateOrderStatus(id, status);
       if (response.success && response.order) {
-        setOrder(response.order);
+        setOrder(response.order as unknown as Order);
       } else {
         alert(response.error || "Failed to update status");
       }

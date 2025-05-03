@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
 import { db } from "@monkeyprint/db";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { storeId: string } }
+  { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const { storeId } = params;
+    const { storeId } = await params;
 
     if (!storeId) {
       return NextResponse.json(
