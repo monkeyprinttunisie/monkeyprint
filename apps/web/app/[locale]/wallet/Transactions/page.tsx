@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { getOrders, OrderWithItems } from "@/actions/orderActions"
 import { useTranslations } from "next-intl"
@@ -24,6 +24,8 @@ export default function HistoryPage() {
     const [userImage, setUserImage] = useState("/default-avatar.png")
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
+    const params = useParams()
+    const locale = params.locale as string
     const { data: session } = useSession()
     // Tab state
     const [activeTab, setActiveTab] = useState<'FULFILLED' | 'PAID'>('FULFILLED')
@@ -111,7 +113,7 @@ export default function HistoryPage() {
     }
 
     const handleBackToWallet = () => {
-        router.push("/wallet")
+        router.push(`/${locale}/wallet`)
     }
 
     // Pagination controls
@@ -312,7 +314,7 @@ export default function HistoryPage() {
             )}
             <div className="fixed bottom-6 left-0 right-0 flex justify-center z-40">
                 <button
-                    onClick={() => router.push("/invoice")}
+                    onClick={() => router.push(`/${locale}/wallet/invoice`)}
                     className="bg-blue-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-blue-600 flex items-center space-x-2"
                 >
                     <svg
