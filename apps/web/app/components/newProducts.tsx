@@ -23,7 +23,7 @@ export default function NewProducts() {
           New Items
         </span>
         <Link
-          href="/allProducts"
+          href="/store/allProducts"
           className="flex flex-row items-center gap-1"
         >
           <span className="font-['Raleway'] font-bold text-[15px] leading-[18px] text-[#202020]">

@@ -147,7 +147,7 @@ export default function OrderSummary({
       {/* Continue Shopping Button */}
       <div className="mt-auto py-4">
         <button
-          onClick={() => router.push("/products/listProducts")}
+          onClick={() => router.push("/store/allProducts")}
           className="w-full py-3 px-4 bg-blue-600 text-white font-raleway font-bold text-lg rounded-lg"
         >
           Continue Shopping
