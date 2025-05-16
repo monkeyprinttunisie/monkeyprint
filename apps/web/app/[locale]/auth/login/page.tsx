@@ -5,7 +5,6 @@ import SignIn from "@/components/oAuthSignInButton";
 import { useTranslations } from "next-intl";
 import { Link } from "@/../i18n/navigation";
 import { useUserActions } from "@/store/useUserStore";
-// Import types from our store instead of Prisma directly
 import { User, Store, StoreType } from "@/store/storeStore";
 
 export default function LoginPage() {
@@ -39,7 +38,11 @@ export default function LoginPage() {
         setCurrentStore(data.store as Store);
         setStoreRole(data.storeRole as StoreType);
       }
-      router.push("/profile");
+      if (data.user.role === "SUPER_ADMIN") {
+        router.push("/superAdmin/dashboard");
+      } else {
+        router.push(`/admin/orders?id=${data.store.id}`);
+      }
     } else {
       // Handle errors
       setError(data.error || "Something went wrong. Please try again.");
