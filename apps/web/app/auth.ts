@@ -98,10 +98,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.email = user.email;
-        token.name = user.name;
-        token.picture = user.image;
+        token.id = user.id as string;
+        token.email = user.email as string;;
+        token.name = user.name as string;;
+        token.picture = user.image as string;;
+
+        const userWithStore = await db.user.findUnique({
+          where: { id: user.id },
+          include: {
+            StoreCollaborator: {
+              include: { store: true },
+            },
+          },
+        });
+
+        if (
+          userWithStore?.StoreCollaborator &&
+          userWithStore.StoreCollaborator.length > 0
+        ) {
+          console.log(
+            "Found store relation:",
+            userWithStore.StoreCollaborator[0]
+          );
+
+          token.storeId = userWithStore.StoreCollaborator[0].storeId;
+        }
       }
       return token;
     },
@@ -110,9 +131,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user = {
           id: token.id as string,
           email: token.email as string,
-          name: token.name,
-          image: token.picture,
+          name: token.name || "",
+          image: token.picture || "",
           emailVerified: null,
+          storeId: token.storeId as string,
         };
       }
       return session;
