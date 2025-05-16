@@ -9,9 +9,8 @@ datasource db {
 }
 
 enum Role {
-  DROPSHIPPING
-  ECOMMERCE_WEBSITE
-  DESIGNER_TOOL
+  SUPER_ADMIN
+  ADMIN
 }
 
 enum StoreType {
@@ -28,8 +27,8 @@ model User {
   emailVerified        DateTime?
   password             String?
   image                String?
-  phoneNumber          String? // phone number with country code
-  role                 Role      @default(DROPSHIPPING)
+  phoneNumber          String? 
+  role                 Role      @default(ADMIN)
   accounts             Account[]
   sessions             Session[]
   createdAt            DateTime  @default(now())
