@@ -106,6 +106,11 @@ export const columns: ColumnDef<Store>[] = [
                 View store orders
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/superAdmin/wallet?id=${store.id}`}>
+                View Wallet
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>Pay customer</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

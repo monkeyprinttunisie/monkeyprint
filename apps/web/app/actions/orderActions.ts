@@ -26,21 +26,23 @@ function convertPrismaOrderToOrder(prismaOrder: any): Order {
       quantity: item.quantity,
       price: item.price,
       imageUrl: item.imageUrl,
-      stock: 0, 
+      stock: 0,
     })),
-    contactInfo: prismaOrder.contactInfo ? {
-      id: prismaOrder.contactInfo.id,
-      name: prismaOrder.contactInfo.name,
-      orderId: prismaOrder.contactInfo.orderId,
-      email: prismaOrder.contactInfo.email,
-      phone: prismaOrder.contactInfo.phone,
-      country: prismaOrder.contactInfo.country,
-      address: prismaOrder.contactInfo.address,
-      city: prismaOrder.contactInfo.city,
-    } : null,
+    contactInfo: prismaOrder.contactInfo
+      ? {
+          id: prismaOrder.contactInfo.id,
+          name: prismaOrder.contactInfo.name,
+          orderId: prismaOrder.contactInfo.orderId,
+          email: prismaOrder.contactInfo.email,
+          phone: prismaOrder.contactInfo.phone,
+          country: prismaOrder.contactInfo.country,
+          address: prismaOrder.contactInfo.address,
+          city: prismaOrder.contactInfo.city,
+        }
+      : null,
     createdAt: prismaOrder.createdAt,
     updatedAt: prismaOrder.updatedAt,
-     storeId: prismaOrder.storeId || null,
+    storeId: prismaOrder.storeId || null,
     isDeleted: prismaOrder.isDeleted || false,
   };
 }
@@ -48,7 +50,8 @@ function convertPrismaOrderToOrder(prismaOrder: any): Order {
 export async function createOrder(
   cartItems: CartItem[],
   contactInfo: ContactInfo,
-  shippingMethod: ShippingMethod
+  shippingMethod: ShippingMethod,
+  storeId = "ebd68aff-0bad-40de-ba1b-9bbe47d98ff5"
 ): Promise<OrderResponse> {
   try {
     const shippingFee = shippingMethod === "STANDARD" ? 5 : 7;
@@ -67,6 +70,7 @@ export async function createOrder(
       totalPrice,
       shippingMethod,
       shippingFee,
+      storeId,
       status: OrderStatus.PENDING,
       contactInfo: {
         create: {
@@ -124,10 +128,21 @@ export async function createOrder(
   }
 }
 
-export async function getOrders(): Promise<OrderResponse> {
+export async function getOrders(storeId?: string): Promise<OrderResponse> {
   try {
+    // Build the query with dynamic filtering
+    const whereClause: any = {
+      isDeleted: false,
+    };
+
+    // Add storeId filter only when provided
+    if (storeId) {
+      whereClause.storeId = storeId;
+    }
+
     const orders = await db.order.findMany({
-      where: { isDeleted: false },
+      where: whereClause,
+      // Keep both relations included
       include: {
         items: true,
         contactInfo: true,

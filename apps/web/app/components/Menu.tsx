@@ -1,4 +1,3 @@
-// components/Menu.tsx
 "use client";
 
 import Link from "next/link";
@@ -6,13 +5,12 @@ import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
 
 export default function Menu() {
-  /* const { cart } = useCart(); */
   const cart = useCartStore((state) => state.cart);
-  const pathname = usePathname(); // Get the current route
+  const pathname = usePathname();
 
   return (
     <div className="fixed bottom-0 left-0 h-[8vh] right-0 bg-white shadow-lg p-4 flex justify-around items-center">
-      <Link href="/home" className="text-gray-900">
+      <Link href="/store" className="text-gray-900">
         <img
           src={
             pathname === "/products/listProducts"
@@ -25,22 +23,7 @@ export default function Menu() {
         />
       </Link>
 
-      {/* 
-      <Link href="/wishlist" className="text-gray-900">
-        <img
-          src={
-            pathname === "/wishlist"
-              ? "/icons/wishlist-icon-selected.svg"
-              : "/icons/wishlist-icon.svg"
-          }
-          alt="Wishlist icon"
-          width="24"
-          height="24"
-        />
-      </Link> 
-      */}
-
-      <Link href="/chat" className="text-gray-800">
+      <Link href="/store/chat" className="text-gray-800">
         <img
           src={
             pathname === "/categories"
@@ -53,7 +36,7 @@ export default function Menu() {
         />
       </Link>
 
-      <Link href="/cart" className="text-gray-900">
+      <Link href="/store/cart" className="text-gray-900">
         <img
           src={
             pathname === "/cart"
@@ -70,7 +53,7 @@ export default function Menu() {
         />
       </Link>
 
-      <Link href="/profile" className="text-gray-800">
+      <Link href="/store/profile" className="text-gray-800">
         <img
           src={
             pathname === "/profile"

@@ -43,7 +43,6 @@ export default async function LocaleLayout({
                 <StoreProvider>
                   {children}
                   <Toaster position="top-center" />
-                  <MenuWrapper />
                 </StoreProvider>
               </SessionSyncProvider>
             </SessionProvider>

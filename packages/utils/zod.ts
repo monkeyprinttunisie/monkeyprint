@@ -1,11 +1,7 @@
 // packages/utils/zod.ts
 import * as z from "zod";
 
-export const RoleEnum = z.enum([
-  "DROPSHIPPING",
-  "ECOMMERCE_WEBSITE",
-  "DESIGNER_TOOL",
-]);
+export const RoleEnum = z.enum(["SUPER_ADMIN", "ADMIN"]);
 
 // Define a schema for input validation
 export const registerSchema = z.object({

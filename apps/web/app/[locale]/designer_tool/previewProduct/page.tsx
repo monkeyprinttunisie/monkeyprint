@@ -6,6 +6,7 @@ import { useUploadThing } from "@/uploadthing";
 
 const PreviewPage: React.FC = () => {
   const [isFromProductPage, setIsFromProductPage] = useState(false);
+  const [isFromUpdatePage, setIsFromUpdatePage] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [targetCategories, setTargetCategories] = useState<string[]>([]);
   const { startUpload } = useUploadThing("productImage");
@@ -16,8 +17,13 @@ const PreviewPage: React.FC = () => {
 
   useEffect(() => {
     const fromProductPage = localStorage.getItem("designForProduct") === "true";
+    const fromUpdatePage =
+      localStorage.getItem("designForProductUpdate") === "true";
+
     setIsFromProductPage(fromProductPage);
+    setIsFromUpdatePage(fromUpdatePage);
     console.log("From product page:", fromProductPage);
+    console.log("From update page:", fromUpdatePage);
 
     // Load target categories from localStorage
     try {
@@ -435,7 +441,7 @@ const PreviewPage: React.FC = () => {
           }
 
           // Get the URL from the upload result
-          const designUrl = uploadResult[0].ufsUrl || uploadResult[0].url;
+          const designUrl = uploadResult[0].ufsUrl || uploadResult[0].ufsUrl;
           console.log("Design uploaded successfully:", designUrl);
 
           // 7. Generate mockup using the design URL
@@ -445,15 +451,27 @@ const PreviewPage: React.FC = () => {
 
           // 8. Store the mockup URL for product creation
           localStorage.setItem("productDesignImage", mockupUrl);
+          sessionStorage.setItem("productDesignImage", mockupUrl);
 
-          // 9. Clear the design flags
-          localStorage.removeItem("designForProduct");
-          localStorage.removeItem("designTargetCategories");
-          localStorage.removeItem("designTargetCategoryNames");
+          // 9. Set a flag that this is a fresh image to be used
+          localStorage.setItem("freshDesignImage", "true");
 
-          // 10. Redirect back to product creation
-          console.log("Process completed successfully, redirecting...");
-          window.location.href = "/products";
+          // Smart redirection based on source
+          if (isFromUpdatePage) {
+            // Came from update product page - keep pendingProduct data for restoration
+            localStorage.removeItem("designForProductUpdate");
+
+            const pendingData = localStorage.getItem("pendingProduct");
+            if (pendingData) {
+              const productData = JSON.parse(pendingData);
+              window.location.href = `/superAdmin/products/updateProduct?id=${productData.id}`;
+            } else {
+              window.location.href = "/superAdmin/products";
+            }
+          } else {
+            // Came from create product page
+            window.location.href = "/superAdmin/products/createProduct";
+          }
         } catch (error) {
           console.error("Error processing or uploading design:", error);
           const errorMessage =

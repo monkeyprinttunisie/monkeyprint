@@ -7,9 +7,8 @@ import Uploader from "@/components/Uploader";
 import { registerSchema } from "@monkeyprint/utils/zod";
 import { z } from "zod";
 const roleOptions = [
-  { label: "Full Pack (Drop Shipping)", value: "DROPSHIPPING" },
-  { label: "Ecommerce + Designer Tool", value: "ECOMMERCE_WEBSITE" },
-  { label: "Designer Tool Only", value: "DESIGNER_TOOL" },
+  { label: "SUPER ADMIN", value: "SUPER_ADMIN" },
+  { label: "ADMIN", value: "ADMIN" },
 ];
 
 export default function RegisterPage() {

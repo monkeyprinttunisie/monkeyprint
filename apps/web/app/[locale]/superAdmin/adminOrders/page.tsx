@@ -30,8 +30,8 @@ export default function AdminOrders() {
   }, [storeId]);
 
   return (
-    <div className="flex flex-col gap-5 items-center h-[92vh] w-screen p-5">
-      <div className="container mx-auto py-10">
+    <div className="flex flex-col gap-5 items-center w-screen px-5">
+      <div className="container mx-auto">
         <DataTable
           columns={columns}
           data={orders}

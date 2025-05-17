@@ -80,7 +80,7 @@
   "WalletPage": {
     "transactions": " View Transactions",
     "no_transactions": "No transactions found",
-    "wallet": " My Wallet"
+    "wallet": ""
   },
   "Team": {
     "team": "Team",

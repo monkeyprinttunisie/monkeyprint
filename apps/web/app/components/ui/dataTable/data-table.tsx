@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4 gap-4">
+      <div className="flex items-center py-2 gap-4">
         <DataTableFilter table={table} />
         <DataTableViewOptions table={table} />
       </div>

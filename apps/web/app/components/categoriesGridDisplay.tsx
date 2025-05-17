@@ -50,7 +50,7 @@ export default function CategoriesGridDisplay() {
         Products
       </span>
       <Link
-        href="/products/listProducts"
+        href="/store/allProducts"
         className="justify-self-end flex flex-row items-center gap-1"
       >
         <span className="font-['Raleway'] font-bold text-[15px] leading-[18px] text-[#202020]">
