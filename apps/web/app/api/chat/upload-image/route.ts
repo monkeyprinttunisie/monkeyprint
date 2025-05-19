@@ -4,7 +4,7 @@ import { uploadImageForIssue } from "@/actions/chatbotActions";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { imageUrl } = body;
+    const { imageUrl, storeUrl } = body;
 
     if (!imageUrl) {
       return NextResponse.json(
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await uploadImageForIssue(imageUrl);
+    const result = await uploadImageForIssue(imageUrl, storeUrl);
     return NextResponse.json(result);
   } catch (error) {
     console.error("Error in upload-image API route:", error);
