@@ -3,6 +3,38 @@ import { db } from "@monkeyprint/db";
 import { hashPassword } from "@monkeyprint/utils/hash";
 import { registerSchema } from "@monkeyprint/utils/zod";
 
+// Helper function to generate a URL-friendly string
+function generateStoreUrl(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/[^a-z0-9-]/g, "") // Remove special characters
+    .replace(/-+/g, "-"); // Replace multiple hyphens with single hyphen
+}
+
+// Helper function to ensure URL uniqueness
+async function ensureUniqueUrl(baseUrl: string): Promise<string> {
+  let url = baseUrl;
+  let counter = 0;
+  let isUnique = false;
+
+  while (!isUnique) {
+    const existingStore = await db.store.findFirst({
+      where: { url },
+    });
+
+    if (!existingStore) {
+      isUnique = true;
+    } else {
+      counter++;
+      url = `${baseUrl}-${counter}`;
+    }
+  }
+
+  return url;
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -54,8 +86,11 @@ export async function POST(req: Request) {
 
       // Create store if storeName is provided
       let store = null;
-      const storeUrl = name.trim().toLowerCase().replace(/\s+/g, "-");
       if (name) {
+        // Generate URL from store name and ensure it's unique
+        const baseUrl = generateStoreUrl(name);
+        const storeUrl = await ensureUniqueUrl(baseUrl);
+
         store = await tx.store.create({
           data: {
             name: name,
