@@ -3,6 +3,7 @@ import PreviewProduct from "@/components/previewProduct";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useUploadThing } from "@/uploadthing";
+import { getCurrentUser } from "@/actions/authActions";
 
 const PreviewPage: React.FC = () => {
   const [isFromProductPage, setIsFromProductPage] = useState(false);
@@ -11,11 +12,26 @@ const PreviewPage: React.FC = () => {
   const [targetCategories, setTargetCategories] = useState<string[]>([]);
   const { startUpload } = useUploadThing("productImage");
   const [targetCategoryNames, setTargetCategoryNames] = useState<string[]>([]);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   //for the mockup generator
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const user = await getCurrentUser();
+        if (user) {
+          setUserRole(user.role);
+          console.log("User role set from server action:", user.role);
+        }
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+      }
+    };
+
+    fetchUserRole();
+
     const fromProductPage = localStorage.getItem("designForProduct") === "true";
     const fromUpdatePage =
       localStorage.getItem("designForProductUpdate") === "true";
@@ -455,8 +471,9 @@ const PreviewPage: React.FC = () => {
 
           // 9. Set a flag that this is a fresh image to be used
           localStorage.setItem("freshDesignImage", "true");
+          const user = getCurrentUser();
 
-          // Smart redirection based on source
+          // Smart redirection based on source and role stored in state
           if (isFromUpdatePage) {
             // Came from update product page - keep pendingProduct data for restoration
             localStorage.removeItem("designForProductUpdate");
@@ -464,13 +481,23 @@ const PreviewPage: React.FC = () => {
             const pendingData = localStorage.getItem("pendingProduct");
             if (pendingData) {
               const productData = JSON.parse(pendingData);
-              window.location.href = `/superAdmin/products/updateProduct?id=${productData.id}`;
+              if (userRole === "SUPER_ADMIN") {
+                window.location.href = `/en/superAdmin/products/updateProduct?id=${productData.id}`;
+              } else {
+                window.location.href = `/en/admin/products/updateProduct?id=${productData.id}`;
+              }
             } else {
-              window.location.href = "/superAdmin/products";
+              window.location.href =
+                userRole === "SUPER_ADMIN"
+                  ? "/en/superAdmin/products"
+                  : "/en/admin/products";
             }
           } else {
             // Came from create product page
-            window.location.href = "/superAdmin/products/createProduct";
+            window.location.href =
+              userRole === "SUPER_ADMIN"
+                ? "/en/superAdmin/products/createProduct"
+                : "/en/admin/products/createProduct";
           }
         } catch (error) {
           console.error("Error processing or uploading design:", error);
