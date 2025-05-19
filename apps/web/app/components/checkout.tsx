@@ -8,6 +8,8 @@ import BottomSheet from "@/components/SlideUpPanel";
 import ContactInfoForm from "@/components/ContactInfoPanel";
 import { createOrder } from "@/actions/orderActions";
 import OrderSummary from "@/components/OrderSummary";
+import { getStoreByUrl } from "@/actions/storeActions";
+import { useParams } from "next/navigation";
 
 interface CheckoutProps {
   cart: CartItem[];
@@ -28,13 +30,13 @@ export default function Checkout({
   setIsProcessing,
   setIsOrderComplete,
 }: CheckoutProps) {
-  const router = useRouter();
-  const [isShippingAddressSheetOpen, setIsShippingAddressSheetOpen] =
     useState(false);
   const [isContactInfoSheetOpen, setIsContactInfoSheetOpen] = useState(false);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderSummary, setOrderSummary] = useState<any>(null);
+  const params = useParams();
+  const storeUrl = params.storeUrl as string;
 
   const handleContactInfoSave = (data: ContactInfo) => {
     setContactInfo(data);
@@ -49,12 +51,20 @@ export default function Checkout({
     }
 
     setIsProcessing(true);
+    let finalStoreId: string | undefined = undefined;
 
     try {
+      if (storeUrl) {
+        const store = await getStoreByUrl(storeUrl);
+        if (store) {
+          finalStoreId = store.id;
+        }
+      }
       const result = await createOrder(
         cart,
         contactInfo,
-        shippingMethod
+        shippingMethod,
+        finalStoreId
       );
 
       if (result.success) {
