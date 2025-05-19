@@ -10,7 +10,7 @@ export default function Menu() {
 
   return (
     <div className="fixed bottom-0 left-0 h-[8vh] right-0 bg-white shadow-lg p-4 flex justify-around items-center">
-      <Link href="/store" className="text-gray-900">
+      <Link href="/" className="text-gray-900">
         <img
           src={
             pathname === "/products/listProducts"
@@ -23,7 +23,7 @@ export default function Menu() {
         />
       </Link>
 
-      <Link href="/store/chat" className="text-gray-800">
+      <Link href="/chat" className="text-gray-800">
         <img
           src={
             pathname === "/categories"
@@ -36,7 +36,7 @@ export default function Menu() {
         />
       </Link>
 
-      <Link href="/store/cart" className="text-gray-900">
+      <Link href="/cart" className="text-gray-900">
         <img
           src={
             pathname === "/cart"
@@ -53,7 +53,7 @@ export default function Menu() {
         />
       </Link>
 
-      <Link href="/store/profile" className="text-gray-800">
+      <Link href="/profile" className="text-gray-800">
         <img
           src={
             pathname === "/profile"
