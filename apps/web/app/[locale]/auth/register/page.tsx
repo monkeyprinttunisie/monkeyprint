@@ -22,7 +22,7 @@ export default function RegisterPage() {
     name: "",
     phoneNumber: "",
     image: "",
-    role: roleOptions[0].value,
+    role: roleOptions[1].value,
   });
 
   // Validation state
