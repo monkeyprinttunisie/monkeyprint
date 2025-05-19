@@ -24,8 +24,6 @@ export interface ChatOrderItem {
   imageUrl: string;
 }
 
-
-
 // types.ts
 export interface DesignZone {
   id: string;
@@ -60,6 +58,7 @@ export interface Product {
   description?: string | null;
   price: number;
   imageUrl: string;
+  storeId: string;
   stock: number | null;
   categories: ProductCategory[];
   categoryIds?: string[];
@@ -70,8 +69,13 @@ export interface ProductState {
   filteredProducts: Product[];
   loading: boolean;
   loadProducts: () => Promise<void>;
+  loadStoreProducts: (storeId: string) => Promise<void>;
   deleteProduct: (productId: string) => Promise<void>;
   filterByCategories: (categoryIds: string[]) => Promise<void>;
+  filterByStoreAndCategories: (
+    storeId: string,
+    categoryIds: string[]
+  ) => Promise<void>;
 }
 
 export interface IUpdatedProductData {
@@ -88,6 +92,7 @@ export interface IProductData {
   price: number;
   imageUrl: string;
   stock?: number;
+  storeId?: string;
   categoryIds?: string[];
 }
 
@@ -231,7 +236,7 @@ export interface Order {
   contactInfo: ContactInfo | null;
   createdAt: Date;
   updatedAt: Date;
-  storeId: string; 
+  storeId: string;
   isDeleted: boolean;
 }
 
