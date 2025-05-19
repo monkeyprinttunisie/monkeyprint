@@ -11,3 +11,37 @@ export async function getStoreById(id: string) {
     where: { id: id },
   });
 }
+
+export async function getStoreByUrl(url: string) {
+  return await db.store.findFirst({
+    where: {
+      url: url,
+      isDeleted: false,
+    },
+  });
+}
+
+export async function getStoreOwnerByStoreId(storeId: string) {
+  const storeOwner = await db.storeUserRelation.findFirst({
+    where: {
+      storeId: storeId,
+      role: "OWNER",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          firstName: true,
+          lastName: true,
+          phoneNumber: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  return storeOwner?.user;
+}
