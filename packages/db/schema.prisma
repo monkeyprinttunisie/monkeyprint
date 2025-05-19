@@ -91,6 +91,11 @@ model Product {
   stock       Int?              @default(0)
   categories  ProductCategory[]
   orderItems  OrderItem[]
+
+  storeId     String            
+  store       Store             @relation(fields: [storeId], references: [id])
+  @@index([storeId])
+  @@index([isDeleted]) 
 }
 
 model Category {
@@ -133,6 +138,7 @@ model ProductCategory {
   category   Category @relation(fields: [categoryId], references: [id])
 
   @@id([productId, categoryId])
+  @@index([categoryId])
 }
 
 enum OrderStatus {
@@ -200,6 +206,7 @@ model Store {
   wallet    Wallet?
   Order     Order[]
 
+  products  Product[]
   StoreCollaborator StoreUserRelation[]
 }
 
