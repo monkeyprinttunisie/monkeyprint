@@ -53,7 +53,7 @@ export default function Menu() {
         />
       </Link>
 
-      <Link href="/profile" className="text-gray-800">
+      <Link href="/aboutUs" className="text-gray-800">
         <img
           src={
             pathname === "/profile"
