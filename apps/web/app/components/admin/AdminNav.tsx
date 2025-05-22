@@ -90,6 +90,21 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
         },
       ],
     },
+    {
+      name: "Shop Builder",
+      href: "/admin/themes",
+      icon: <ShoppingCart className="w-5 h-5" />,
+      subItems: [
+        {
+          name: "Themes",
+          href: "/admin/themes",
+        },
+        {
+          name: "Informations",
+          href: "/admin/shopInformations",
+        },
+      ],
+    },
   ];
 
   const toggleSubMenu = (name: string) => {
