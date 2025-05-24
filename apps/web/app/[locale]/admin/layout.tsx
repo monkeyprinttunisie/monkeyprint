@@ -32,7 +32,7 @@ export default function SuperAdminLayout({
       />
 
       {/* Main content area */}
-      <div className="flex-1 ml-0 lg:ml-64 transition-all duration-200">
+      <div className="flex-1 ml-0 lg:ml-[14vw] transition-all duration-200">
         <main className="min-h-screen">
           {/* Added padding-top on mobile to ensure content doesn't hide under the button */}
           <div className="pt-12 lg:pt-0">
