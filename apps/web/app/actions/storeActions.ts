@@ -382,3 +382,86 @@ export async function updateContactUs(
     return { success: false, message: String(error) };
   }
 }
+
+export async function getStoreNetEarning(storeId: string) {
+  try {
+    // Fetch all orders for this store
+    const orders = await db.order.findMany({
+      where: {
+        storeId,
+        isDeleted: false,
+      },
+    });
+
+    if (!orders || orders.length === 0) {
+      return {
+        success: true,
+        data: {
+          deliveredTotal: 0,
+          totalDeliveryFees: 0,
+          totalMonkeyPrintEarnings: 0,
+          totalReturnFees: 0,
+          netEarnings: 0,
+          fulfilledOrdersCount: 0,
+          canceledOrdersCount: 0,
+        },
+      };
+    }
+
+    // Filter orders by status
+    const fulfilledOrders = orders.filter(
+      (order) => order.status === "FULFILLED"
+    );
+    const canceledOrders = orders.filter(
+      (order) => order.status === "CANCELED"
+    );
+
+    // Calculate delivered total
+    const deliveredTotal = fulfilledOrders.reduce(
+      (sum, order) => sum + order.totalPrice,
+      0
+    );
+
+    // Calculate total delivery fees
+    const totalDeliveryFees = fulfilledOrders.reduce((sum, order) => {
+      return sum + (order.shippingMethod === "EXPRESS" ? 7 : 5);
+    }, 0);
+
+    // Calculate total MonkeyPrint earnings (10% of each order's value after shipping fees)
+    const totalMonkeyPrintEarnings = fulfilledOrders.reduce((sum, order) => {
+      const deliveryFee = order.shippingMethod === "EXPRESS" ? 7 : 5;
+      const totalAfterFees = order.totalPrice - deliveryFee;
+      return sum + totalAfterFees * 0.1;
+    }, 0);
+
+    // Calculate total return fees (5 per canceled order)
+    const totalReturnFees = canceledOrders.length * 5;
+
+    // Calculate net earnings
+    const netEarnings =
+      deliveredTotal -
+      totalDeliveryFees -
+      totalReturnFees -
+      totalMonkeyPrintEarnings;
+
+    return {
+      success: true,
+      data: {
+        deliveredTotal,
+        totalDeliveryFees,
+        totalMonkeyPrintEarnings,
+        totalReturnFees,
+        netEarnings,
+        fulfilledOrdersCount: fulfilledOrders.length,
+        canceledOrdersCount: canceledOrders.length,
+      },
+    };
+  } catch (error) {
+    console.error("Error calculating store net earnings:", error);
+    return {
+      success: false,
+      error: "Failed to calculate net earnings",
+      message: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
