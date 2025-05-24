@@ -51,7 +51,7 @@ export async function createOrder(
   cartItems: CartItem[],
   contactInfo: ContactInfo,
   shippingMethod: ShippingMethod,
-  storeId = "ebd68aff-0bad-40de-ba1b-9bbe47d98ff5"
+  storeId?: string
 ): Promise<OrderResponse> {
   try {
     const shippingFee = shippingMethod === "STANDARD" ? 5 : 7;
@@ -180,7 +180,10 @@ export async function getOrderById(id: string): Promise<OrderResponse> {
   }
 }
 
-export async function getOrdersByPhoneNumber(phoneNumber: string) {
+export async function getOrdersByPhoneNumber(
+  phoneNumber: string,
+  storeId?: string
+) {
   try {
     // Find the contact info with this phone number
     const contactInfos = await db.contactInfo.findMany({
@@ -206,6 +209,7 @@ export async function getOrdersByPhoneNumber(phoneNumber: string) {
       where: {
         id: { in: orderIds },
         isDeleted: false,
+        storeId: storeId,
       },
       include: {
         items: true,
@@ -221,8 +225,12 @@ export async function getOrdersByPhoneNumber(phoneNumber: string) {
       orders: orders.map((order) => convertPrismaOrderToOrder(order)),
     };
   } catch (error) {
-    console.error("Error fetching orders by phone number:", error);
-    return { success: false, error: "Failed to fetch orders" };
+    const errorMessage = storeId
+      ? "Error fetching orders by phone number and store ID:"
+      : "Error fetching orders by phone number:";
+
+    console.error(errorMessage, error);
+    return { success: false, error: errorMessage };
   }
 }
 

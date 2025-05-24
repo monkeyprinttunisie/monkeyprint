@@ -91,6 +91,11 @@ model Product {
   stock       Int?              @default(0)
   categories  ProductCategory[]
   orderItems  OrderItem[]
+
+  storeId     String            
+  store       Store             @relation(fields: [storeId], references: [id])
+  @@index([storeId])
+  @@index([isDeleted]) 
 }
 
 model Category {
@@ -133,6 +138,7 @@ model ProductCategory {
   category   Category @relation(fields: [categoryId], references: [id])
 
   @@id([productId, categoryId])
+  @@index([categoryId])
 }
 
 enum OrderStatus {
@@ -194,12 +200,21 @@ model Store {
   name      String   @unique
   url       String?
   image     String?
+  seoDescription  String? 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
-  wallet    Wallet?
-  Order     Order[]
 
+  wallet    Wallet?
+  socialMedia SocialMediaLinks?
+  checkoutFields CheckoutFields?
+  contactUs ContactUs?
+  aboutUs   AboutUs?
+  pages     StorePages?
+
+  products  Product[]
+  Order     Order[]
+  homeBanner HomeBanner[]
   StoreCollaborator StoreUserRelation[]
 }
 
@@ -223,4 +238,95 @@ model StoreUserRelation {
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([storeId, userId])
+}
+
+model SocialMediaLinks{
+  id String @id @default(uuid())
+  facebook String?
+  instagram String?
+  whatsapp String? 
+  tiktok String?
+  storeId String @unique
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+}
+
+model CheckoutFields{
+  id           String       @id @default(uuid())
+  shippingType ShippingType @default(BOTH)
+  name         Boolean?
+  phone        Boolean?
+  email        Boolean?
+  address      Boolean?
+  city         Boolean?
+  storeId      String       @unique
+  store        Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+enum ShippingType{
+STANDARD
+EXPRESS
+BOTH
+}
+
+model HomeBanner {
+  id               String             @id @default(uuid())
+  imageUrl         String?
+  title            String?
+  titleColor       String?
+  description      String?
+  descriptionColor String?
+  backgroundColor  String?
+  buttonId         String?            @unique
+  button           CallToActionButton? @relation(fields: [buttonId], references: [id])
+  storeId          String
+  store            Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+model CallToActionButton {
+  id              String      @id @default(uuid())
+  buttonText      String
+  buttonLink      String
+  textColor       String
+  backgroundColor String
+  borderColor     String      @default("transparent")
+  homeBanner      HomeBanner?
+}
+
+model ContactUs {
+  id          String @id @default(uuid())
+  introText   String
+  workingTime String
+  requestDesign Boolean @default(true)
+  storeId     String @unique
+  store       Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+model AboutUs {
+  id         String        @id @default(uuid())
+  introText  String
+  howWorks   Boolean       @default(true)
+  ourValues  Boolean       @default(true)
+  aboutUs    Boolean       @default(true)
+  ourProducts OurProducts[]
+  storeId    String        @unique
+  store      Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+model OurProducts {
+  id          String  @id @default(uuid())
+  description String
+  imageUrl    String
+  aboutUsId   String
+  aboutUs     AboutUs @relation(fields: [aboutUsId], references: [id], onDelete: Cascade)
+}
+
+model StorePages {
+  id        String   @id @default(uuid())
+  storeId   String   @unique
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  home      Boolean  @default(true)
+  products  Boolean  @default(true)
+  about     Boolean  @default(false)
+  contact   Boolean  @default(false)
 }

@@ -21,7 +21,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
   const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/resetPassword?token=${token}`;
 
   await resend.emails.send({
-    from: "contact@monkeyprinttunisie.com",
+    from: "Monkey Print <onboarding@resend.dev>",
     to: email,
     subject: "Password Reset",
     html: `<p>Click <a href="${resetUrl}">here</a> to reset your password.</p>`,
@@ -32,11 +32,16 @@ export async function sendOrderIssueEmail(
   order: OrderForEmail,
   issueType: string,
   description?: string,
-  imageUrl?: string
+  imageUrl?: string,
+  email?: string
 ) {
   try {
-    const supportEmail = "ahmedzouaghi2003@gmail.com"; // Shop owner email
-
+    if (!email || email.trim() === "") {
+      console.error("[EMAIL] No recipient email provided");
+      return { success: false, error: "No recipient email provided" };
+    }
+    let supportEmail = email;
+    console.log("[SERVER] Sending order issue email to:", supportEmail);
     // Format the order items for the email
     const itemsList = order.items
       .map(
@@ -74,7 +79,7 @@ export async function sendOrderIssueEmail(
 
     // Send the email
     await resend.emails.send({
-      from: "contact@monkeyprinttunisie.com",
+      from: "Monkey Print <onboarding@resend.dev>",
       to: supportEmail,
       subject: emailSubject,
       html: emailContent,

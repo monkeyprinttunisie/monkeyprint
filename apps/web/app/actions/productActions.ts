@@ -9,6 +9,11 @@ import {
 import { db } from "@monkeyprint/db";
 import { productUpdateSchema } from "@monkeyprint/utils/zod";
 import { revalidatePath } from "next/cache";
+import { getUserStoreId } from "@/actions/authActions";
+
+export async function getCurrentUserStoreId() {
+  return await getUserStoreId();
+}
 
 export async function updateProduct(
   id: string,
@@ -59,14 +64,26 @@ export async function updateProduct(
   }
 }
 
-export async function listProductsAction(): Promise<{
+export async function listProductsAction(storeId?: string | null): Promise<{
   success?: boolean;
   products?: Product[];
   error?: string;
 }> {
   try {
+    if (!storeId) {
+      storeId = await getUserStoreId();
+    }
+
+    // If still no storeId, return error
+    if (!storeId) {
+      return {
+        success: false,
+        error: "store id is missing",
+        products: [],
+      };
+    }
     const products = await db.product.findMany({
-      where: { isDeleted: false },
+      where: { storeId: storeId, isDeleted: false },
       include: {
         categories: {
           include: {
@@ -89,6 +106,41 @@ export async function listProductsAction(): Promise<{
   }
 }
 
+// Get products for a specific store
+export async function getStoreProducts(
+  storeId: string
+): Promise<ProductResponse> {
+  try {
+    const products = await db.product.findMany({
+      where: {
+        storeId: storeId,
+        isDeleted: false,
+      },
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return {
+      success: true,
+      products,
+    };
+  } catch (error) {
+    console.error("Error fetching store products:", error);
+    return {
+      success: false,
+      error: "Failed to fetch store products",
+    };
+  }
+}
+
 export async function deleteProductAction(id: string) {
   if (!id) {
     throw new Error("Product ID is required");
@@ -108,14 +160,36 @@ export async function deleteProductAction(id: string) {
   }
 }
 
-export async function createProduct(productData: IProductData) {
+export async function createProduct(
+  productData: IProductData & { storeId?: string }
+) {
   try {
-    const { categoryIds, ...data } = productData;
+    const { categoryIds, storeId: providedStoreId, ...data } = productData;
     const validatedData = productUpdateSchema.parse(data);
 
-    // Create the product
+    // Handle storeId correctly with null check
+    let finalStoreId: string;
+    if (providedStoreId) {
+      finalStoreId = providedStoreId;
+    } else {
+      const userStoreId = await getUserStoreId();
+      if (!userStoreId) {
+        return {
+          success: false,
+          error: "No store associated with current user",
+        };
+      }
+      finalStoreId = userStoreId;
+    }
+
+    // Create the product with store relation
     const product = await db.product.create({
-      data: validatedData,
+      data: {
+        ...validatedData,
+        store: {
+          connect: { id: finalStoreId },
+        },
+      },
     });
 
     // If categoryIds are provided, create product categories
@@ -132,7 +206,7 @@ export async function createProduct(productData: IProductData) {
       );
     }
 
-    // Revalidate paths to invalidate the cache
+    // Revalidate paths
     revalidatePath("/products");
 
     return { success: true, product };
@@ -239,10 +313,127 @@ export async function getProductsByCategories(
   }
 }
 
+export async function getProductsByStoreAndCategories(
+  storeId: string,
+  categoryIds: string[] = []
+): Promise<ProductResponse> {
+  try {
+    if (!storeId) {
+      return {
+        success: false,
+        error: "Store ID is required",
+        products: [],
+      };
+    }
+
+    // If no category filters, just return all store products
+    if (!categoryIds.length) {
+      const products = await db.product.findMany({
+        where: {
+          storeId: storeId,
+          isDeleted: false,
+        },
+        include: {
+          categories: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      });
+
+      return { success: true, products };
+    }
+
+    // Find which categories are target categories and which are subproduct categories
+    const targetCategoryIds: string[] = [];
+    const subproductCategoryIds: string[] = [];
+
+    // Fetching category info to determine their types
+    const categories = await db.category.findMany({
+      where: {
+        id: { in: categoryIds },
+        isDeleted: false,
+      },
+    });
+
+    // Separate the categories by type
+    categories.forEach((category) => {
+      if (category.type === "TARGET") {
+        targetCategoryIds.push(category.id);
+      } else if (category.type === "SUBPRODUCT") {
+        subproductCategoryIds.push(category.id);
+      }
+    });
+
+    // Build a proper WHERE clause
+    const whereCondition: any = {
+      storeId: storeId,
+      isDeleted: false,
+      AND: [], // This will hold our category conditions
+    };
+
+    // Add target category conditions
+    if (targetCategoryIds.length > 0) {
+      targetCategoryIds.forEach((id) => {
+        whereCondition.AND.push({
+          categories: {
+            some: {
+              categoryId: id,
+            },
+          },
+        });
+      });
+    }
+
+    // Add subproduct category condition if any exist
+    if (subproductCategoryIds.length > 0) {
+      whereCondition.AND.push({
+        categories: {
+          some: {
+            categoryId: {
+              in: subproductCategoryIds,
+            },
+          },
+        },
+      });
+    }
+
+    // If no category conditions were added, remove the empty AND array
+    if (whereCondition.AND.length === 0) {
+      delete whereCondition.AND;
+    }
+
+    // Query with the proper structure
+    const products = await db.product.findMany({
+      where: whereCondition,
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    });
+
+    return { success: true, products };
+  } catch (error) {
+    console.error("Error fetching products by store and categories:", error);
+    return { success: false, error: "Failed to fetch products", products: [] };
+  }
+}
+
 export async function getProductsByCategory(
   categoryId: string
 ): Promise<ProductResponse> {
   return getProductsByCategories([categoryId]);
+}
+
+export async function getProductsByStoreAndCategory(
+  categoryId: string,
+  storeId: string
+): Promise<ProductResponse> {
+  return getProductsByStoreAndCategories(storeId,[categoryId]);
 }
 
 export async function getProductById(id: string): Promise<ProductResponse> {
@@ -303,12 +494,68 @@ export async function getFirstFourProductsByCategorie(
   }
 }
 
+export async function getFirstFourProductsByCategoryAndStore(
+  categoryId: string,
+  storeId: string
+): Promise<ProductResponse> {
+  try {
+    // Find products that belong to both this category and the specified store
+    const products = await db.product.findMany({
+      where: {
+        storeId: storeId,
+        isDeleted: false,
+        categories: {
+          some: {
+            categoryId: categoryId,
+          },
+        },
+      },
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 4,
+    });
+
+    return {
+      success: true,
+      products,
+    };
+  } catch (error) {
+    console.error("Error fetching products by category and store:", error);
+    return {
+      success: false,
+      error: "An error occurred while fetching products.",
+      products: [],
+    };
+  }
+}
+
 export async function getNewProducts({
   take,
   skip,
-}: PaginationProps): Promise<ProductResponse> {
+  storeId,
+}: PaginationProps & { storeId?: string }): Promise<ProductResponse> {
   try {
+    // Build the where condition
+    const whereCondition: any = {
+      isDeleted: false,
+    };
+
+    // Add storeId to the where condition if it exists
+    if (storeId) {
+      whereCondition.storeId = storeId;
+    }
+
+    // Fetch products with the where condition
     const products = await db.product.findMany({
+      where: whereCondition,
       take: take,
       skip: skip * take,
       include: {
@@ -328,9 +575,11 @@ export async function getNewProducts({
       products,
     };
   } catch (error) {
+    console.error("Error fetching new products:", error);
     return {
       success: false,
       error: "An error occurred while fetching products.",
+      products: [],
     };
   }
 }

@@ -3,60 +3,100 @@
 import { AddToCartButton } from "@/components/addToCartButton";
 import { useProductStore } from "@/store/useProductStore";
 import CategoriesFilter from "@/components/categoriesFilter";
-import { useEffect, useState } from "react";
+import { getStoreByUrl } from "@/actions/storeActions";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-export default function ProductHome() {
-  const filteredProducts = useProductStore((state) => state.filteredProducts);
-  const loading = useProductStore((state) => state.loading);
-  const filterByCategories = useProductStore(
-    (state) => state.filterByCategories
-  );
+import { useParams } from "next/navigation";
 
+export default function ProductHome() {
+  const params = useParams();
+  const storeUrl = params.storeUrl as string;
+  const locale = params.locale as string;
+
+  // Product state from store
+  const products = useProductStore((state) => state.products);
+  const loading = useProductStore((state) => state.loading);
+  const loadStoreProducts = useProductStore((state) => state.loadStoreProducts);
+
+  // Local state
+  const [storeId, setStoreId] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSubCategories, setSelectedSubCategories] = useState<string[]>(
     []
   );
-  // preventing unnecessary re-renders
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
 
-  // filtering products whenever selections change
+  // Fetch data only once on mount
   useEffect(() => {
-    // Skiping the effect during the initial render
-    if (isInitialLoad) {
-      setIsInitialLoad(false);
-      return;
+    let isMounted = true;
+
+    async function fetchStoreAndProducts() {
+      try {
+        // Get store information by URL
+        const store = await getStoreByUrl(storeUrl);
+
+        if (!store || !isMounted) return;
+
+        setStoreId(store.id);
+
+        // Load all products for this store
+        await loadStoreProducts(store.id);
+      } catch (error) {
+        console.error("Error loading store data:", error);
+      } finally {
+        if (isMounted) {
+          setInitialLoading(false);
+        }
+      }
     }
 
-    const handleFilterProducts = async () => {
-      // creating categories array to filter by
-      let categoriesToFilter = [];
+    fetchStoreAndProducts();
 
-      // adding target category if not "all"
-      if (selectedCategory !== "all") {
-        categoriesToFilter.push(selectedCategory);
-      }
-
-      // adding subcategories if any are selected
-      if (selectedSubCategories.length > 0) {
-        categoriesToFilter.push(...selectedSubCategories);
-      }
-
-      // applying filters
-      await filterByCategories(categoriesToFilter);
+    return () => {
+      isMounted = false;
     };
+  }, [storeUrl, loadStoreProducts]);
 
-    handleFilterProducts();
-  }, [selectedCategory, selectedSubCategories, filterByCategories]);
+  // Filter products on the client side for immediate responses
+  const filteredProducts = useMemo(() => {
+    if (!products || products.length === 0) return [];
+
+    // If "all" is selected and no subcategories, return all products
+    if (selectedCategory === "all" && selectedSubCategories.length === 0) {
+      return products;
+    }
+
+    return products.filter((product) => {
+      const productCategories =
+        product.categories?.map((pc) => pc.categoryId) || [];
+
+      // Check if product has the selected main category
+      const hasMainCategory =
+        selectedCategory === "all" ||
+        productCategories.includes(selectedCategory);
+
+      // Check if product has any of the selected subcategories
+      const hasSubCategory =
+        selectedSubCategories.length === 0 ||
+        productCategories.some((catId) =>
+          selectedSubCategories.includes(catId)
+        );
+
+      return hasMainCategory && hasSubCategory;
+    });
+  }, [products, selectedCategory, selectedSubCategories]);
 
   const handleCategorySelect = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    // Clear subcategory selection when changing main category
     setSelectedSubCategories([]);
   };
 
   const handleSubCategorySelect = (subCategoryIds: string[]) => {
     setSelectedSubCategories(subCategoryIds);
   };
+
+  // Combined loading state
+  const isLoading = initialLoading || loading;
 
   return (
     <div className="bg-white pb-[8.5vh] overflow-x-hidden">
@@ -69,7 +109,7 @@ export default function ProductHome() {
       <h1 className="ml-2 mt-4 font-raleway font-bold text-[21px] text-gray-800">
         Products
       </h1>
-      {loading ? (
+      {isLoading ? (
         <div className="flex justify-center py-8">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
         </div>
@@ -82,7 +122,10 @@ export default function ProductHome() {
           ) : (
             filteredProducts.map((product) => (
               <div key={product.id} className="p-2 flex flex-col">
-                <Link href={`/products/listProducts/${product.id}`} className="cursor-pointer">
+                <Link
+                  href={`/${locale}/store/${storeUrl}/allProducts/${product.id}`}
+                  className="cursor-pointer"
+                >
                   <div className="p-1.5 bg-white shadow-md shadow-[rgba(0,0,0,0.1)] rounded-[9px]">
                     <img
                       className="w-[100%] h-[26vh] rounded-[9px]"
@@ -90,6 +133,7 @@ export default function ProductHome() {
                       alt={product.name}
                       width={200}
                       height={200}
+                      loading="lazy"
                     />
                   </div>
                 </Link>

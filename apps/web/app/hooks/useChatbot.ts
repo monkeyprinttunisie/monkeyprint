@@ -5,6 +5,7 @@ import {
 } from "@/actions/chatbotActions";
 import { useChatStore } from "@/store/ChatStore";
 import { ContactInfo } from "@/types";
+import { useParams } from "next/navigation";
 
 // Define the response type to match what the server returns
 interface ChatbotResponse {
@@ -32,6 +33,8 @@ export const useChatbot = () => {
     (state) => state.setOrderConfirmation
   );
   const setTemporaryCart = useChatStore((state) => state.setTemporaryCart);
+  const params = useParams();
+  const storeUrl = params.storeUrl as string;
 
   const handleSendMessage = async (userMessage: string, optionId?: string) => {
     if (!userMessage.trim()) return;
@@ -45,7 +48,8 @@ export const useChatbot = () => {
       console.log("Sending message:", userMessage, "optionId:", optionId);
       const response = (await sendMessageToChatbot(
         userMessage,
-        optionId
+        optionId,
+        storeUrl
       )) as ChatbotResponse;
       console.log("Response received:", response);
 
@@ -117,13 +121,14 @@ export const useChatbot = () => {
 
   const uploadImage = async (imageUrl: string) => {
     try {
+      const hostname = window.location.hostname.split(".")[0];
       setLoading(true);
       const response = await fetch("/api/chat/upload-image", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ imageUrl }),
+        body: JSON.stringify({ imageUrl, storeUrl }),
       });
 
       const data = await response.json();

@@ -234,7 +234,7 @@ export async function getCategoriesByType(
 
 export async function getCategoriesByTypeWithPagination(type: CategoryType) {
   const firstFourCategories = await db.category.findMany({
-    where: { type },
+    where: { type, isDeleted: false },
     take: 4,
   });
 
@@ -245,6 +245,21 @@ export async function getCategoryProductCount(categoryId: string) {
   return await db.productCategory.count({
     where: {
       categoryId: categoryId,
+    },
+  });
+}
+
+export async function getCategoryProductCountByStore(
+  categoryId: string,
+  storeId: string
+) {
+  return await db.productCategory.count({
+    where: {
+      categoryId: categoryId,
+      product: {
+        storeId: storeId,
+        isDeleted: false,
+      },
     },
   });
 }

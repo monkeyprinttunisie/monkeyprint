@@ -7,21 +7,20 @@ import { cookies } from "next/headers";
 import {
   createOrder as createOrderAction,
   getOrderById,
+  getOrdersByPhoneNumber,
+  updateOrderStatus,
 } from "@/actions/orderActions";
 import { listCategories } from "@/actions/categoryActions";
 import {
   getProductsByCategory as getProductsByCategoryAction,
   getProductById as getProductByIdAction,
+  getProductsByStoreAndCategory,
 } from "@/actions/productActions";
 
-import {
-  getOrdersByPhoneNumber,
-  updateOrderStatus,
-} from "@/actions/orderActions";
 import { sendOrderIssueEmail } from "@monkeyprint/utils/email";
 
 import { UTApi } from "uploadthing/server";
-
+import { getStoreByUrl, getStoreOwnerByStoreId } from "@/actions/storeActions";
 import { OrderForEmail } from "@monkeyprint/utils/email";
 // Initialize Resend for email
 const utapi = new UTApi();
@@ -71,6 +70,24 @@ type ConversationState = {
   issueDescription?: string;
   uploadedImageUrl?: string;
 };
+
+async function getStoreInfo(storeUrl?: string) {
+  let finalStoreId: string = "";
+  let storeOwnerEmail: string | undefined;
+
+  if (storeUrl) {
+    const store = await getStoreByUrl(storeUrl);
+    if (store) {
+      finalStoreId = store.id;
+      const storeOwner = await getStoreOwnerByStoreId(store.id);
+      if (storeOwner) {
+        storeOwnerEmail = storeOwner.email;
+      }
+    }
+  }
+
+  return { finalStoreId, storeOwnerEmail };
+}
 
 export async function resetChatbotState() {
   const cookieStore = await cookies();
@@ -124,10 +141,15 @@ export async function sendContactInfoToChatbot(contactInfo: ContactInfo) {
   }
 }
 
-export async function sendMessageToChatbot(message: string, optionId?: string) {
+export async function sendMessageToChatbot(
+  message: string,
+  optionId?: string,
+  storeUrl?: string
+) {
   try {
     // Get current conversation state from cookies or initialize
     const state = await getConversationState();
+    const { finalStoreId, storeOwnerEmail } = await getStoreInfo(storeUrl);
 
     // Process message based on current stage
     switch (state.stage) {
@@ -213,7 +235,10 @@ export async function sendMessageToChatbot(message: string, optionId?: string) {
 
         if (phoneRegex.test(message.trim())) {
           const phoneNumber = message.trim();
-          const ordersResponse = await getOrdersByPhoneNumber(phoneNumber);
+          const ordersResponse = await getOrdersByPhoneNumber(
+            phoneNumber,
+            finalStoreId
+          );
 
           if (!ordersResponse.success || !ordersResponse.orders) {
             return {
@@ -381,7 +406,9 @@ export async function sendMessageToChatbot(message: string, optionId?: string) {
               await sendOrderIssueEmail(
                 prepareOrderForEmail(state.selectedOrder!),
                 "Cancel Request (Post-Processing)",
-                `Customer attempted to cancel order #${state.selectedOrder?.id.slice(0, 8)} which is already in ${state.selectedOrder?.status} status.`
+                `Customer attempted to cancel order #${state.selectedOrder?.id.slice(0, 8)} which is already in ${state.selectedOrder?.status} status.`,
+                undefined,
+                storeOwnerEmail
               );
 
               return {
@@ -421,7 +448,9 @@ export async function sendMessageToChatbot(message: string, optionId?: string) {
             await sendOrderIssueEmail(
               prepareOrderForEmail(state.selectedOrder!),
               "Delivery Inquiry",
-              `Customer inquired about delivery status for order #${state.selectedOrder?.id.slice(0, 8)} which is in ${status} status.`
+              `Customer inquired about delivery status for order #${state.selectedOrder?.id.slice(0, 8)} which is in ${status} status.`,
+              undefined,
+              storeOwnerEmail
             );
 
             return {
@@ -483,7 +512,9 @@ export async function sendMessageToChatbot(message: string, optionId?: string) {
             state.issueType === "return_order"
               ? "Return Request"
               : "Other Issue",
-            description
+            description,
+            undefined,
+            storeOwnerEmail
           );
 
           return {
@@ -519,12 +550,21 @@ export async function sendMessageToChatbot(message: string, optionId?: string) {
         // For now, we'll just check if an image URL was provided in the state
 
         if (state.uploadedImageUrl) {
+          console.log("Sending email to store owner:", {
+            order: state.selectedOrder?.id,
+            issueType: "Damaged Product Report",
+            description:
+              "Customer reported damaged product and provided an image.",
+            imageUrl: state.uploadedImageUrl,
+            emailTo: storeOwnerEmail,
+          });
           // Send email with the image
           await sendOrderIssueEmail(
             prepareOrderForEmail(state.selectedOrder!),
             "Damaged Product Report",
             "Customer reported damaged product and provided an image.",
-            state.uploadedImageUrl
+            state.uploadedImageUrl,
+            storeOwnerEmail
           );
 
           return {
@@ -561,13 +601,15 @@ export async function sendMessageToChatbot(message: string, optionId?: string) {
               await sendOrderIssueEmail(
                 prepareOrderForEmail(state.selectedOrder!),
                 "Order Cancellation (Automated)",
-                "Customer canceled their order through the chatbot."
+                "Customer canceled their order through the chatbot.",
+                undefined,
+                storeOwnerEmail
               );
 
               return {
                 success: true,
                 message:
-                  "Your order has been successfully canceled. You'll receive a confirmation of the cancellation by email shortly.",
+                  "Your order has been successfully canceled. Store owners will be notified about your order cancellation by email shortly.",
                 intent: "GREETING",
               };
             }
@@ -579,7 +621,9 @@ export async function sendMessageToChatbot(message: string, optionId?: string) {
             state.issueType === "other_issue"
               ? "Other Issue"
               : state.issueType!,
-            state.issueDescription || "No additional details provided."
+            state.issueDescription || "No additional details provided.",
+            undefined,
+            storeOwnerEmail
           );
 
           return {
@@ -636,8 +680,10 @@ export async function sendMessageToChatbot(message: string, optionId?: string) {
         const categoryId = optionId || extractOptionId(message);
         if (categoryId) {
           // Try to get products for this category
-          const productsResponse =
-            await getProductsByCategoryAction(categoryId);
+          const productsResponse = await getProductsByStoreAndCategory(
+            categoryId,
+            finalStoreId
+          );
 
           if (
             !productsResponse.success ||
@@ -984,13 +1030,14 @@ export async function sendMessageToChatbot(message: string, optionId?: string) {
           if (state.contactInfo && state.shippingMethod) {
             const contactInfoWithCity = {
               ...state.contactInfo,
-              city: state.contactInfo.city || "Tunis", // Default to Tunis if no city provided
+              city: state.contactInfo.city || "Tunis",
             };
 
             const orderResponse = await createOrderAction(
               state.temporaryCart,
               contactInfoWithCity,
-              state.shippingMethod
+              state.shippingMethod,
+              finalStoreId
             );
 
             if (orderResponse.success && orderResponse.order) {
@@ -1111,8 +1158,10 @@ function extractIssueType(message: string): string | null {
   return null;
 }
 
-export async function uploadImageForIssue(imageUrl: string) {
+export async function uploadImageForIssue(imageUrl: string, storeUrl: string) {
   try {
+    const { finalStoreId, storeOwnerEmail } = await getStoreInfo(storeUrl);
+
     console.log("Processing image URL:", imageUrl);
     const state = await getConversationState();
 
@@ -1140,7 +1189,8 @@ export async function uploadImageForIssue(imageUrl: string) {
       prepareOrderForEmail(state.selectedOrder),
       "Damaged Product Report",
       "Customer reported damaged product and provided an image.",
-      fullImageUrl // Use the absolute URL
+      fullImageUrl,
+      storeOwnerEmail
     );
 
     return {

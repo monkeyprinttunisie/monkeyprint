@@ -28,7 +28,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ message }) => {
   const { submitContactInfo, sendMessage, uploadImage } = useChatbot();
 
   // Add this for handling image uploads
-  const handleImageUpload = (imageUrl: string) => {
+  const handleImageUpload = async (imageUrl: string) => {
     uploadImage(imageUrl);
   };
 
