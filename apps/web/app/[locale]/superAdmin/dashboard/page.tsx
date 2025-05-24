@@ -2,7 +2,7 @@
 
 import { getAllStores } from "@/actions/storeActions";
 import { columns } from "./columns";
-import { DataTable } from "../../../components/ui/dataTable/data-table";
+import { DataTable } from "@/components/ui/dataTable/data-table";
 import { useEffect, useState } from "react";
 import { Store } from "@monkeyprint/db";
 
@@ -18,8 +18,8 @@ export default function SAdminDashboardPage() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-5 items-center w-screen px-5">
-      <div className="container mx-auto ">
+    <div className=" items-center mx-2 w-[96vw] lg:w-[98vw] lg:pl-2">
+      <div className="container mx-auto">
         <DataTable columns={columns} data={stores} />
       </div>
     </div>
