@@ -15,6 +15,7 @@ import {
   Moon,
   Sun,
   Globe,
+  Users,
 } from "lucide-react";
 import LogoutButton from "../sharedAdminSuperAdmin/LogoutButton";
 
@@ -69,6 +70,18 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
       subItems: [
         { name: "Dashboard Preview", href: "/superAdmin/adminOrders" },
         { name: "Detailed Orders", href: "/superAdmin/orders" },
+      ],
+    },
+    {
+      name: "Team",
+      href: "/superAdmin/team",
+      icon: <Users className="w-5 h-5" />,
+      subItems: [
+        { name: "Collaborators", href: "/superAdmin/team" },
+        {
+          name: "Add Collaborator",
+          href: "/superAdmin/team/addCollaborator",
+        },
       ],
     },
   ];
