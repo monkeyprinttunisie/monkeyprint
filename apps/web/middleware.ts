@@ -55,7 +55,7 @@ export default async function middleware(request: NextRequest) {
   // Lookup store by URL
   try {
     const protocol = request.nextUrl.protocol;
-    const host = "localhost:3000"; // For local testing
+    const host = hostname;
 
     const lookupUrl = `${protocol}//${host}/api/lookup-store?url=${subdomain}`;
     console.log("Looking up store at:", lookupUrl);
