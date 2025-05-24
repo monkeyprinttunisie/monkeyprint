@@ -1,15 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ChevronDown,
   LayoutDashboard,
+  Package,
   ShoppingBasket,
   Tags,
   X,
+  Moon,
+  Sun,
+  Globe,
 } from "lucide-react";
+import LogoutButton from "../sharedAdminSuperAdmin/LogoutButton";
 
 interface NavItem {
   name: string;
@@ -26,6 +33,9 @@ interface SuperAdminNavProps {
 export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
   // Define navigation items with their respective routes and submenus
   const navItems: NavItem[] = [
@@ -55,13 +65,24 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
     {
       name: "Orders",
       href: "/superAdmin/adminOrders",
-      icon: <Tags className="w-5 h-5" />,
+      icon: <Package className="w-5 h-5" />,
       subItems: [
         { name: "Dashboard Preview", href: "/superAdmin/adminOrders" },
         { name: "Detailed Orders", href: "/superAdmin/orders" },
       ],
     },
   ];
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const toggleLanguage = () => {
+    const currentPath = pathname || "";
+    const newLocale = currentPath.includes("/en/") ? "ar" : "en";
+    const newPath = currentPath.replace(/\/(en|ar)\//, `/${newLocale}/`);
+    router.push(newPath);
+  };
 
   const toggleSubMenu = (name: string) => {
     if (openSubMenu === name) {
@@ -99,11 +120,19 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
     <div
       className={`fixed inset-y-0 left-0 transform ${
         isOpen ? "translate-x-0" : "-translate-x-full"
-      } lg:translate-x-0 w-64 bg-[#004CFF] text-white transition duration-200 ease-in-out z-40 shadow-lg`}
+      } lg:translate-x-0 w-[70vw] md:w-[14vw] bg-[#004CFF] text-white transition duration-200 ease-in-out z-40 shadow-lg flex flex-col h-full`}
     >
       <div className="p-5 border-b border-blue-500 flex justify-between items-center">
-        <Link href="/en/superAdmin/dashboard" className="flex items-center">
-          <span className="text-xl font-bold">S.Admin Panel</span>
+        <Link
+          href="/en/superAdmin/dashboard"
+          className="flex items-center gap-2"
+        >
+          <img
+            src="/icons/mp.png"
+            alt="MonkeyPrint Logo"
+            className="h-8 w-auto brightness-0 invert"
+          />
+          <span className="text-l font-bold">Super Admin</span>
         </Link>
 
         <button
@@ -115,7 +144,7 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
         </button>
       </div>
 
-      <nav className="mt-5">
+      <nav className="mt-5 flex-1 overflow-y-auto">
         <ul className="space-y-2 px-2">
           {navItems.map((item) => (
             <li key={item.name}>
@@ -179,6 +208,9 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
           ))}
         </ul>
       </nav>
+      <div className="p-2 border-t border-blue-500">
+        <LogoutButton onClose={onClose} />
+      </div>
     </div>
   );
 }
