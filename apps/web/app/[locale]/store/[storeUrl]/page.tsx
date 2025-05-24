@@ -15,6 +15,7 @@ export default function HomePage() {
   const storeUrl = params.storeUrl as string;
   const [storeId, setStoreId] = useState<string | null>(null);
   const [storeImage, setStoreImage] = useState<string | null>(null);
+  const [banners, setBanners] = useState<any[]>([]);
 
   const t = useTranslations("HomePage");
   useEffect(() => {
@@ -24,6 +25,9 @@ export default function HomePage() {
         if (store) {
           setStoreId(store.id);
           setStoreImage(store.image);
+          if (store.homeBanner && store.homeBanner.length > 0) {
+            setBanners(store.homeBanner);
+          }
         }
       } catch (error) {
         console.error("Error fetching store:", error);
@@ -52,9 +56,13 @@ export default function HomePage() {
           </button>
         </form>
       </div>
-      <CardCarousel
-        cards={[<DiscountCard />, <DiscountCard />, <DiscountCard />]}
-      />
+      {banners.length > 0 && (
+        <CardCarousel
+          cards={banners.map((banner) => (
+            <DiscountCard key={banner.id} banner={banner} />
+          ))}
+        />
+      )}
       <CategoriesGridDisplay storeId={storeId || undefined} />
       <div className="flex flex-col gap-1 w-full">
         <span className="font-['Raleway'] font-bold text-[21px] leading-[30px] tracking-[-0.21px] text-[#202020]">
