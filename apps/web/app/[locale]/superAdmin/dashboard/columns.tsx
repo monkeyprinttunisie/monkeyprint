@@ -17,10 +17,12 @@ import {
 import { DataTableColumnHeader } from "@/components/ui/dataTable/dataTableColumnHeader";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "@/../i18n/navigation";
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
 
-export const columns: ColumnDef<Store>[] = [
+type StoreWithEarnings = Store & {
+  netEarnings?: number;
+};
+
+export const columns: ColumnDef<StoreWithEarnings>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -67,17 +69,19 @@ export const columns: ColumnDef<Store>[] = [
       <DataTableColumnHeader
         column={column}
         title="Wallet"
-        className="justify-end"
+        className="justify-start"
       />
     ),
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("wallet"));
+      const store = row.original;
+      const netEarnings = store.netEarnings || 0;
+
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "TND",
-      }).format(amount);
+      }).format(netEarnings);
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return <div className="text-left font-medium">{formatted}</div>;
     },
   },
   {
