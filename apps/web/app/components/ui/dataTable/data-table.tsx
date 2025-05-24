@@ -70,11 +70,11 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-2 gap-4">
+      <div className="flex items-center py-2 gap-4 lg:w-[86%]">
         <DataTableFilter table={table} />
         <DataTableViewOptions table={table} />
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border lg:w-[86%]">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

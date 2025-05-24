@@ -30,7 +30,7 @@ export default function AdminOrders() {
   }, [storeId]);
 
   return (
-    <div className="flex flex-col gap-5 items-center w-screen px-5">
+    <div className="items-center mx-2 w-[96vw] lg:w-[100%] lg:px-5">
       <div className="container mx-auto">
         <DataTable
           columns={columns}
