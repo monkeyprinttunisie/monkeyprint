@@ -94,16 +94,6 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
       ],
     },
     {
-      name: "Wallet",
-      href: `/admin/wallet?id=${storeId}`,
-      icon: <WalletIcon className="w-5 h-5" />,
-    },
-    {
-      name: "Team",
-      href: "/admin/team",
-      icon: <Users className="w-5 h-5" />,
-    },
-    {
       name: "Orders",
       href: storeId ? `/admin/orders?id=${storeId}` : "/admin/orders",
       icon: <Package className="w-5 h-5" />,
@@ -117,6 +107,23 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
           href: storeId
             ? `/admin/ordersState?id=${storeId}`
             : "/admin/ordersState",
+        },
+      ],
+    },
+    {
+      name: "Wallet",
+      href: `/admin/wallet?id=${storeId}`,
+      icon: <WalletIcon className="w-5 h-5" />,
+    },
+    {
+      name: "Team",
+      href: "/admin/team",
+      icon: <Users className="w-5 h-5" />,
+      subItems: [
+        { name: "Collaborators", href: "/admin/team" },
+        {
+          name: "Add Collaborator",
+          href: "/admin/team/addCollaborator",
         },
       ],
     },
