@@ -194,7 +194,10 @@
   "WalletPage": {
     "transactions": " شوف المعاملات",
     "no_transactions": "ما فماش معاملات",
-    "wallet": " محفظتي"
+    "wallet": " محفظتي",
+    "all_time_view": "إحصائيات من البداية",
+    "date_specific_view": "إحصائيات يومية",
+    "view_all_time": "شوف إحصائيات الكل وقت"
   },
   "Team": {
     "team": "فريق",

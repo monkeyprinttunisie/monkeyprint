@@ -192,9 +192,12 @@
     "shipping": "Shipping"
   },
   "WalletPage": {
-    "transactions": " View Invoice",
+    "transactions": "Print Invoice",
     "no_transactions": "No transactions found",
-    "wallet": ""
+    "wallet": "",
+    "all_time_view": "All-Time Statistics",
+    "date_specific_view": "Daily Statistics",
+    "view_all_time": "View All-Time Stats"
   },
   "Team": {
     "team": "Team",
