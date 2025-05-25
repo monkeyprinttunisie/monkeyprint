@@ -338,8 +338,8 @@ export default function ImageGenerator() {
       const targetIndices =
         baseOnSelected && selectedImageIndex !== null
           ? Array.from({ length: 4 })
-            .map((_, i) => i)
-            .filter((i) => i !== selectedImageIndex)
+              .map((_, i) => i)
+              .filter((i) => i !== selectedImageIndex)
           : [0, 1, 2, 3]; // All indices if not based on selected
 
       console.log(
@@ -577,9 +577,7 @@ export default function ImageGenerator() {
       window.dispatchEvent(new Event("storage"));
 
       // Navigate to preview
-      router.push(
-        `/designer_tool/previewProduct?product=${selectedProduct}`
-      );
+      router.push(`/designer_tool/previewProduct?product=${selectedProduct}`);
     } catch (error) {
       console.error("Error applying selected image:", error);
       alert(
@@ -696,8 +694,7 @@ export default function ImageGenerator() {
           htmlFor="transparent-bg"
           className="text-sm text-gray-700 cursor-pointer select-none"
         >
-          Generate images with transparent background (limited to 50 free
-          images)
+          Generate images with transparent background (limited to 50 images)
         </label>
       </div>
 

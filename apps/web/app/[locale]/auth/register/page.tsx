@@ -264,13 +264,13 @@ export default function RegisterPage() {
                   <SignIn
                     provider="google"
                     className={
-                      isRTL ? "justify-self-start" : "justify-self-end"
+                      isRTL ? "justify-self-start mr-4" : "justify-self-end"
                     }
                   />
                   <SignIn
                     provider="facebook"
                     className={
-                      isRTL ? "justify-self-end" : "justify-self-start"
+                      isRTL ? "justify-self-end mr-4" : "justify-self-start"
                     }
                   />
                 </div>
