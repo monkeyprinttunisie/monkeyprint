@@ -442,14 +442,14 @@ const AddProduct: React.FC = () => {
                 >
                   Create Design for Product
                 </button>
-                <p className="text-sm text-gray-500 mb-2">or</p>
+                {/* <p className="text-sm text-gray-500 mb-2">or</p>
                 <button
                   type="button"
                   onClick={() => setIsImageSelectorOpen(true)}
                   className="px-4 py-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-md mb-3"
                 >
                   Select from Existing Images
-                </button>
+                </button> */}
               </div>
             )}
           </div>
