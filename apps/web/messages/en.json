@@ -192,7 +192,7 @@
     "shipping": "Shipping"
   },
   "WalletPage": {
-    "transactions": " View Transactions",
+    "transactions": " View Invoice",
     "no_transactions": "No transactions found",
     "wallet": ""
   },
@@ -206,8 +206,31 @@
     "edit": "Edit",
     "remove": "Remove",
     "removing": "Removing...",
+    "members": "Members",
+    "member": "Member",
+    "addMember": "Add Member",
+    "removeMember": "Remove Member",
+    "noMembers": "No Members",
+    "noTeam": "You don't have a team",
     "noCollaboratorsYet": "No team members yet",
-    "addYourFirstTeamMember": "Add your first team member to start collaborating"
+    "addYourFirstTeamMember": "Add your first team member to start collaborating",
+    "add_collaborator": "Add Collaborator",
+    "add_collaborator_subtitle": "Add a new team member to your store",
+    "full_name": "Full Name",
+    "full_name_placeholder": "Enter full name",
+    "email_address": "Email Address",
+    "email_placeholder": "Enter email address",
+    "password": "Password",
+    "password_placeholder": "Create a secure password",
+    "phone_number": "Phone Number",
+    "phone_number_placeholder": "Enter phone number",
+    "adding": "Adding...",
+    "back_to_team": "Back to Team",
+    "collaborator_added": "Collaborator added successfully!",
+    "collaborator_error": "Failed to add collaborator. Please try again.",
+    "team_promo_line1": "Grow your business",
+    "team_promo_line2": "with a strong team",
+    "team_promo_action": "Add team members"
   },
   "HistoryPage": {
     "Delivered": "Delivered",
