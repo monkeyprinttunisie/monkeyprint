@@ -114,6 +114,13 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
       name: "Wallet",
       href: `/admin/wallet?id=${storeId}`,
       icon: <WalletIcon className="w-5 h-5" />,
+      subItems: [
+        { name: "Income", href: `/admin/wallet?id=${storeId}` },
+        {
+          name: "Print Invoice",
+          href: `/admin/wallet/invoice?storeId=${storeId}`,
+        },
+      ],
     },
     {
       name: "Team",
