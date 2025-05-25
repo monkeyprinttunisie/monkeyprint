@@ -1,11 +1,10 @@
-"use client"
+"use client";
 
-import React, { useState, useRef } from "react"
+import React, { useState, useRef } from "react";
 import {
   Menu,
   X,
   Check,
-  Plug,
   Printer,
   Info,
   LayoutTemplate,
@@ -18,11 +17,12 @@ import {
   PaintBucket,
   Store,
   ArrowRight,
-} from "lucide-react"
-import { useTranslations } from "next-intl"
-import { CoverageMap } from "@/components/CoverageMap"
-import { motion } from "framer-motion"
-import { useInView } from "react-intersection-observer"
+} from "lucide-react";
+import { useTranslations } from "next-intl";
+import { CoverageMap } from "@/components/CoverageMap";
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
+import { useLocale } from "next-intl";
 
 // Animation variants - move these outside the component
 const fadeIn = {
@@ -32,7 +32,7 @@ const fadeIn = {
     y: 0,
     transition: { duration: 0.6 },
   },
-}
+};
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -42,7 +42,7 @@ const staggerContainer = {
       staggerChildren: 0.1,
     },
   },
-}
+};
 
 const scaleUp = {
   hidden: { scale: 0.8, opacity: 0 },
@@ -51,60 +51,65 @@ const scaleUp = {
     opacity: 1,
     transition: { duration: 0.5 },
   },
-}
+};
 
 export default function HomePage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState("home")
-  const [activeStep, setActiveStep] = useState(1)
-  const t = useTranslations("HomePage")
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
+  const [activeStep, setActiveStep] = useState(1);
+  const t = useTranslations("HomePage");
+  const locale = useLocale();
+  const isRTL = locale === "tn";
   // Refs for scrolling to sections
-  const functionalitiesRef = useRef<HTMLElement>(null)
-  const whyMPRef = useRef<HTMLElement>(null)
-  const templatesRef = useRef<HTMLElement>(null)
-  const stepsRef = useRef<HTMLElement>(null)
-  const partnersRef = useRef<HTMLElement>(null)
+  const functionalitiesRef = useRef<HTMLElement>(null);
+  const whyMPRef = useRef<HTMLElement>(null);
+  const templatesRef = useRef<HTMLElement>(null);
+  const stepsRef = useRef<HTMLElement>(null);
+  const partnersRef = useRef<HTMLElement>(null);
 
   // Function to scroll to a section - fixed to handle null refs
-  const scrollToSection = (sectionRef: React.RefObject<HTMLElement | null>, sectionId: string) => {
+  const scrollToSection = (
+    sectionRef: React.RefObject<HTMLElement | null>,
+    sectionId: string
+  ) => {
     if (sectionRef.current) {
-      sectionRef.current.scrollIntoView({ behavior: "smooth" })
-      setActiveSection(sectionId)
-      setIsMenuOpen(false)
+      sectionRef.current.scrollIntoView({ behavior: "smooth" });
+      setActiveSection(sectionId);
+      setIsMenuOpen(false);
     }
-  }
+  };
 
   // Steps data with icons
   const steps = [
     {
       step: 1,
-      title: "Sign Up",
-      description: "Create your free MonkeyPrint account in seconds",
+      title: t("step1_title"),
+      description: t("step1_desc"),
       icon: <UserPlus className="w-6 h-6" />,
       color: "from-blue-600 to-blue-400",
     },
     {
       step: 2,
-      title: "Choose Products",
-      description: "Browse our catalog of high-quality blank products",
-      icon: <ShoppingBag className="w-6 h-6" />,
-      color: "from-purple-600 to-purple-400",
+      title: t("step2_title"),
+      description: t("step2_desc"),
+      icon: <Store className="w-6 h-6" />,
+      color: "from-green-600 to-green-400",
     },
     {
       step: 3,
-      title: "Add Designs",
-      description: "Upload your artwork or use our design templates",
+      title: t("step3_title"),
+      description: t("step3_desc"),
       icon: <PaintBucket className="w-6 h-6" />,
       color: "from-pink-600 to-pink-400",
     },
     {
       step: 4,
-      title: "Start Selling",
-      description: "Connect to marketplaces or create your own store",
-      icon: <Store className="w-6 h-6" />,
-      color: "from-green-600 to-green-400",
+      title: t("step4_title"),
+      description: t("step4_desc"),
+      icon: <ShoppingBag className="w-6 h-6" />,
+      color: "from-purple-600 to-purple-400",
     },
-  ]
+  ];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -135,16 +140,25 @@ export default function HomePage() {
               className="flex items-center justify-center w-10 h-10 rounded-full lg:hidden bg-blue-100 text-blue-600"
               whileTap={{ scale: 0.9 }}
             >
-              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
               <span className="sr-only"></span>
             </motion.button>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex lg:items-center lg:gap-6">
               <motion.button
-                onClick={() => scrollToSection(functionalitiesRef, "functionalities")}
-                className={`px-3 py-2 text-sm font-medium transition-colors rounded-full ${activeSection === "functionalities" ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                onClick={() =>
+                  scrollToSection(functionalitiesRef, "functionalities")
+                }
+                className={`px-3 py-2 text-sm font-medium transition-colors rounded-full ${
+                  activeSection === "functionalities"
+                    ? "bg-blue-100 text-blue-600"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -152,8 +166,11 @@ export default function HomePage() {
               </motion.button>
               <motion.button
                 onClick={() => scrollToSection(whyMPRef, "whyMP")}
-                className={`px-3 py-2 text-sm font-medium transition-colors rounded-full ${activeSection === "whyMP" ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                className={`px-3 py-2 text-sm font-medium transition-colors rounded-full ${
+                  activeSection === "whyMP"
+                    ? "bg-blue-100 text-blue-600"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -161,8 +178,11 @@ export default function HomePage() {
               </motion.button>
               <motion.button
                 onClick={() => scrollToSection(templatesRef, "templates")}
-                className={`px-3 py-2 text-sm font-medium transition-colors rounded-full ${activeSection === "templates" ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                className={`px-3 py-2 text-sm font-medium transition-colors rounded-full ${
+                  activeSection === "templates"
+                    ? "bg-blue-100 text-blue-600"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -170,8 +190,11 @@ export default function HomePage() {
               </motion.button>
               <motion.button
                 onClick={() => scrollToSection(stepsRef, "steps")}
-                className={`px-3 py-2 text-sm font-medium transition-colors rounded-full ${activeSection === "steps" ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                className={`px-3 py-2 text-sm font-medium transition-colors rounded-full ${
+                  activeSection === "steps"
+                    ? "bg-blue-100 text-blue-600"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -179,8 +202,11 @@ export default function HomePage() {
               </motion.button>
               <motion.button
                 onClick={() => scrollToSection(partnersRef, "partners")}
-                className={`px-3 py-2 text-sm font-medium transition-colors rounded-full ${activeSection === "partners" ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                className={`px-3 py-2 text-sm font-medium transition-colors rounded-full ${
+                  activeSection === "partners"
+                    ? "bg-blue-100 text-blue-600"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -225,7 +251,9 @@ export default function HomePage() {
             <nav className="container px-4 py-4 mx-auto">
               <div className="flex flex-col space-y-4">
                 <motion.button
-                  onClick={() => scrollToSection(functionalitiesRef, "functionalities")}
+                  onClick={() =>
+                    scrollToSection(functionalitiesRef, "functionalities")
+                  }
                   className="py-2 font-medium text-left"
                   whileTap={{ scale: 0.95 }}
                 >
@@ -283,7 +311,9 @@ export default function HomePage() {
       </motion.header>
 
       {/* Main Content */}
-      <main className={`flex-1 ${isMenuOpen ? "opacity-50 lg:opacity-100" : ""}`}>
+      <main
+        className={`flex-1 ${isMenuOpen ? "opacity-50 lg:opacity-100" : ""}`}
+      >
         {/* Hero Section */}
         <section
           className="relative py-12 md:py-20 bg-cover bg-center"
@@ -356,41 +386,51 @@ export default function HomePage() {
         </section>
 
         {/* MP Functionalities Section */}
-        <AnimatedSection ref={functionalitiesRef} id="functionalities" className="py-12 bg-blue-50">
+        <AnimatedSection
+          ref={functionalitiesRef}
+          id="functionalities"
+          className="py-12 bg-blue-50"
+        >
           <div className="container px-4 mx-auto">
-            <motion.h2 variants={fadeIn} className="mb-8 text-3xl font-bold text-center">
+            <motion.h2
+              variants={fadeIn}
+              className="mb-8 text-3xl font-bold text-center"
+            >
               {t("functionalities")}
             </motion.h2>
-            <motion.div variants={staggerContainer} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <motion.div
+              variants={staggerContainer}
+              className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+            >
               <FeatureCard
                 icon={<Printer className="w-6 h-6 text-blue-600" />}
-                title="Print on Demand"
-                description="Create custom products without inventory or upfront costs"
+                title={t("pod_title")}
+                description={t("pod_desc")}
               />
               <FeatureCard
                 icon={<LayoutTemplate className="w-6 h-6 text-blue-600" />}
-                title="Design Tools"
-                description="Easy-to-use design tools to create professional products"
+                title={t("design_title")}
+                description={t("design_desc")}
               />
               <FeatureCard
                 icon={<Truck className="w-6 h-6 text-blue-600" />}
-                title="Global Shipping"
-                description="Ship your products worldwide with reliable carriers"
+                title={t("shipping_title")}
+                description={t("shipping_desc")}
               />
               <FeatureCard
                 icon={<ListChecks className="w-6 h-6 text-blue-600" />}
-                title="Order Management"
-                description="Track and manage all your orders in one place"
+                title={t("order_title")}
+                description={t("order_desc")}
               />
               <FeatureCard
                 icon={<Info className="w-6 h-6 text-blue-600" />}
-                title="Analytics"
-                description="Get insights into your sales and customer behavior"
+                title={t("analytics_title")}
+                description={t("analytics_desc")}
               />
               <FeatureCard
-                icon={<Plug className="w-6 h-6 text-blue-600" />}
-                title="Integration"
-                description="Connect with popular e-commerce platforms and marketplaces"
+                icon={<Store className="w-6 h-6 text-blue-600" />}
+                title={t("store_title")}
+                description={t("store_desc")}
               />
             </motion.div>
           </div>
@@ -399,58 +439,88 @@ export default function HomePage() {
         {/* Why MP Section */}
         <AnimatedSection ref={whyMPRef} id="whyMP" className="py-12">
           <div className="container px-4 mx-auto">
-            <motion.h2 variants={fadeIn} className="mb-8 text-3xl font-bold text-center">
+            <motion.h2
+              variants={fadeIn}
+              className="mb-8 text-3xl font-bold text-center"
+            >
               {t("whyMP")}
             </motion.h2>
-            <motion.div variants={staggerContainer} className="grid gap-8 md:grid-cols-2">
+            <motion.div
+              variants={staggerContainer}
+              className="grid gap-8 md:grid-cols-2"
+            >
               <motion.div
                 variants={scaleUp}
                 className="p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
               >
-                <h3 className="mb-4 text-xl font-medium text-blue-600">{t("quality")}</h3>
-                <p className="mb-4 text-gray-600">
-                  {t("p1")}                </p>
+                <h3
+                  className={`mb-4 text-xl font-medium text-blue-600 ${isRTL ? "text-right" : ""}`}
+                >
+                  {t("quality")}
+                </h3>
+                <p
+                  className={`mb-4 text-gray-600 ${isRTL ? "text-right" : ""}`}
+                >
+                  {t("p1")}
+                </p>
                 <ul className="space-y-2">
-                  {["Premium materials", "Vibrant colors", "Durable prints", "Consistent quality"].map(
-                    (item, index) => (
-                      <motion.li
-                        key={index}
-                        className="flex items-center gap-2"
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        viewport={{ once: true }}
-                      >
-                        <Check className="w-5 h-5 text-blue-600 !fill-none" />
-                        <span>{item}</span>
-                      </motion.li>
-                    ),
-                  )}
+                  {[
+                    t("quality_point1"),
+                    t("quality_point2"),
+                    t("quality_point3"),
+                    t("quality_point4"),
+                  ].map((item, index) => (
+                    <motion.li
+                      key={index}
+                      className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}
+                      initial={{ opacity: 0, x: isRTL ? 10 : -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                    >
+                      <Check
+                        className={`w-5 h-5 text-blue-600 !fill-none ${isRTL ? "ml-1" : "mr-1"}`}
+                      />
+                      <span className={isRTL ? "text-right" : ""}>{item}</span>
+                    </motion.li>
+                  ))}
                 </ul>
               </motion.div>
               <motion.div
                 variants={scaleUp}
                 className="p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
               >
-                <h3 className="mb-4 text-xl font-medium text-blue-600">{t("business")}</h3>
-                <p className="mb-4 text-gray-600">
-                  {t("p2")}                </p>
+                <h3
+                  className={`mb-4 text-xl font-medium text-blue-600 ${isRTL ? "text-right" : ""}`}
+                >
+                  {t("business")}
+                </h3>
+                <p
+                  className={`mb-4 text-gray-600 ${isRTL ? "text-right" : ""}`}
+                >
+                  {t("p2")}
+                </p>
                 <ul className="space-y-2">
-                  {["No inventory costs", "Scale on demand", "Focus on marketing", "Expand product range easily"].map(
-                    (item, index) => (
-                      <motion.li
-                        key={index}
-                        className="flex items-start gap-2"
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        viewport={{ once: true }}
-                      >
-                        <Check className="w-5 h-5 mt-0.5 text-blue-600 !fill-none" />
-                        <span>{item}</span>
-                      </motion.li>
-                    ),
-                  )}
+                  {[
+                    t("business_point1"),
+                    t("business_point2"),
+                    t("business_point3"),
+                    t("business_point4"),
+                  ].map((item, index) => (
+                    <motion.li
+                      key={index}
+                      className={`flex items-start gap-2 ${isRTL ? "flex-row-reverse" : ""}`}
+                      initial={{ opacity: 0, x: isRTL ? 10 : -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                    >
+                      <Check
+                        className={`w-5 h-5 mt-0.5 text-blue-600 !fill-none ${isRTL ? "ml-1" : "mr-1"}`}
+                      />
+                      <span className={isRTL ? "text-right" : ""}>{item}</span>
+                    </motion.li>
+                  ))}
                 </ul>
               </motion.div>
             </motion.div>
@@ -458,20 +528,39 @@ export default function HomePage() {
         </AnimatedSection>
 
         {/* Templates Preview Section - Simplified */}
-        <AnimatedSection ref={templatesRef} id="templates" className="py-16 bg-gradient-to-b from-blue-50 to-white">
+        <AnimatedSection
+          ref={templatesRef}
+          id="templates"
+          className="py-16 bg-gradient-to-b from-blue-50 to-white"
+        >
           <div className="container px-4 mx-auto">
-            <motion.div variants={fadeIn} className="max-w-3xl mx-auto text-center mb-10">
+            <motion.div
+              variants={fadeIn}
+              className="max-w-3xl mx-auto text-center mb-10"
+            >
               <h2 className="text-3xl font-bold mb-4">{t("templates")}</h2>
-              <p className="text-gray-600">
-                {t("p3")}              </p>
+              <p className="text-gray-600">{t("p3")} </p>
             </motion.div>
 
             {/* Featured Templates - Single Row */}
-            <motion.div variants={staggerContainer} className="grid gap-8 grid-cols-1 md:grid-cols-3 mb-12">
+            <motion.div
+              variants={staggerContainer}
+              className="grid gap-8 grid-cols-1 md:grid-cols-3"
+            >
               {[
-                { id: 2, title: "MP t-shirt", category: "T-Shirts", popular: true },
-                { id: 1, title: "MP Mug", category: "Mugs", popular: false },
-                { id: 3, title: "MP hoodie", category: "Hoodies", popular: true },
+                {
+                  id: 2,
+                  title: "Simple",
+                  category: "T-Shirts",
+                  popular: true,
+                },
+                { id: 1, title: "Modern", category: "Mugs", popular: false },
+                {
+                  id: 3,
+                  title: "Premuim",
+                  category: "Hoodies",
+                  popular: true,
+                },
               ].map((template) => (
                 <motion.div
                   key={template.id}
@@ -525,7 +614,10 @@ export default function HomePage() {
                         ))}
                       </div>
                       <div className="flex items-center gap-1 text-yellow-400">
-                        <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                        <svg
+                          className="w-4 h-4 fill-current"
+                          viewBox="0 0 20 20"
+                        >
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                         <span className="text-sm font-medium">4.8</span>
@@ -534,36 +626,6 @@ export default function HomePage() {
                   </div>
                 </motion.div>
               ))}
-            </motion.div>
-
-            {/* See More Button - Prominent */}
-            <motion.div variants={fadeIn} className="text-center">
-              <motion.a
-                href="/templates"
-                className="inline-flex items-center justify-center px-8 py-4 font-medium text-white transition-all duration-300 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-lg hover:shadow-xl"
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: "0 0 20px rgba(59, 130, 246, 0.6)",
-                }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="mr-2">{t("inspire")}</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-arrow-right"
-                >
-                  <path d="M5 12h14"></path>
-                  <path d="m12 5 7 7-7 7"></path>
-                </svg>
-              </motion.a>
             </motion.div>
           </div>
         </AnimatedSection>
@@ -575,11 +637,12 @@ export default function HomePage() {
           className="py-16 bg-gradient-to-br from-gray-50 to-white overflow-hidden"
         >
           <div className="container px-4 mx-auto">
-            <motion.div variants={fadeIn} className="max-w-3xl mx-auto text-center mb-12">
+            <motion.div
+              variants={fadeIn}
+              className="max-w-3xl mx-auto text-center mb-12"
+            >
               <h2 className="text-3xl font-bold mb-4">{t("how")}</h2>
-              <p className="text-gray-600">
-                {t("p4")}
-              </p>
+              <p className="text-gray-600">{t("p4")}</p>
             </motion.div>
 
             {/* Interactive Steps - Desktop */}
@@ -590,7 +653,14 @@ export default function HomePage() {
                   className="h-full bg-blue-500"
                   initial={{ width: "0%" }}
                   whileInView={{
-                    width: activeStep === 1 ? "0%" : activeStep === 2 ? "33%" : activeStep === 3 ? "66%" : "100%",
+                    width:
+                      activeStep === 1
+                        ? "0%"
+                        : activeStep === 2
+                          ? "33%"
+                          : activeStep === 3
+                            ? "66%"
+                            : "100%",
                   }}
                   transition={{ duration: 0.5 }}
                 />
@@ -609,8 +679,11 @@ export default function HomePage() {
                   >
                     {/* Step Circle */}
                     <motion.div
-                      className={`relative flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-white shadow-lg border-2 ${activeStep >= step.step ? "border-blue-500" : "border-gray-200"
-                        }`}
+                      className={`relative flex items-center justify-center w-24 h-24 mb-6 rounded-full bg-white shadow-lg border-2 ${
+                        activeStep >= step.step
+                          ? "border-blue-500"
+                          : "border-gray-200"
+                      }`}
                       whileHover={{
                         scale: 1.1,
                         boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
@@ -636,7 +709,10 @@ export default function HomePage() {
                       <motion.div
                         className="relative z-10"
                         animate={{
-                          color: activeStep === step.step ? "white" : "rgb(37, 99, 235)",
+                          color:
+                            activeStep === step.step
+                              ? "white"
+                              : "rgb(37, 99, 235)",
                         }}
                       >
                         {step.icon}
@@ -651,7 +727,9 @@ export default function HomePage() {
                       }}
                     >
                       <h3 className="mb-2 text-xl font-medium">{step.title}</h3>
-                      <p className="text-gray-600 max-w-xs mx-auto">{step.description}</p>
+                      <p className="text-gray-600 max-w-xs mx-auto">
+                        {step.description}
+                      </p>
                     </motion.div>
 
                     {/* Arrow to next step */}
@@ -695,8 +773,9 @@ export default function HomePage() {
                   >
                     {/* Step Circle */}
                     <motion.div
-                      className={`absolute left-0 top-0 -translate-x-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-md border-2 ${index === 0 ? "border-blue-500" : "border-gray-200"
-                        }`}
+                      className={`absolute left-0 top-0 -translate-x-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-md border-2 ${
+                        index === 0 ? "border-blue-500" : "border-gray-200"
+                      }`}
                       whileInView={{
                         borderColor: "rgb(59, 130, 246)",
                         transition: { delay: index * 0.3 },
@@ -710,13 +789,17 @@ export default function HomePage() {
                         transition={{ delay: index * 0.3 + 0.2, duration: 0.5 }}
                         viewport={{ once: true }}
                       />
-                      <span className="relative z-10 text-xs font-bold text-white">{step.step}</span>
+                      <span className="relative z-10 text-xs font-bold text-white">
+                        {step.step}
+                      </span>
                     </motion.div>
 
                     {/* Step Content */}
                     <div className="bg-white p-5 rounded-lg shadow-sm">
                       <div className="flex items-center mb-3">
-                        <div className="mr-3 p-2 rounded-full bg-blue-100 text-blue-600">{step.icon}</div>
+                        <div className="mr-3 p-2 rounded-full bg-blue-100 text-blue-600">
+                          {step.icon}
+                        </div>
                         <h3 className="text-lg font-medium">{step.title}</h3>
                       </div>
                       <p className="text-gray-600">{step.description}</p>
@@ -765,81 +848,61 @@ export default function HomePage() {
         </AnimatedSection>
 
         {/* Delivery Partners Section */}
-        <AnimatedSection ref={partnersRef} id="partners" className="py-12 bg-blue-50">
+        <AnimatedSection
+          ref={partnersRef}
+          id="partners"
+          className="py-12 bg-blue-50"
+        >
           <div className="container px-4 mx-auto">
-            <motion.div variants={fadeIn} className="max-w-3xl mx-auto text-center mb-8">
-              <h2 className="text-3xl font-bold mb-3">{t("Dpartners")}</h2>
-              <p className="text-gray-600">
-                {t("p5")}              </p>
-            </motion.div>
-
-            {/* Partner Logos */}
-            <motion.div variants={staggerContainer} className="flex flex-wrap justify-center items-center gap-6 mb-10">
-              {[1, 2, 3, 4, 5].map((item) => (
-                <motion.div
-                  key={item}
-                  variants={scaleUp}
-                  whileHover={{ y: -5, scale: 1.05 }}
-                  className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  <div className="w-24 h-16 flex items-center justify-center">
-                    <span className="text-gray-400">Partner {item}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {/* Global Coverage - Compact */}
-            <motion.div variants={fadeIn} className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <motion.div
+              variants={fadeIn}
+              className="bg-white rounded-xl shadow-sm overflow-hidden"
+            >
               <div className="grid md:grid-cols-2">
                 <div className="p-6 flex flex-col justify-center">
-                  <div className="flex items-center gap-2 mb-3">
+                  {/* Header with conditional RTL class */}
+                  <div
+                    className={`flex items-center gap-2 mb-3 ${isRTL ? "flex-row-reverse justify-start" : ""}`}
+                  >
                     <Globe className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-xl font-medium">Global Coverage</h3>
+                    <h3 className="text-xl font-medium">
+                      {t("local_coverage")}
+                    </h3>
                   </div>
-                  <p className="text-gray-600 mb-4">
+                  {/* Description with conditional alignment */}
+                  <p
+                    className={`text-gray-600 mb-4 ${isRTL ? "text-right" : ""}`}
+                  >
                     {t("p6")}
                   </p>
-                  <div className="space-y-2">
-                    {["Sousse", "Sfax", "Ben Arous", "Ariana", "Beja"].map((region, index) => (
+                  {/* Cities list with conditional direction */}
+                  <div
+                    className={`flex flex-col-reverse mb-3  ${isRTL ? "flex-col-reverse justify-end" : ""}`}
+                  >
+                    {[
+                      t("city_tunis"),
+                      t("city_sousse"),
+                      t("city_sfax"),
+                      t("city_ariana"),
+                      t("city_beja"),
+                      t("city_gabes"),
+                    ].map((city, index) => (
                       <motion.div
-                        key={region}
-                        className="flex items-center gap-2"
-                        initial={{ opacity: 0, x: -10 }}
+                        key={city}
+                        className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse justify-start" : ""}`}
+                        initial={{ opacity: 0, x: isRTL ? 10 : -10 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
                         viewport={{ once: true }}
                       >
                         <MapPin className="w-4 h-4 text-blue-600" />
-                        <span>{region}</span>
+                        <span>{city}</span>
                       </motion.div>
                     ))}
                   </div>
-
-                  <motion.a
-                    href="/delivery-coverage"
-                    className="inline-flex items-center text-blue-600 font-medium mt-4 hover:underline"
-                    whileHover={{ x: 5 }}
-                  >
-                    View detailed coverage map
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="ml-1"
-                    >
-                      <path d="M5 12h14"></path>
-                      <path d="m12 5 7 7-7 7"></path>
-                    </svg>
-                  </motion.a>
                 </div>
 
+                {/* Map stays the same */}
                 <div className="h-64 md:h-auto relative">
                   <div className="absolute inset-0">
                     <CoverageMap />
@@ -853,8 +916,11 @@ export default function HomePage() {
         {/* Trust Section */}
         <AnimatedSection className="py-12">
           <div className="container px-4 mx-auto text-center">
-            <motion.div variants={fadeIn} className="flex flex-col items-center justify-center gap-4 md:flex-row">
-              <span className="font-medium">Trusted by 10M+ sellers</span>
+            <motion.div
+              variants={fadeIn}
+              className="flex flex-col items-center justify-center gap-4 md:flex-row"
+            >
+              <span className="font-medium">Trusted by 1M+ sellers</span>
               <div className="flex items-center gap-2">
                 <motion.div
                   className="flex"
@@ -904,13 +970,18 @@ export default function HomePage() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                <img src="/icons/mp.png" alt="MonkeyPrint Logo" className="w-10 h-8 rounded-full" />
+                <img
+                  src="/icons/mp.png"
+                  alt="MonkeyPrint Logo"
+                  className="w-10 h-8 rounded-full"
+                />
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
                   MonkeyPrint
                 </span>
               </motion.div>
               <p className="text-sm text-gray-600 mb-6 mt-5">
-                Create and sell custom products with print-on-demand services. No inventory, no hassle.
+                Create and sell custom products with print-on-demand services.
+                No inventory, no hassle.
               </p>
               {/* Social Media Icons */}
               <div className="flex space-x-4">
@@ -1009,51 +1080,13 @@ export default function HomePage() {
             <div>
               <h3 className="font-medium text-gray-800 mb-4">Products</h3>
               <ul className="space-y-2 text-sm">
-                {["Apparel & Clothing", "Home & Living", "Accessories", "Wall Art", "Phone Cases"].map(
-                  (item, index) => (
-                    <motion.li
-                      key={index}
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      <motion.a href="#" className="text-gray-600 hover:text-blue-600" whileHover={{ x: 5 }}>
-                        {item}
-                      </motion.a>
-                    </motion.li>
-                  ),
-                )}
-              </ul>
-            </div>
-
-            {/* Resources */}
-            <div>
-              <h3 className="font-medium text-gray-800 mb-4">Resources</h3>
-              <ul className="space-y-2 text-sm">
-                {["Design Templates", "Tutorials", "Blog", "Success Stories", "Integration Guides"].map(
-                  (item, index) => (
-                    <motion.li
-                      key={index}
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      <motion.a href="#" className="text-gray-600 hover:text-blue-600" whileHover={{ x: 5 }}>
-                        {item}
-                      </motion.a>
-                    </motion.li>
-                  ),
-                )}
-              </ul>
-            </div>
-
-            {/* Company */}
-            <div>
-              <h3 className="font-medium text-gray-800 mb-4">Company</h3>
-              <ul className="space-y-2 text-sm">
-                {["About Us", "Contact", "Careers", "Privacy Policy", "Terms of Service"].map((item, index) => (
+                {[
+                  "Apparel & Clothing",
+                  "Home & Living",
+                  "Accessories",
+                  "Wall Art",
+                  "Phone Cases",
+                ].map((item, index) => (
                   <motion.li
                     key={index}
                     initial={{ opacity: 0, x: -10 }}
@@ -1061,7 +1094,71 @@ export default function HomePage() {
                     transition={{ delay: index * 0.1 }}
                     viewport={{ once: true }}
                   >
-                    <motion.a href="#" className="text-gray-600 hover:text-blue-600" whileHover={{ x: 5 }}>
+                    <motion.a
+                      href="#"
+                      className="text-gray-600 hover:text-blue-600"
+                      whileHover={{ x: 5 }}
+                    >
+                      {item}
+                    </motion.a>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h3 className="font-medium text-gray-800 mb-4">Resources</h3>
+              <ul className="space-y-2 text-sm">
+                {[
+                  "Design Templates",
+                  "Tutorials",
+                  "Blog",
+                  "Success Stories",
+                  "Integration Guides",
+                ].map((item, index) => (
+                  <motion.li
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <motion.a
+                      href="#"
+                      className="text-gray-600 hover:text-blue-600"
+                      whileHover={{ x: 5 }}
+                    >
+                      {item}
+                    </motion.a>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h3 className="font-medium text-gray-800 mb-4">Company</h3>
+              <ul className="space-y-2 text-sm">
+                {[
+                  "About Us",
+                  "Contact",
+                  "Careers",
+                  "Privacy Policy",
+                  "Terms of Service",
+                ].map((item, index) => (
+                  <motion.li
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <motion.a
+                      href="#"
+                      className="text-gray-600 hover:text-blue-600"
+                      whileHover={{ x: 5 }}
+                    >
                       {item}
                     </motion.a>
                   </motion.li>
@@ -1077,67 +1174,72 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="pt-8 mt-5 border-t border-gray-200 text-center text-sm text-gray-500 mx-auto"
           >
-            <p className="mb-2">© 2024 MonkeyPrint. All rights reserved.</p>
+            <p className="mb-2">© 2025 MonkeyPrint. All rights reserved.</p>
             <p>Trusted by creators, entrepreneurs, and businesses worldwide.</p>
           </motion.div>
         </div>
       </footer>
-    </div >
-  )
+    </div>
+  );
 }
 
 // Properly type the AnimatedSection component
 interface AnimatedSectionProps {
-  children: React.ReactNode
-  className?: string
-  id?: string
+  children: React.ReactNode;
+  className?: string;
+  id?: string;
 }
 
-const AnimatedSection = React.forwardRef<HTMLElement, AnimatedSectionProps>(({ children, className, id }, ref) => {
-  const [inViewRef, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  })
+const AnimatedSection = React.forwardRef<HTMLElement, AnimatedSectionProps>(
+  ({ children, className, id }, ref) => {
+    const [inViewRef, inView] = useInView({
+      triggerOnce: true,
+      threshold: 0.1,
+    });
 
-  // Merge refs
-  const setRefs = React.useCallback(
-    (node: HTMLElement | null) => {
-      // Ref from forwardRef
-      if (ref) {
-        if (typeof ref === "function") {
-          ref(node)
-        } else {
-          ref.current = node
+    // Merge refs
+    const setRefs = React.useCallback(
+      (node: HTMLElement | null) => {
+        // Ref from forwardRef
+        if (ref) {
+          if (typeof ref === "function") {
+            ref(node);
+          } else {
+            ref.current = node;
+          }
         }
-      }
-      // Ref for intersection observer
-      inViewRef(node)
-    },
-    [inViewRef, ref],
-  )
+        // Ref for intersection observer
+        inViewRef(node);
+      },
+      [inViewRef, ref]
+    );
 
-  return (
-    <section ref={setRefs} id={id} className={className}>
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-        transition={{ duration: 0.5 }}
-      >
-        {children}
-      </motion.div>
-    </section>
-  )
-})
+    return (
+      <section ref={setRefs} id={id} className={className}>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 0.5 }}
+        >
+          {children}
+        </motion.div>
+      </section>
+    );
+  }
+);
 
-AnimatedSection.displayName = "AnimatedSection"
+AnimatedSection.displayName = "AnimatedSection";
 
 interface FeatureCardProps {
-  icon?: React.ReactNode
-  title: string
-  description: string
+  icon?: React.ReactNode;
+  title: string;
+  description: string;
 }
 
 function FeatureCard({ icon, title, description }: FeatureCardProps) {
+  const locale = useLocale();
+  const isRTL = locale === "tn";
+
   return (
     <motion.div
       variants={scaleUp}
@@ -1147,17 +1249,21 @@ function FeatureCard({ icon, title, description }: FeatureCardProps) {
       }}
       className="p-6 bg-white rounded-lg shadow-sm transition-all duration-300"
     >
-      {icon && (
-        <motion.div
-          className="flex items-center justify-center w-12 h-12 mb-4 bg-blue-100 rounded-full"
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          transition={{ type: "spring", stiffness: 400 }}
-        >
-          {icon}
-        </motion.div>
-      )}
-      <h3 className="mb-2 text-lg font-medium text-blue-600">{title}</h3>
-      <p className="text-gray-600">{description}</p>
+      <div className={`${isRTL ? "text-right" : ""}`}>
+        {icon && (
+          <motion.div
+            className={`flex items-center justify-center w-12 h-12 mb-4 bg-blue-100 rounded-full ${
+              isRTL ? "ml-auto" : ""
+            }`}
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            transition={{ type: "spring", stiffness: 400 }}
+          >
+            {icon}
+          </motion.div>
+        )}
+        <h3 className="mb-2 text-lg font-medium text-blue-600">{title}</h3>
+        <p className="text-gray-600">{description}</p>
+      </div>
     </motion.div>
-  )
+  );
 }
