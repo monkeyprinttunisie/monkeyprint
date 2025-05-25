@@ -404,7 +404,7 @@ export default function UpdateProductPage() {
   };
 
   return (
-    <div className="px-4 pt-4 pb-[8.5vh] w-full max-w-lg mx-auto">
+    <div className="px-4 pt-4 pb-[8.5vh] w-full mx-auto">
       <div className="flex items-center space-x-2 mb-4">
         <button
           onClick={() => router.push("/admin/products")}
@@ -526,7 +526,7 @@ export default function UpdateProductPage() {
                 Design a new image using our designer tool
               </p>
             </div>
-            <div className="flex flex-col items-center">
+            {/* <div className="flex flex-col items-center">
               <button
                 type="button"
                 onClick={() => setIsImageSelectorOpen(true)}
@@ -534,7 +534,7 @@ export default function UpdateProductPage() {
               >
                 Select from Existing Images
               </button>
-            </div>
+            </div> */}
           </div>
 
           <div className="space-y-2 pt-2">

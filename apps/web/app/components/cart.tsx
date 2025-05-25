@@ -4,8 +4,11 @@ import { useState } from "react";
 import { useCartStore } from "@/store/useCartStore";
 import Checkout from "@/components/checkout";
 import { ShippingMethod } from "@monkeyprint/db";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 export default function Cart() {
+  const router = useRouter();
   const [isCheckoutMode, setIsCheckoutMode] = useState(false);
   const cart = useCartStore((state) => state.cart);
   const updateCartItemQuantity = useCartStore(
@@ -56,15 +59,26 @@ export default function Cart() {
           // Cart View
           <>
             <div className="flex items-center mb-2">
-              <span>
-                <h2 className="font-raleway font-bold text-[28px] text-[#202020]">
-                  Cart
-                </h2>
-              </span>
-              <span className="bg-[#E5EBFC] text-[#202020] ml-2 py-1 px-3 rounded-full font-raleway font-bold text-lg">
-                {cart.reduce((total, item) => total + item.quantity, 0)}
-              </span>
+              <button
+                onClick={() => router.back()}
+                className="mr-3 p-1 rounded hover:bg-gray-200 transition"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="w-6 h-6 text-[#202020]" />
+              </button>
+
+              <div className="flex items-center">
+                <span>
+                  <h2 className="font-raleway font-bold text-[28px] text-[#202020]">
+                    Cart
+                  </h2>
+                </span>
+                <span className="bg-[#E5EBFC] text-[#202020] ml-2 py-1 px-3 rounded-full font-raleway font-bold text-lg">
+                  {cart.reduce((total, item) => total + item.quantity, 0)}
+                </span>
+              </div>
             </div>
+
             <div className="flex items-center justify-center my-3">
               {cart.length === 0 && (
                 <img src="/icons/empty-cart.svg" alt="empty cart" />

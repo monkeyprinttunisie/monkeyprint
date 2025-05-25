@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SaveButton from "@/components/sharedAdminSuperAdmin/SaveButton";
-import { Eye, EyeOff, ImageIcon, Mail } from "lucide-react";
+import { Eye, EyeOff, Image, ImageIcon, Mail } from "lucide-react";
 import { useState } from "react";
 
 export default function Component() {
@@ -36,8 +36,18 @@ export default function Component() {
               {/* Profile Picture */}
               <div className="lg:col-span-2 flex justify-center lg:justify-start">
                 <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50">
-                  <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
-                  <span className="text-sm text-gray-500">1000 × 1000</span>
+                  <div className="relative h-24 w-24 overflow-hidden rounded-md border">
+                    <img
+                      src="/images/ahmed.jpg"
+                      alt="Logo"
+                      sizes="(max-width: 768px) 96px, 96px"
+                      className="object-cover" // Changed from object-contain
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 

@@ -123,12 +123,12 @@ export default function ThemeConfigPage() {
           setStoreData({
             ...storeData,
             name: storeDetails.name || "",
-            imageUrl: userData.image || "",
+            imageUrl: storeDetails.image || "",
           });
         }
 
         // load existing banners
-        const existingBanners = (await storeDetails?.homeBanner) || [];
+        const existingBanners = storeDetails?.homeBanner || [];
 
         if (existingBanners.length > 0) {
           const formattedBanners = existingBanners.map(
@@ -462,13 +462,18 @@ export default function ThemeConfigPage() {
                   <h3 className="mb-4 font-medium">Logo</h3>
                   <div className="flex flex-col">
                     <div className="flex h-32 w-32 items-center justify-center rounded-md border p-4 mb-3">
-                      <div className="relative h-24 w-24">
+                      <div className="relative h-24 w-24 overflow-hidden rounded-md border">
                         {storeData.imageUrl ? (
                           <Image
                             src={storeData.imageUrl}
                             alt="Logo"
                             fill
-                            className="object-contain"
+                            sizes="(max-width: 768px) 96px, 96px"
+                            className="object-cover"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                            }}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-md">

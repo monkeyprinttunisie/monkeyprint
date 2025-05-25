@@ -3,6 +3,8 @@
 import { Product } from "@/types";
 import { useCartStore } from "@/store/useCartStore";
 import { Button } from "@/components/button";
+import toast from "react-hot-toast";
+
 interface AddToCartButtonProps {
   product: Product;
 }
@@ -19,6 +21,7 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
       stock: product.stock ?? 0,
       quantity: 1,
     });
+    toast.success("Product added to cart!");
     /* alert("Product added to cart!"); */
   };
 
