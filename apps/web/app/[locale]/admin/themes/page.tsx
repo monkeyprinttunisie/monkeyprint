@@ -469,7 +469,7 @@ export default function ThemeConfigPage() {
                             alt="Logo"
                             fill
                             sizes="(max-width: 768px) 96px, 96px"
-                            className="object-cover" // Changed from object-contain
+                            className="object-cover"
                             style={{
                               width: "100%",
                               height: "100%",
