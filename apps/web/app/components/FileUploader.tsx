@@ -11,9 +11,13 @@ interface UploadResponse {
 
 interface UploaderProps {
   handleUploadComplete: (res: UploadResponse[]) => void;
+  buttonText?: string;
 }
 
-export default function Uploader({ handleUploadComplete }: UploaderProps) {
+export default function Uploader({
+  handleUploadComplete,
+  buttonText = "Change Image",
+}: UploaderProps) {
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const apiKey = process.env.UPLOADTHING_TOKEN;
   const appId = process.env.UPLOADTHING_APP_ID;
@@ -101,7 +105,7 @@ export default function Uploader({ handleUploadComplete }: UploaderProps) {
                       <polyline points="17 8 12 3 7 8"></polyline>
                       <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg>
-                    Change Image
+                    {buttonText}
                   </>
                 )}
               </span>
