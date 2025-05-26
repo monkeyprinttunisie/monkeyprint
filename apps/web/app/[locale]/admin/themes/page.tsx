@@ -739,6 +739,7 @@ export default function ThemeConfigPage() {
                             setCurrentEditingBannerId(banner.id);
                             handleUploadComplete(res);
                           }}
+                          buttonText="Change Background"
                         />
                       </div>
 
