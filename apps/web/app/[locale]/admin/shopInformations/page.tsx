@@ -1195,7 +1195,7 @@ export default function ThemeConfigPage() {
                       </label>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                       <Switch
                         checked={aboutUsData.aboutUs}
                         onCheckedChange={(checked) =>
@@ -1206,7 +1206,7 @@ export default function ThemeConfigPage() {
                       <label className="text-sm font-medium">
                         Show "About Us" Section
                       </label>
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="pt-4 border-t">
@@ -1265,7 +1265,7 @@ export default function ThemeConfigPage() {
                                     ourProducts: newProducts,
                                   });
                                 }
-                              }}
+                              }} buttonText="Upload Image"
                             />
 
                             {product.imageUrl && (

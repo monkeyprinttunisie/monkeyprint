@@ -18,6 +18,9 @@ export async function getStoreUserRelationByStore(
 ) {
   return await db.storeUserRelation.findMany({
     where: { storeId: storeId, role: role },
+    include: {
+      user: true,
+    },
   });
 }
 
@@ -56,5 +59,17 @@ export async function deleteStoreUserRelation(id: {
 }) {
   return await db.storeUserRelation.delete({
     where: { storeId_userId: { storeId: id.storeId, userId: id.userId } },
+  });
+}
+
+export async function getStoreOwner(storeId: string) {
+  return await db.storeUserRelation.findFirst({
+    where: {
+      storeId: storeId,
+      role: "OWNER",
+    },
+    include: {
+      user: true,
+    },
   });
 }

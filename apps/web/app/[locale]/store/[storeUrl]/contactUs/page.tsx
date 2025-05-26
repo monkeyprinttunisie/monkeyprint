@@ -1,23 +1,65 @@
 "use client";
 
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from "lucide-react";
-import Image from "next/image";
-
+import { Mail, Phone, Send, CheckCircle, X, Loader2 } from "lucide-react";
+import FileUploader from "@/components/FileUploader";
+import toast from "react-hot-toast";
+import { getStoreByUrl } from "@/actions/storeActions";
+import { useParams } from "next/navigation";
+import { getStoreOwner } from "@/actions/storeUserRelationAction";
 export default function ContactPage() {
   const [formState, setFormState] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
+    imageUrl: "",
   });
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const params = useParams();
+  const storeUrl = params.storeUrl as string;
+  const [storeId, setStoreId] = useState<string | null>(null);
+  const [storeName, setStoreName] = useState<string | null>(null);
+  const [storeEmail, setStoreEmail] = useState<string | null>(null);
+  const [contactIntroText, setContactIntroText] = useState<string | null>(null);
+
+  const [ownerPhone, setOwnerPhone] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStoreId() {
+      setIsLoading(true);
+      try {
+        const store = await getStoreByUrl(storeUrl);
+        if (store) {
+          setStoreId(store.id);
+          setStoreName(store.name);
+          if (store.contactUs) {
+            setContactIntroText(store.contactUs.introText || null);
+          }
+          const user = await getStoreOwner(store.id);
+          if (user) {
+            setStoreEmail(user.user.email);
+            setOwnerPhone(user.user.phoneNumber);
+          } else {
+            console.error("No owner found for this store.");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching store:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchStoreId();
+  }, [storeUrl]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -28,25 +70,75 @@ export default function ContactPage() {
       [name]: value,
     }));
   };
+  const handleUploadComplete = (res: any[]) => {
+    if (res && res.length > 0) {
+      setFormState((prev) => ({
+        ...prev,
+        imageUrl: res[0].url,
+      }));
+      toast.success("Image uploaded successfully!");
+    }
+  };
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (!storeEmail) {
+      toast.error("Cannot send message: Store owner email not available");
+      setIsSubmitting(false);
+      return;
+    }
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    setFormState({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    });
+    try {
+      // Send email through API endpoint
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recipient: storeEmail,
+          name: formState.name,
+          email: formState.email,
+          subject: formState.subject,
+          message: formState.message,
+          imageUrl: formState.imageUrl,
+          storeId,
+          storeName,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success("Message sent successfully!");
+        setIsSubmitted(true);
+        setFormState({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+          imageUrl: "",
+        });
+      } else {
+        throw new Error(result.error || "Failed to send message");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="mr-2 h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
   return (
-    <main className="flex flex-col h-[94vh]">
+    <main className="flex flex-col min-h-[94vh]">
       {/* Contact Information and Form Section */}
       <section className="py-12 md:py-20">
         <div className="container mx-auto px-4">
@@ -57,11 +149,7 @@ export default function ContactPage() {
                 <h2 className="text-3xl font-bold mb-6 text-gray-900">
                   Contact Information
                 </h2>
-                <p className="text-gray-600 mb-8">
-                  Have questions or need assistance? Reach out to us using any
-                  of the methods below or fill out the contact form, and we'll
-                  get back to you as soon as possible.
-                </p>
+                <p className="text-gray-600 mb-8">{contactIntroText}</p>
               </div>
 
               {/* Contact Cards */}
@@ -79,10 +167,10 @@ export default function ContactPage() {
                         For general inquiries
                       </p>
                       <a
-                        href="mailto:contact@monkeyprint.com"
+                        href={`mailto:${storeEmail || "contact@monkeyprint.com"}`}
                         className="text-[#004CFF] hover:underline"
                       >
-                        contact@monkeyprint.com
+                        {storeEmail || "contact@monkeyprint.com"}
                       </a>
                     </div>
                   </div>
@@ -101,10 +189,10 @@ export default function ContactPage() {
                         Mon-Fri from 9am to 5pm
                       </p>
                       <a
-                        href="tel:+21670111222"
+                        href={`tel:${ownerPhone || "+21670111222"}`}
                         className="text-[#004CFF] hover:underline"
                       >
-                        +216 70 111 222
+                        {ownerPhone || "+216 70 111 222"}
                       </a>
                     </div>
                   </div>
@@ -207,6 +295,43 @@ export default function ContactPage() {
                         className="min-h-[150px]"
                         required
                       />
+                    </div>
+
+                    {/* File Uploader Section */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Attach Image (optional)
+                      </label>
+                      <div className="flex items-center gap-4">
+                        <FileUploader
+                          handleUploadComplete={handleUploadComplete}
+                          buttonText={
+                            formState.imageUrl ? "Change Image" : "Attach Image"
+                          }
+                        />
+                        {formState.imageUrl && (
+                          <div className="relative">
+                            <img
+                              src={formState.imageUrl}
+                              alt="Uploaded"
+                              className="h-16 w-16 object-cover rounded-md"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setFormState((prev) => ({
+                                  ...prev,
+                                  imageUrl: "",
+                                }))
+                              }
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-sm"
+                              aria-label="Remove image"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <Button
