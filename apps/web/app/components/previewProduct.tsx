@@ -1098,10 +1098,10 @@ export default function PreviewProduct({ mode }: PreviewProductProps) {
 
         // Set the color and positioning to match ProductColorPreview
         (colorOverlay as HTMLElement).style.backgroundColor = appliedColor || 'transparent';
-        (colorOverlay as HTMLElement).style.height = '75%';
-        (colorOverlay as HTMLElement).style.width = '65%';
-        (colorOverlay as HTMLElement).style.top = '12%';
-        (colorOverlay as HTMLElement).style.left = '18%';
+        (colorOverlay as HTMLElement).style.height = '80%';
+        (colorOverlay as HTMLElement).style.width = '100%';
+        (colorOverlay as HTMLElement).style.top = '10%';
+        (colorOverlay as HTMLElement).style.left = '0%';
         (colorOverlay as HTMLElement).style.position = 'absolute';
         (colorOverlay as HTMLElement).style.zIndex = '0';
       }
