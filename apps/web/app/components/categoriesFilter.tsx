@@ -78,9 +78,9 @@ export default function CategoriesFilter({
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-raleway font-bold text-[28px] text-[#202020]">
-          All Categories
+          All Products
         </h2>
-        <Link href="/products">
+        <Link href="/">
           <button className="text-gray-500 hover:text-gray-700">
             <img src="/icons/close-icon.svg" alt="close icon" />
           </button>
