@@ -263,10 +263,10 @@ model CheckoutFields{
   store        Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }
 
-enum ShippingType{
-STANDARD
-EXPRESS
-BOTH
+enum ShippingType {
+  STANDARD
+  EXPRESS
+  BOTH
 }
 
 model HomeBanner {

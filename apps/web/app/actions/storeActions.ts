@@ -46,6 +46,7 @@ export async function getStoreByUrl(url: string) {
           button: true,
         },
       },
+      checkoutFields: true,
     },
   });
 }

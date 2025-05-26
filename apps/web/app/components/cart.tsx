@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/useCartStore";
 import Checkout from "@/components/checkout";
 import { ShippingMethod } from "@monkeyprint/db";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { getStoreByUrl } from "@/actions/storeActions";
+import { useParams } from "next/navigation";
 
 export default function Cart() {
   const router = useRouter();
@@ -18,6 +20,31 @@ export default function Cart() {
   const clearCart = useCartStore((state) => state.clearCart);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOrderComplete, setIsOrderComplete] = useState(false);
+
+  //store information
+  const params = useParams();
+  const storeUrl = params.storeUrl as string;
+  const [storeId, setStoreId] = useState<string | null>(null);
+  const [checkoutFields, setCheckoutFields] = useState<any>([]);
+
+    useEffect(() => {
+      async function fetchStoreId() {
+        try {
+          const store = await getStoreByUrl(storeUrl);
+          if (store) {
+            setStoreId(store.id);
+            if (store.checkoutFields) {
+              setCheckoutFields(store.checkoutFields);
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching store:", error);
+        }
+      }
+
+      fetchStoreId();
+    }, [storeUrl]);
+
   // For checkout mode
   const [shippingMethod, setShippingMethod] =
     useState<ShippingMethod>("STANDARD");

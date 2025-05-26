@@ -788,6 +788,7 @@ export default function ThemeConfigPage() {
                   <Switch
                     id="name-field"
                     checked={fields.name}
+                    disabled={true}
                     onCheckedChange={() => handleFieldToggle("name")}
                     className="data-[state=checked]:bg-blue-600"
                   />
@@ -803,6 +804,7 @@ export default function ThemeConfigPage() {
                   <Switch
                     id="phone-field"
                     checked={fields.phone}
+                    disabled={true}
                     onCheckedChange={() => handleFieldToggle("phone")}
                     className="data-[state=checked]:bg-blue-600"
                   />
@@ -818,6 +820,7 @@ export default function ThemeConfigPage() {
                   <Switch
                     id="city-field"
                     checked={fields.city}
+                    disabled={true}
                     onCheckedChange={() => handleFieldToggle("city")}
                     className="data-[state=checked]:bg-blue-600"
                   />
@@ -833,6 +836,7 @@ export default function ThemeConfigPage() {
                   <Switch
                     id="address-field"
                     checked={fields.address}
+                    disabled={true}
                     onCheckedChange={() => handleFieldToggle("address")}
                     className="data-[state=checked]:bg-blue-600"
                   />
@@ -849,7 +853,7 @@ export default function ThemeConfigPage() {
                     id="email-field"
                     checked={fields.email}
                     onCheckedChange={() => handleFieldToggle("email")}
-                    className="data-[state=checked]:bg-blue-600"
+                    className="data-[state=checked]:bg-blue-600 cursor-pointer"
                   />
                 </div>
               </div>
