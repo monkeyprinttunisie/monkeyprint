@@ -1,21 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ChevronDown,
-  LayoutDashboard,
   Package,
   ShoppingBasket,
   Tags,
   X,
-  Moon,
-  Sun,
-  Globe,
   Users,
+  Store,
+  Palette,
 } from "lucide-react";
 import LogoutButton from "../sharedAdminSuperAdmin/LogoutButton";
 
@@ -34,16 +31,15 @@ interface SuperAdminNavProps {
 export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   // Define navigation items with their respective routes and submenus
   const navItems: NavItem[] = [
     {
-      name: "Dashboard",
+      name: "Stores",
       href: "/superAdmin/dashboard",
-      icon: <LayoutDashboard className="w-5 h-5" />,
+      icon: <Store className="w-5 h-5" />,
     },
     {
       name: "Products",
@@ -83,6 +79,11 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
           href: "/superAdmin/team/addCollaborator",
         },
       ],
+    },
+    {
+      name: "D.T Colors",
+      href: "/superAdmin/designerColors?product=tshirt",
+      icon: <Palette className="w-5 h-5" />,
     },
   ];
 
