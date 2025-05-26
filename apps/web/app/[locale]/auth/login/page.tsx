@@ -46,7 +46,7 @@ export default function LoginPage() {
       if (data.user.role === "SUPER_ADMIN") {
         router.push("/superAdmin/dashboard");
       } else {
-        router.push(`/admin/orders?id=${data.store.id}`);
+        router.push(`/admin/dashboard?id=${data.store.id}`);
       }
     } else {
       // Handle errors

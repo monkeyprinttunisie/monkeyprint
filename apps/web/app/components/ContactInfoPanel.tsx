@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { ContactInfo } from "@/types";
+import { getStoreByUrl } from "@/actions/storeActions";
+import { useParams } from "next/navigation";
 
 interface ContactInfoFormProps {
   initialData?: ContactInfo;
@@ -19,6 +21,30 @@ export default function ContactInfoForm({
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
+
+  //store information
+  const params = useParams();
+  const storeUrl = params.storeUrl as string;
+  const [storeId, setStoreId] = useState<string | null>(null);
+  const [checkoutFields, setCheckoutFields] = useState<any>([]);
+
+  useEffect(() => {
+    async function fetchStoreId() {
+      try {
+        const store = await getStoreByUrl(storeUrl);
+        if (store) {
+          setStoreId(store.id);
+          if (store.checkoutFields) {
+            setCheckoutFields(store.checkoutFields);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching store:", error);
+      }
+    }
+
+    fetchStoreId();
+  }, [storeUrl]);
 
   useEffect(() => {
     if (initialData) {
@@ -86,22 +112,24 @@ export default function ContactInfoForm({
       </div>
 
       {/* Email Field (optional) */}
-      <div className="space-y-1">
-        <label
-          htmlFor="email"
-          className="font-nunito text-sm font-medium text-gray-700"
-        >
-          Email (optional)
-        </label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
-          className="w-full px-3 py-2 focus:outline-none bg-[#F1F4FE] rounded-[9px]"
-        />
-      </div>
+      {checkoutFields.email && (
+        <div className="space-y-1">
+          <label
+            htmlFor="email"
+            className="font-nunito text-sm font-medium text-gray-700"
+          >
+            Email (optional)
+          </label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            className="w-full px-3 py-2 focus:outline-none bg-[#F1F4FE] rounded-[9px]"
+          />
+        </div>
+      )}
 
       {/* Address Field */}
       <div className="space-y-1">

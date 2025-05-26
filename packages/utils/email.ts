@@ -91,3 +91,82 @@ export async function sendOrderIssueEmail(
     return { success: false, error: "Failed to send email notification" };
   }
 }
+
+export async function sendContactFormEmail({
+  recipient,
+  name,
+  email,
+  subject,
+  message,
+  imageUrl,
+  storeName,
+  storeId,
+}: {
+  recipient: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  imageUrl?: string;
+  storeName?: string;
+  storeId?: string;
+}) {
+  try {
+    if (!recipient || !name || !email || !subject || !message) {
+      console.error("[EMAIL] Missing required contact form fields");
+      return { success: false, error: "Missing required fields" };
+    }
+
+    console.log("[SERVER] Sending contact form email to:", recipient);
+
+    // Create HTML content for the email
+    let htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #004CFF; margin-bottom: 20px;">New Contact Form Message</h2>
+        <p style="margin-bottom: 5px;"><strong>From:</strong> ${name} (${email})</p>
+        <p style="margin-bottom: 20px;"><strong>Subject:</strong> ${subject}</p>
+        
+        <div style="background-color: #f5f7ff; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <h3 style="color: #333; margin-top: 0;">Message:</h3>
+          <p style="white-space: pre-line;">${message}</p>
+        </div>
+    `;
+
+    // Add image if provided
+    if (imageUrl) {
+      htmlContent += `
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #333;">Attached Image:</h3>
+          <img src="${imageUrl}" alt="Attached by sender" style="max-width: 100%; max-height: 400px; border-radius: 4px;">
+        </div>
+      `;
+    }
+
+    // Add footer
+    htmlContent += `
+        <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px; font-size: 12px; color: #777;">
+          <p>This message was sent through the contact form on your ${storeName || "Monkey Print"} store.</p>
+          ${storeId ? `<p>Store ID: ${storeId}</p>` : ""}
+          <p>You can reply directly to this email to respond to the customer.</p>
+        </div>
+      </div>
+    `;
+
+    // Send the email
+    const emailResult = await resend.emails.send({
+      from: "Monkey Print <onboarding@resend.dev>",
+      to: recipient,
+      subject: `[Contact Form] ${subject}`,
+      html: htmlContent,
+    });
+
+    if (!emailResult) {
+      throw new Error("Failed to send email");
+    }
+
+    return { success: true, id: emailResult };
+  } catch (error) {
+    console.error("Error sending contact form email:", error);
+    return { success: false, error: "Failed to send email" };
+  }
+}

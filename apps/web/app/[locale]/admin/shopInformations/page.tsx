@@ -788,6 +788,7 @@ export default function ThemeConfigPage() {
                   <Switch
                     id="name-field"
                     checked={fields.name}
+                    disabled={true}
                     onCheckedChange={() => handleFieldToggle("name")}
                     className="data-[state=checked]:bg-blue-600"
                   />
@@ -803,6 +804,7 @@ export default function ThemeConfigPage() {
                   <Switch
                     id="phone-field"
                     checked={fields.phone}
+                    disabled={true}
                     onCheckedChange={() => handleFieldToggle("phone")}
                     className="data-[state=checked]:bg-blue-600"
                   />
@@ -818,6 +820,7 @@ export default function ThemeConfigPage() {
                   <Switch
                     id="city-field"
                     checked={fields.city}
+                    disabled={true}
                     onCheckedChange={() => handleFieldToggle("city")}
                     className="data-[state=checked]:bg-blue-600"
                   />
@@ -833,6 +836,7 @@ export default function ThemeConfigPage() {
                   <Switch
                     id="address-field"
                     checked={fields.address}
+                    disabled={true}
                     onCheckedChange={() => handleFieldToggle("address")}
                     className="data-[state=checked]:bg-blue-600"
                   />
@@ -849,7 +853,7 @@ export default function ThemeConfigPage() {
                     id="email-field"
                     checked={fields.email}
                     onCheckedChange={() => handleFieldToggle("email")}
-                    className="data-[state=checked]:bg-blue-600"
+                    className="data-[state=checked]:bg-blue-600 cursor-pointer"
                   />
                 </div>
               </div>
@@ -1191,7 +1195,7 @@ export default function ThemeConfigPage() {
                       </label>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                       <Switch
                         checked={aboutUsData.aboutUs}
                         onCheckedChange={(checked) =>
@@ -1202,7 +1206,7 @@ export default function ThemeConfigPage() {
                       <label className="text-sm font-medium">
                         Show "About Us" Section
                       </label>
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="pt-4 border-t">
@@ -1261,7 +1265,7 @@ export default function ThemeConfigPage() {
                                     ourProducts: newProducts,
                                   });
                                 }
-                              }}
+                              }} buttonText="Upload Image"
                             />
 
                             {product.imageUrl && (

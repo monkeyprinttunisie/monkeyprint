@@ -46,6 +46,14 @@ export async function getStoreByUrl(url: string) {
           button: true,
         },
       },
+      checkoutFields: true,
+      aboutUs: {
+        include: {
+          ourProducts: true,
+        },
+      },
+      contactUs: true,
+      pages: true,
     },
   });
 }

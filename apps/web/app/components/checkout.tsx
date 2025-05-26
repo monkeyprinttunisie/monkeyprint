@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { CartItem, ContactInfo } from "@/types";
 import { ShippingMethod } from "@monkeyprint/db";
 import BottomSheet from "@/components/SlideUpPanel";
@@ -10,6 +9,8 @@ import { createOrder } from "@/actions/orderActions";
 import OrderSummary from "@/components/OrderSummary";
 import { getStoreByUrl } from "@/actions/storeActions";
 import { useParams } from "next/navigation";
+
+import { Loader2 } from "lucide-react";
 
 interface CheckoutProps {
   cart: CartItem[];
@@ -30,13 +31,37 @@ export default function Checkout({
   setIsProcessing,
   setIsOrderComplete,
 }: CheckoutProps) {
-    useState(false);
+  useState(false);
   const [isContactInfoSheetOpen, setIsContactInfoSheetOpen] = useState(false);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderSummary, setOrderSummary] = useState<any>(null);
   const params = useParams();
   const storeUrl = params.storeUrl as string;
+  const [storeId, setStoreId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [checkoutFields, setCheckoutFields] = useState<any>([]);
+
+  useEffect(() => {
+    async function fetchStoreId() {
+      setIsLoading(true);
+      try {
+        const store = await getStoreByUrl(storeUrl);
+        if (store) {
+          setStoreId(store.id);
+          if (store.checkoutFields) {
+            setCheckoutFields(store.checkoutFields);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching store:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchStoreId();
+  }, [storeUrl]);
 
   const handleContactInfoSave = (data: ContactInfo) => {
     setContactInfo(data);
@@ -192,79 +217,94 @@ export default function Checkout({
             <h2 className="font-raleway font-bold text-[24px] text-[#202020] mb-3">
               Shipping Options
             </h2>
-            <div className="space-y-3">
-              <div
-                className={`flex items-center border rounded-lg p-3 ${
-                  shippingMethod === "STANDARD"
-                    ? "border-blue-500"
-                    : "border-gray-200"
-                }`}
-                onClick={() => onShippingMethodChange("STANDARD")}
-              >
-                <div className="mr-3">
+            {isLoading ? (
+              <>
+                <div className="flex items-center space-x-2">
+                  <p className="text-blue-600">Loading</p>{" "}
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin text-blue-600" />
+                </div>
+              </>
+            ) : (
+              <div className="space-y-3">
+                {(checkoutFields.shippingType === "BOTH" ||
+                  checkoutFields.shippingType === "STANDARD") && (
                   <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    className={`flex items-center border rounded-lg p-3 ${
                       shippingMethod === "STANDARD"
                         ? "border-blue-500"
-                        : "border-gray-300"
+                        : "border-gray-200"
                     }`}
+                    onClick={() => onShippingMethodChange("STANDARD")}
                   >
-                    {shippingMethod === "STANDARD" && (
-                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                    )}
+                    <div className="mr-3">
+                      <div
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          shippingMethod === "STANDARD"
+                            ? "border-blue-500"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {shippingMethod === "STANDARD" && (
+                          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-raleway font-bold text-[16px] text-[#202020]">
+                        Standard Delivery
+                      </p>
+                      <p className="font-nunito text-sm text-gray-600">
+                        3-5 business days
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-raleway font-bold text-[16px] text-[#202020]">
+                        5dt
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex-1">
-                  <p className="font-raleway font-bold text-[16px] text-[#202020]">
-                    Standard Delivery
-                  </p>
-                  <p className="font-nunito text-sm text-gray-600">
-                    3-5 business days
-                  </p>
-                </div>
-                <div>
-                  <p className="font-raleway font-bold text-[16px] text-[#202020]">
-                    5dt
-                  </p>
-                </div>
-              </div>
+                )}
 
-              <div
-                className={`flex items-center border rounded-lg p-3 ${
-                  shippingMethod === "EXPRESS"
-                    ? "border-blue-500"
-                    : "border-gray-200"
-                }`}
-                onClick={() => onShippingMethodChange("EXPRESS")}
-              >
-                <div className="mr-3">
+                {(checkoutFields.shippingType === "BOTH" ||
+                  checkoutFields.shippingType === "EXPRESS") && (
                   <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    className={`flex items-center border rounded-lg p-3 ${
                       shippingMethod === "EXPRESS"
                         ? "border-blue-500"
-                        : "border-gray-300"
+                        : "border-gray-200"
                     }`}
+                    onClick={() => onShippingMethodChange("EXPRESS")}
                   >
-                    {shippingMethod === "EXPRESS" && (
-                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                    )}
+                    <div className="mr-3">
+                      <div
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          shippingMethod === "EXPRESS"
+                            ? "border-blue-500"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {shippingMethod === "EXPRESS" && (
+                          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-raleway font-bold text-[16px] text-[#202020]">
+                        Express Delivery
+                      </p>
+                      <p className="font-nunito text-sm text-gray-600">
+                        1-2 business days
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-raleway font-bold text-[16px] text-[#202020]">
+                        7dt
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex-1">
-                  <p className="font-raleway font-bold text-[16px] text-[#202020]">
-                    Express Delivery
-                  </p>
-                  <p className="font-nunito text-sm text-gray-600">
-                    1-2 business days
-                  </p>
-                </div>
-                <div>
-                  <p className="font-raleway font-bold text-[16px] text-[#202020]">
-                    7dt
-                  </p>
-                </div>
+                )}
               </div>
-            </div>
+            )}
           </div>
           <button
             id="buy-button"

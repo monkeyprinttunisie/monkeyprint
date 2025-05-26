@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/useCartStore";
 import Checkout from "@/components/checkout";
 import { ShippingMethod } from "@monkeyprint/db";
@@ -18,6 +18,7 @@ export default function Cart() {
   const clearCart = useCartStore((state) => state.clearCart);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isOrderComplete, setIsOrderComplete] = useState(false);
+
   // For checkout mode
   const [shippingMethod, setShippingMethod] =
     useState<ShippingMethod>("STANDARD");
