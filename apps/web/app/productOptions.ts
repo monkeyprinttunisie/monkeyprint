@@ -8,7 +8,6 @@ export const products: Record<string, ProductOption> = {
     images: {
       front: "/images/frontSweatshirt.png",
       back: "/images/backSweatshirt.png",
-
     },
     designZones: {
       front: [
@@ -16,26 +15,26 @@ export const products: Record<string, ProductOption> = {
           id: "frontChest",
           name: "Front Print Area",
           x: 0,
-          y: -40,
-          width: 250,
-          height: 400,
+          y: -35,
+          width: 280,
+          height: 350,
           rotation: 0,
-          maxImagesAllowed: 5
-        }
+          maxImagesAllowed: 5,
+        },
       ],
       back: [
         {
           id: "backCenter",
           name: "Back Print Area",
           x: 0,
-          y: -30,
-          width: 250,
-          height: 300,
+          y: -35,
+          width: 280,
+          height: 380,
           rotation: 0,
-          maxImagesAllowed: 5
-        }
-      ]
-    }
+          maxImagesAllowed: 5,
+        },
+      ],
+    },
   },
   hoodie: {
     id: "hoodie",
@@ -55,8 +54,8 @@ export const products: Record<string, ProductOption> = {
           width: 250, // width in pixels
           height: 300, // height in pixels
           rotation: 0,
-          maxImagesAllowed: 5
-        }
+          maxImagesAllowed: 5,
+        },
       ],
       back: [
         {
@@ -67,10 +66,10 @@ export const products: Record<string, ProductOption> = {
           width: 250,
           height: 300,
           rotation: 0,
-          maxImagesAllowed: 5
-        }
-      ]
-    }
+          maxImagesAllowed: 5,
+        },
+      ],
+    },
   },
   mug: {
     id: "mug",
@@ -90,8 +89,8 @@ export const products: Record<string, ProductOption> = {
           width: 150,
           height: 100,
           rotation: 0,
-          maxImagesAllowed: 3
-        }
+          maxImagesAllowed: 3,
+        },
       ],
       back: [
         {
@@ -102,10 +101,10 @@ export const products: Record<string, ProductOption> = {
           width: 150,
           height: 100,
           rotation: 0,
-          maxImagesAllowed: 3
-        }
-      ]
-    }
+          maxImagesAllowed: 3,
+        },
+      ],
+    },
   },
   casque: {
     id: "casque",
@@ -125,8 +124,8 @@ export const products: Record<string, ProductOption> = {
           width: 250, // width in pixels
           height: 300, // height in pixels
           rotation: 0,
-          maxImagesAllowed: 5
-        }
+          maxImagesAllowed: 5,
+        },
       ],
       back: [
         {
@@ -137,10 +136,10 @@ export const products: Record<string, ProductOption> = {
           width: 250,
           height: 300,
           rotation: 0,
-          maxImagesAllowed: 5
-        }
-      ]
-    }
+          maxImagesAllowed: 5,
+        },
+      ],
+    },
   },
   toteBag: {
     id: "toteBag",
@@ -156,26 +155,26 @@ export const products: Record<string, ProductOption> = {
           id: "frontChest",
           name: "Front Print Area",
           x: 0,
-          y: 0,
-          width: 120,
-          height: 140,
+          y: -20,
+          width: 160,
+          height: 200,
           rotation: 0,
-          maxImagesAllowed: 5
-        }
+          maxImagesAllowed: 5,
+        },
       ],
       back: [
         {
           id: "backCenter",
           name: "Back Print Area",
           x: 0,
-          y: 0,
-          width: 120,
-          height: 140,
+          y: -20,
+          width: 160,
+          height: 200,
           rotation: 0,
-          maxImagesAllowed: 5
-        }
-      ]
-    }
+          maxImagesAllowed: 5,
+        },
+      ],
+    },
   },
   pillow: {
     id: "pillow",
@@ -192,11 +191,11 @@ export const products: Record<string, ProductOption> = {
           name: "Front Print Area",
           x: 7,
           y: -30,
-          width: 270,
-          height: 200,
+          width: 260,
+          height: 175,
           rotation: 0,
-          maxImagesAllowed: 5
-        }
+          maxImagesAllowed: 5,
+        },
       ],
       back: [
         {
@@ -204,12 +203,12 @@ export const products: Record<string, ProductOption> = {
           name: "Back Print Area",
           x: 7,
           y: -30,
-          width: 270,
-          height: 200,
+          width: 260,
+          height: 175,
           rotation: 0,
-          maxImagesAllowed: 5
-        }
-      ]
-    }
+          maxImagesAllowed: 5,
+        },
+      ],
+    },
   },
 };
