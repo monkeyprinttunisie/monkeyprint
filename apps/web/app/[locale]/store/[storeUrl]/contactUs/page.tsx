@@ -28,9 +28,120 @@ export default function ContactPage() {
   const [storeName, setStoreName] = useState<string | null>(null);
   const [storeEmail, setStoreEmail] = useState<string | null>(null);
   const [contactIntroText, setContactIntroText] = useState<string | null>(null);
+  const [workingTime, setWorkingTime] = useState<string | null>(null);
 
   const [ownerPhone, setOwnerPhone] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  function formatOpeningHours(openingHours: {
+    [day: string]: {
+      isOpen: boolean;
+      open: string;
+      close: string;
+    };
+  }): string {
+    // First, group days with the same hours together
+    const hoursMap: { [key: string]: string[] } = {};
+
+    Object.entries(openingHours).forEach(([day, hours]) => {
+      if (!hours.isOpen) {
+        hoursMap[`closed:${day}`] = [day];
+        return;
+      }
+
+      const key = `${hours.open}-${hours.close}`;
+      if (!hoursMap[key]) {
+        hoursMap[key] = [];
+      }
+      hoursMap[key].push(day);
+    });
+
+    // Then, build the result string
+    const parts: string[] = [];
+
+    Object.entries(hoursMap).forEach(([key, days]) => {
+      if (key.startsWith("closed:")) {
+        const day = days[0];
+        parts.push(`${day}: closed`);
+        return;
+      }
+
+      const [openTime, closeTime] = key.split("-");
+      const formattedOpen = formatTime(openTime);
+      const formattedClose = formatTime(closeTime);
+
+      if (days.length === 1) {
+        parts.push(`${days[0]}: ${formattedOpen} to ${formattedClose}`);
+      } else {
+        // Sort days in week order
+        const dayOrder = [
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+          "sunday",
+        ];
+        days.sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));
+
+        // Find consecutive days
+        const groupedDays = groupConsecutiveDays(days, dayOrder);
+
+        groupedDays.forEach((group) => {
+          if (group.length > 2) {
+            parts.push(
+              `${group[0]} to ${group[group.length - 1]}: ${formattedOpen} to ${formattedClose}`
+            );
+          } else if (group.length === 2) {
+            parts.push(
+              `${group[0]} and ${group[1]}: ${formattedOpen} to ${formattedClose}`
+            );
+          } else {
+            parts.push(`${group[0]}: ${formattedOpen} to ${formattedClose}`);
+          }
+        });
+      }
+    });
+
+    return parts.join("; ");
+  }
+
+  function formatTime(time: string): string {
+    const [hours, minutes] = time.split(":");
+    const hourNum = parseInt(hours, 10);
+    const minuteNum = parseInt(minutes, 10);
+
+    if (minuteNum === 0) {
+      return `${hourNum} o'clock`;
+    }
+    return `${hourNum}:${minutes}`;
+  }
+
+  function groupConsecutiveDays(
+    days: string[],
+    dayOrder: string[]
+  ): string[][] {
+    if (days.length <= 1) return [days];
+
+    const result: string[][] = [];
+    let currentGroup: string[] = [days[0]];
+
+    for (let i = 1; i < days.length; i++) {
+      const prevIndex = dayOrder.indexOf(days[i - 1]);
+      const currentIndex = dayOrder.indexOf(days[i]);
+
+      if (currentIndex === prevIndex + 1) {
+        currentGroup.push(days[i]);
+      } else {
+        result.push(currentGroup);
+        currentGroup = [days[i]];
+      }
+    }
+
+    result.push(currentGroup);
+    return result;
+  }
 
   useEffect(() => {
     async function fetchStoreId() {
@@ -42,6 +153,9 @@ export default function ContactPage() {
           setStoreName(store.name);
           if (store.contactUs) {
             setContactIntroText(store.contactUs.introText || null);
+            const workingTimeObj = JSON.parse(store.contactUs.workingTime);
+            const formattedString = formatOpeningHours(workingTimeObj);
+            setWorkingTime(formattedString);
           }
           const user = await getStoreOwner(store.id);
           if (user) {
@@ -130,6 +244,7 @@ export default function ContactPage() {
       setIsSubmitting(false);
     }
   };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -185,14 +300,12 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-medium text-lg mb-1">Phone</h3>
-                      <p className="text-gray-600 mb-1">
-                        Mon-Fri from 9am to 5pm
-                      </p>
+                      <p className="text-gray-600 mb-1">{workingTime}</p>
                       <a
-                        href={`tel:${ownerPhone || "+21670111222"}`}
+                        href={`tel:${ownerPhone}`}
                         className="text-[#004CFF] hover:underline"
                       >
-                        {ownerPhone || "+216 70 111 222"}
+                        {ownerPhone}
                       </a>
                     </div>
                   </div>
