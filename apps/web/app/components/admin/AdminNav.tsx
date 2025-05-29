@@ -16,8 +16,6 @@ import {
 } from "lucide-react";
 import LogoutButton from "@/components/sharedAdminSuperAdmin/LogoutButton";
 import { useSession } from "next-auth/react";
-import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
 
 interface NavItem {
   name: string;
@@ -36,7 +34,6 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [storeId, setStoreId] = useState<string | null>(null);
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -45,7 +42,6 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
 
   const toggleLanguage = () => {
     const currentPath = pathname || "";
-    const router = useRouter();
 
     // Extract path parts
     const pathParts = currentPath.split("/");
