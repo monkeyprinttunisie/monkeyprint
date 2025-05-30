@@ -110,8 +110,8 @@
     "passwordLabel": "Password",
     "promo_line1": "Very good works are",
     "promo_line2": "waiting for you",
-    "login_success": "تم تسجيل الدخول بنجاح!",
-    "login_error": "فشل تسجيل الدخول. الرجاء التأكد من البيانات."
+    "login_success": "Login successful!",
+    "login_error": "Login failed. Please check your credentials."
   },
   "RegisterPage": {
     "create_store": "Sign Up",
