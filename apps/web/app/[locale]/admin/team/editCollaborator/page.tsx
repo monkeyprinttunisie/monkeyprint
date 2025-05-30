@@ -5,15 +5,19 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SaveButton from "@/components/sharedAdminSuperAdmin/SaveButton";
 import FileUploader from "@/components/FileUploader";
-import { Eye, EyeOff, Mail, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Mail, Loader2, ImageIcon } from "lucide-react";
 import { useState, useEffect, ChangeEvent } from "react";
-import { updateUser } from "@/actions/userActions";
-import { getCurrentUser } from "@/actions/authActions";
+import { getUserById, updateUser } from "@/actions/userActions";
 import { toast } from "react-hot-toast";
 import { hashPassword } from "@monkeyprint/utils/hash";
 import { comparePassword } from "@monkeyprint/utils/hash";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function Component() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const userId = searchParams.get("id");
+
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -21,7 +25,6 @@ export default function Component() {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
 
-  const [userId, setUserId] = useState<string>("");
   const [userFirstName, setUserFirstName] = useState<string | null>("");
   const [userLastName, setUserLastName] = useState<string | null>("");
   const [userName, setUserName] = useState<string | null>("");
@@ -42,11 +45,16 @@ export default function Component() {
       try {
         setIsLoading(true);
 
+        if (!userId) {
+          toast.error("No user ID provided");
+          router.push("/admin/team");
+          return;
+        }
+
         // Get user details
-        const userData = await getCurrentUser();
+        const userData = await getUserById(userId);
 
         if (userData) {
-          setUserId(userData.id);
           setUserFirstName(userData.firstName);
           setUserLastName(userData.lastName);
           setUserImage(userData.image);
@@ -55,6 +63,9 @@ export default function Component() {
           setUserName(userData.name);
           setUserCurrentHashedPassword(userData.password);
           setUserRole(userData.role);
+        } else {
+          toast.error("User not found");
+          router.push("/admin/team");
         }
       } catch (error) {
         console.error("Error loading user data:", error);
@@ -64,11 +75,16 @@ export default function Component() {
     };
 
     loadUserData();
-  }, []);
+  }, [userId, router]);
 
   // Handle profile save
   const handleProfileSave = async () => {
     try {
+      if (!userId) {
+        toast.error("No user ID provided");
+        return;
+      }
+
       setIsSavingProfile(true);
 
       // Get values from form inputs
@@ -120,6 +136,11 @@ export default function Component() {
   // Handle password save
   const handlePasswordSave = async () => {
     try {
+      if (!userId) {
+        toast.error("No user ID provided");
+        return;
+      }
+
       setIsSavingPassword(true);
 
       // Validate passwords
@@ -228,16 +249,21 @@ export default function Component() {
               <div className="lg:col-span-2 flex flex-col items-center lg:items-start">
                 <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 mb-2">
                   <div className="relative h-24 w-24 overflow-hidden rounded-md border">
-                    <img
-                      src={userImage || "/default-profile.png"}
-                      alt="Profile"
-                      sizes="(max-width: 768px) 96px, 96px"
-                      className="object-cover"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                      }}
-                    />
+                    {userImage && (
+                      <img
+                        src={userImage || "/default-profile.png"}
+                        alt="Profile"
+                        sizes="(max-width: 768px) 96px, 96px"
+                        className="object-cover"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                        }}
+                      />
+                    )}
+                    {!userImage && (
+                      <ImageIcon className="h-8 w-8 text-gray-400 absolute inset-0 m-auto" />
+                    )}
                   </div>
                 </div>
                 <FileUploader

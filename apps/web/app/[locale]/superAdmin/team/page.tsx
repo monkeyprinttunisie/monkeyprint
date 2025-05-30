@@ -271,7 +271,9 @@ export default function TeamPage() {
                       <button
                         className="text-indigo-600 hover:text-indigo-900 mr-3"
                         onClick={() =>
-                          router.push("/superAdmin/team/editCollaborator")
+                          router.push(
+                            `/superAdmin/team/editCollaborator?id=${collaborator.userId}`
+                          )
                         }
                       >
                         {t("edit")}
@@ -345,7 +347,9 @@ export default function TeamPage() {
                     <button
                       className="text-indigo-600 hover:text-indigo-900 mr-5 text-sm"
                       onClick={() =>
-                        router.push("/superAdmin/team/editCollaborator")
+                        router.push(
+                          `/superAdmin/team/editCollaborator?id=${collaborator.userId}`
+                        )
                       }
                     >
                       {t("edit")}
