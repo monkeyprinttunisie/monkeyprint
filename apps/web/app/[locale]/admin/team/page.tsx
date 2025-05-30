@@ -270,7 +270,11 @@ export default function TeamPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <button
                         className="text-indigo-600 hover:text-indigo-900 mr-3"
-                        onClick={() => router.push("/admin/settings")}
+                        onClick={() =>
+                          router.push(
+                            `/admin/team/editCollaborator?id=${collaborator.userId}`
+                          )
+                        }
                       >
                         {t("edit")}
                       </button>
@@ -342,7 +346,11 @@ export default function TeamPage() {
                   <div className="flex justify-end mt-3 border-t pt-3 border-gray-100">
                     <button
                       className="text-indigo-600 hover:text-indigo-900 mr-5 text-sm"
-                      onClick={() => router.push("/admin/settings")}
+                      onClick={() =>
+                        router.push(
+                          `/admin/team/editCollaborator?id=${collaborator.userId}`
+                        )
+                      }
                     >
                       {t("edit")}
                     </button>
