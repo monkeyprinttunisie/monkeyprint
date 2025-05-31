@@ -68,7 +68,7 @@ export default function InvoicePage() {
 
   // Fetch store info and orders
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       if (!storeId) {
         setError("No store ID provided");
         setLoading(false);
@@ -99,7 +99,7 @@ export default function InvoicePage() {
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchData();
   }, [storeId]);
@@ -110,7 +110,7 @@ export default function InvoicePage() {
 
   // Filter orders by status
   const fulfilledOrders = orders.filter(
-    (order) => order.status === "FULFILLED"
+    (order) => order.status === "DELIVERED"
   );
   const canceledOrders = orders.filter((order) => order.status === "CANCELED");
 

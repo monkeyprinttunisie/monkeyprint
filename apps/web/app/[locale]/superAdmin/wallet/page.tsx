@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import WalletHeader from "@/components/walletHeader";
@@ -8,7 +8,7 @@ import WalletStats from "@/components/walletStats";
 import WalletCalendar from "@/components/walletCalendar";
 import { useTranslations } from "next-intl";
 import { getWalletData } from "@/actions/walletActions";
-import { getStoreById } from "@/actions/storeActions";
+import { getStoreById, getStoreNetEarning } from "@/actions/storeActions";
 
 interface WalletData {
   total: number;
@@ -22,14 +22,17 @@ interface WalletData {
     shipping: number;
     returned: number;
   };
+  netEarnings?: number;
 }
 
 export default function StoreWalletPage() {
   const [storeImage, setStoreImage] = useState("/default-store.png");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isAllTime, setIsAllTime] = useState(true); // New state to track all-time view
   const t = useTranslations("WalletPage");
   const [storeName, setStoreName] = useState("");
+  const initialLoadComplete = useRef(false);
   const [walletData, setWalletData] = useState<WalletData>({
     total: 0,
     delivered: 0,
@@ -42,6 +45,7 @@ export default function StoreWalletPage() {
       shipping: 0,
       returned: 0,
     },
+    netEarnings: 0,
   });
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
@@ -50,6 +54,10 @@ export default function StoreWalletPage() {
   const storeId = searchParams.get("id");
 
   const fetchWalletData = async (date?: Date) => {
+    if (date && !initialLoadComplete.current) {
+      return;
+    }
+
     if (!storeId) {
       setError("No store ID provided");
       setIsLoading(false);
@@ -58,21 +66,62 @@ export default function StoreWalletPage() {
 
     setIsLoading(true);
     try {
-      // Format date if provided
-      const formattedDate = date ? date.toISOString().split("T")[0] : undefined;
+      // Determine if we're viewing all-time data
+      setIsAllTime(!date);
 
-      // Use server action instead of API call
-      const result = await getWalletData(storeId, formattedDate);
+      if (date) {
+        // Format date if provided for specific date view
+        const formattedDate = date.toISOString().split("T")[0];
 
-      if (!result.success) {
-        throw new Error(result.error || "Failed to load data");
-      }
+        // Use server action for specific date
+        const result = await getWalletData(storeId, formattedDate);
 
-      // Add null check here
-      if (result.data) {
-        setWalletData(result.data);
+        if (!result.success) {
+          throw new Error(result.error || "Failed to load data");
+        }
+
+        if (result.data) {
+          setWalletData(result.data);
+        } else {
+          throw new Error("No data returned");
+        }
       } else {
-        throw new Error("No data returned");
+        // Fetch all-time data using getStoreNetEarning
+        const netEarningResult = await getStoreNetEarning(storeId);
+
+        if (!netEarningResult.success || !netEarningResult.data) {
+          throw new Error(
+            netEarningResult.error || "Failed to load net earnings"
+          );
+        }
+
+        // Also fetch the order counts data using getWalletData with no date filter
+        const walletResult = await getWalletData(storeId);
+
+        if (!walletResult.success) {
+          throw new Error(walletResult.error || "Failed to load wallet data");
+        }
+
+        // Now we're sure netEarningResult.data exists
+        const netEarningData = netEarningResult.data;
+
+        // Combine the data from both sources
+        setWalletData({
+          total: netEarningData.netEarnings || 0,
+          delivered: netEarningData.deliveredTotal || 0,
+          returned: netEarningData.totalReturnFees || 0,
+          currency: "DT",
+          deliveredProductCount: netEarningData.fulfilledOrdersCount || 0,
+          returnedProductCount: netEarningData.canceledOrdersCount || 0,
+          orderCounts: walletResult.data
+            ? walletResult.data.orderCounts
+            : {
+                delivered: netEarningData.fulfilledOrdersCount || 0,
+                shipping: 0,
+                returned: netEarningData.canceledOrdersCount || 0,
+              },
+          netEarnings: netEarningData.netEarnings || 0,
+        });
       }
     } catch (error) {
       console.error("Failed to fetch wallet data:", error);
@@ -108,19 +157,29 @@ export default function StoreWalletPage() {
         };
 
         fetchStoreInfo();
-        fetchWalletData(selectedDate || undefined);
+        fetchWalletData(); // Default to all-time data (no date parameter)
+
+        setTimeout(() => {
+          initialLoadComplete.current = true;
+        }, 500);
       } else {
         setError("No store ID provided");
         setIsLoading(false);
       }
-    } else if (session === null) {
-      router.push("/auth/login");
     }
   }, [session, storeId, router]);
 
   const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-    fetchWalletData(date);
+    if (initialLoadComplete.current) {
+      setSelectedDate(date);
+      fetchWalletData(date);
+    }
+  };
+
+  // New function to reset to all-time view
+  const handleResetToAllTime = () => {
+    setSelectedDate(null);
+    fetchWalletData();
   };
 
   if (isLoading) {
@@ -138,54 +197,45 @@ export default function StoreWalletPage() {
         <h2 className="text-xl font-bold mb-2">Error</h2>
         <p className="text-gray-600 mb-4 text-center">No store ID provided</p>
         <button
-          onClick={() => router.push("/superAdmin/wallets")}
+          onClick={() => router.push("/auth/login")}
           className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
         >
-          Go to Store List
+          Go to Sign in page
         </button>
       </div>
     );
   }
 
   const handleViewHistory = () => {
-    router.push(`/superAdmin/wallet/transactions?id=${storeId}`);
-  };
-
-  const handleBackToStores = () => {
-    router.push("/superAdmin/dashboard");
+    router.push(`/superAdmin/wallet/invoice?storeId=${storeId}`);
   };
 
   return (
     <div className="container mx-auto max-w-md p-4 min-h-screen">
-      <div className="mb-4">
-        <button
-          onClick={handleBackToStores}
-          className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-2"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <span className="font-medium"> Back to Stores</span>
-        </button>
-      </div>
       <WalletHeader
         imageUrl={storeImage}
         title={`${storeName || "Store"} ${t("wallet")}`}
       />
 
       <div className="mt-6">
+        {/* Add a view mode indicator */}
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium text-gray-700">
+            {isAllTime ? t("all_time_view") : t("date_specific_view")}
+          </span>
+          {!isAllTime && (
+            <button
+              onClick={handleResetToAllTime}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              {t("view_all_time")}
+            </button>
+          )}
+        </div>
         <WalletCalendar
           onDateSelect={handleDateSelect}
           initialDate={selectedDate || undefined}
+          disableAutoSelection={true}
         />
       </div>
 
@@ -196,7 +246,7 @@ export default function StoreWalletPage() {
           </div>
         ) : (
           <WalletStats
-            total={walletData.total || 0}
+            total={walletData.netEarnings || walletData.total || 0}
             delivered={walletData.delivered || 0}
             returned={walletData.returned || 0}
             currency="DT"
