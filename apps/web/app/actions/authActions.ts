@@ -4,7 +4,7 @@ import { db } from "@monkeyprint/db";
 import { signIn, signOut, auth } from "@/auth";
 
 export async function signInAction(provider: string) {
-  await signIn(provider, { redirectTo: "/profile" });
+  await signIn(provider, { redirectTo: "/admin/dashboard" });
 }
 
 export async function signOutAction() {
