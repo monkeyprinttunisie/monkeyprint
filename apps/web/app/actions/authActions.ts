@@ -1,7 +1,9 @@
 "use server";
 
+import { randomBytes } from "crypto";
 import { db } from "@monkeyprint/db";
 import { signIn, signOut, auth } from "@/auth";
+import { sendEmailVerification } from "@monkeyprint/utils/email";
 
 export async function signInAction(provider: string) {
   await signIn(provider, { redirectTo: "/admin/dashboard" });
@@ -12,7 +14,31 @@ export async function signOutAction() {
 }
 
 export async function sendVerificationEmail(email: string) {
-  return await signIn("resend", { email, redirect: false });
+  try {
+    // Generate a verification token
+    const token = randomBytes(32).toString("hex");
+    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Save the token in the database
+    await db.verificationToken.create({
+      data: {
+        identifier: email,
+        token,
+        expires,
+      },
+    });
+
+    // Send the verification email using your existing email utility
+    const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/verify?token=${token}&email=${encodeURIComponent(email)}`;
+
+    // Use your existing email sending function from @monkeyprint/utils/email
+    await sendEmailVerification(email, verifyUrl);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending verification email:", error);
+    return { success: false, error: "Failed to send verification email" };
+  }
 }
 
 //get the current user from the session

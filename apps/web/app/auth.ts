@@ -2,7 +2,6 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import Facebook from "next-auth/providers/facebook";
-import Resend from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { ZodError } from "zod";
 import { comparePassword } from "@monkeyprint/utils/hash";
@@ -14,7 +13,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google,
     Facebook,
-    Resend,
     Credentials({
       // You can specify which fields should be submitted, by adding keys to the `credentials` object.
       // e.g. domain, username, password, 2FA token, etc.
@@ -124,9 +122,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.name = user.name as string;
         token.picture = user.image as string;
 
-        if ("emailVerified" in user) {
-          token.emailVerified = user.emailVerified;
-        }
+        // Get the emailVerified date from the database
+        const dbUser = await db.user.findUnique({
+          where: { id: user.id },
+          select: { emailVerified: true },
+        });
+
+        token.emailVerified = dbUser?.emailVerified;
 
         // Check if user has a store relation
         const userWithStore = await db.user.findUnique({

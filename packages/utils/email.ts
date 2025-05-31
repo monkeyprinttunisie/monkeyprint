@@ -170,3 +170,42 @@ export async function sendContactFormEmail({
     return { success: false, error: "Failed to send email" };
   }
 }
+
+export async function sendEmailVerification(
+  email: string,
+  verificationUrl: string
+) {
+  try {
+    const emailResult = await resend.emails.send({
+      from: "MonkeyPrint <onboarding@resend.dev>",
+      to: email,
+      subject: "Verify your MonkeyPrint account",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #004CFF; margin-bottom: 20px;">Verify Your Email Address</h2>
+          
+          <p>Thank you for creating a MonkeyPrint account! Please verify your email address by clicking the button below:</p>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationUrl}" style="background-color: #004CFF; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+              Verify Email
+            </a>
+          </div>
+          
+          <p>If the button doesn't work, you can also click this link: <a href="${verificationUrl}">${verificationUrl}</a></p>
+          
+          <p>This link will expire in 24 hours.</p>
+          
+          <div style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px; font-size: 12px; color: #777;">
+            <p>If you didn't create an account with MonkeyPrint, you can ignore this email.</p>
+          </div>
+        </div>
+      `,
+    });
+
+    return { success: true, id: emailResult };
+  } catch (error) {
+    console.error("Error sending verification email:", error);
+    return { success: false, error: "Failed to send verification email" };
+  }
+}
