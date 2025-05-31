@@ -23,6 +23,7 @@ import { CoverageMap } from "@/components/CoverageMap";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useLocale } from "next-intl";
+import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
 
 // Animation variants - move these outside the component
 const fadeIn = {
@@ -235,6 +236,8 @@ export default function HomePage() {
               >
                 {t("register")}
               </motion.a>
+              {/* Language Switcher */}
+              <LanguageSwitcher variant="default" />
             </div>
           </div>
         </div>
@@ -303,6 +306,7 @@ export default function HomePage() {
                   >
                     {t("register")}
                   </motion.a>
+                  <LanguageSwitcher variant="default" />
                 </div>
               </div>
             </nav>
