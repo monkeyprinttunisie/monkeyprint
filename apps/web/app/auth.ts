@@ -64,45 +64,63 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user, account }) {
       if (!account) return true; // Handle credentials sign-in normally
 
-      const existingUser = await db.user.findUnique({
-        where: { email: user.email! },
-        include: { accounts: true },
-      });
+      // If we have a user with an account
+      if (user.email) {
+        const existingUser = await db.user.findUnique({
+          where: { email: user.email },
+          include: { accounts: true },
+        });
 
-      if (existingUser) {
-        // Check if the account already exists
-        const linkedAccount = existingUser.accounts.find(
-          (acc) => acc.provider === account.provider
-        );
+        // If user exists but doesn't have this OAuth account linked
+        if (existingUser) {
+          // Check if the account already exists
+          const linkedAccount = existingUser.accounts.find(
+            (acc) => acc.provider === account.provider
+          );
 
-        if (!linkedAccount) {
-          // ✅ Link new OAuth provider to the existing user
-          await db.account.create({
-            data: {
-              userId: existingUser.id,
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
-              type: account.type,
-              access_token: account.access_token,
-              refresh_token: account.refresh_token,
-              expires_at: account.expires_at,
-              token_type: account.token_type,
-              scope: account.scope,
-              id_token: account.id_token,
-            },
-          });
+          if (!linkedAccount) {
+            // Link the new OAuth provider to the existing user
+            await db.account.create({
+              data: {
+                userId: existingUser.id,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                type: account.type,
+                access_token: account.access_token,
+                refresh_token: account.refresh_token,
+                expires_at: account.expires_at,
+                token_type: account.token_type,
+                scope: account.scope,
+                id_token: account.id_token,
+              },
+            });
+
+            // Successfully linked new provider account
+            return true;
+          }
+
+          // Account already linked, proceed with normal sign in
+          return true;
+        } else {
+          // This is a first-time OAuth user
+          // We'll create a store for them in the jwt callback
         }
       }
 
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id as string;
-        token.email = user.email as string;;
-        token.name = user.name as string;;
-        token.picture = user.image as string;;
+        token.email = user.email as string;
+        token.name = user.name as string;
+        token.picture = user.image as string;
 
+        // Log for debugging
+        console.log("JWT Callback - User:", user);
+        console.log("JWT Callback - Account:", account);
+
+        // Check if user has a store relation
         const userWithStore = await db.user.findUnique({
           where: { id: user.id },
           include: {
@@ -112,20 +130,77 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           },
         });
 
+        // Log for debugging
+        console.log("JWT Callback - UserWithStore:", userWithStore);
+
         if (
           userWithStore?.StoreCollaborator &&
           userWithStore.StoreCollaborator.length > 0
         ) {
-          console.log(
-            "Found store relation:",
-            userWithStore.StoreCollaborator[0]
-          );
-
+          // User already has a store relation
           token.storeId = userWithStore.StoreCollaborator[0].storeId;
+          console.log("User has existing store:", token.storeId);
+        } else {
+          console.log("Creating new store for user");
+          // User doesn't have a store relation - create one
+          // Generate a store name from user name or email
+          const storeName =
+            (user.name || user.email?.split("@")[0] || "My Store") + "'s Store";
+          const storeUrl = storeName
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "");
+
+          try {
+            // Create a new store
+            const store = await db.store.create({
+              data: {
+                name: storeName,
+                url: storeUrl,
+                image: user.image || null,
+              },
+            });
+
+            console.log("Created store:", store);
+
+            // Associate the user with the store
+            if (user.id) {
+              const storeRelation = await db.storeUserRelation.create({
+                data: {
+                  userId: user.id,
+                  storeId: store.id,
+                  role: "OWNER",
+                },
+              });
+
+              console.log("Created store relation:", storeRelation);
+            } else {
+              throw new Error(
+                "User ID is required to create a store relationship"
+              );
+            }
+
+            // Create wallet for the store
+            const wallet = await db.wallet.create({
+              data: {
+                storeId: store.id,
+                Total: 0,
+                Delivered: 0,
+                Returned: 0,
+              },
+            });
+
+            console.log("Created wallet:", wallet);
+
+            token.storeId = store.id;
+          } catch (error) {
+            console.error("Error creating store:", error);
+          }
         }
       }
       return token;
     },
+
     async session({ session, token }) {
       if (token) {
         session.user = {
