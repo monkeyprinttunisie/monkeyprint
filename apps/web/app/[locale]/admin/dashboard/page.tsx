@@ -42,7 +42,7 @@ const getStatusColor = (status: string) => {
       return "text-blue-600 bg-blue-50";
     case OrderStatus.PRINTED:
       return "text-purple-600 bg-purple-50";
-    case OrderStatus.FULFILLED:
+    case OrderStatus.DELIVERED:
       return "text-green-600 bg-green-50";
     case OrderStatus.PAID:
       return "text-green-600 bg-green-50";
@@ -64,7 +64,7 @@ const getProgressPercentage = (status: string) => {
       return "66%";
     case OrderStatus.PAID:
       return "100%";
-    case OrderStatus.FULFILLED:
+    case OrderStatus.DELIVERED:
       return "80%";
     case OrderStatus.CANCELED:
       return "0%";
@@ -77,7 +77,7 @@ enum OrderStatus {
   CANCELED = "CANCELED",
   CONFIRMED = "CONFIRMED",
   PRINTED = "PRINTED",
-  FULFILLED = "FULFILLED",
+  DELIVERED = "DELIVERED",
   PAID = "PAID",
   PENDING = "PENDING",
 }
@@ -147,7 +147,7 @@ export default function Page() {
     // Filter fulfilled orders (only count completed orders for revenue)
     const fulfilledOrders = orders.filter(
       (order) =>
-        order.status === OrderStatus.FULFILLED ||
+        order.status === OrderStatus.DELIVERED ||
         order.status === OrderStatus.PAID
     );
 
@@ -313,7 +313,9 @@ export default function Page() {
               <div className="text-xs font-semibold text-gray-600 mb-6">
                 Orders This Week
               </div>
-              <div className="text-l font-bold text-gray-900">{weekRevenue}</div>
+              <div className="text-l font-bold text-gray-900">
+                {weekRevenue}
+              </div>
             </div>
           </Card>
 
@@ -362,7 +364,7 @@ export default function Page() {
                 <option>{OrderStatus.CONFIRMED}</option>
                 <option>{OrderStatus.PRINTED}</option>
                 <option>{OrderStatus.PAID}</option>
-                <option>{OrderStatus.FULFILLED}</option>
+                <option>{OrderStatus.DELIVERED}</option>
                 <option>{OrderStatus.CANCELED}</option>
               </select>
             </div>
@@ -461,7 +463,7 @@ export default function Page() {
                                   OrderStatus.CONFIRMED,
                                   OrderStatus.PRINTED,
                                   OrderStatus.PAID,
-                                  OrderStatus.FULFILLED,
+                                  OrderStatus.DELIVERED,
                                 ].includes(order.status)
                                   ? "bg-[#004CFF]"
                                   : "bg-gray-300"
@@ -473,7 +475,7 @@ export default function Page() {
                                   OrderStatus.CONFIRMED,
                                   OrderStatus.PRINTED,
                                   OrderStatus.PAID,
-                                  OrderStatus.FULFILLED,
+                                  OrderStatus.DELIVERED,
                                 ].includes(order.status)
                                   ? "text-gray-500"
                                   : "text-gray-400"
@@ -488,7 +490,7 @@ export default function Page() {
                                 [
                                   OrderStatus.PRINTED,
                                   OrderStatus.PAID,
-                                  OrderStatus.FULFILLED,
+                                  OrderStatus.DELIVERED,
                                 ].includes(order.status)
                                   ? "bg-[#004CFF]"
                                   : "bg-gray-300"
@@ -499,7 +501,7 @@ export default function Page() {
                                 [
                                   OrderStatus.PRINTED,
                                   OrderStatus.PAID,
-                                  OrderStatus.FULFILLED,
+                                  OrderStatus.DELIVERED,
                                 ].includes(order.status)
                                   ? "text-gray-500"
                                   : "text-gray-400"
@@ -511,14 +513,14 @@ export default function Page() {
                           <div className="flex flex-col items-center">
                             <div
                               className={`w-3 h-3 rounded-full ${
-                                [OrderStatus.FULFILLED].includes(order.status)
+                                [OrderStatus.DELIVERED].includes(order.status)
                                   ? "bg-[#004CFF]"
                                   : "bg-gray-300"
                               }`}
                             ></div>
                             <span
                               className={`text-xs ${
-                                [OrderStatus.FULFILLED].includes(order.status)
+                                [OrderStatus.DELIVERED].includes(order.status)
                                   ? "text-gray-500"
                                   : "text-gray-400"
                               } mt-1`}

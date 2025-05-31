@@ -60,12 +60,12 @@ export async function getWalletData(storeId: string, date?: string) {
 
     // Calculate totals based on order status
     const deliveredTotal = orders
-      .filter((o) => o.status === "FULFILLED")
+      .filter((o) => o.status === "DELIVERED")
       .reduce((sum, o) => sum + (o.totalPrice || 0), 0);
 
     // Calculate product counts for delivered and returned orders
     const deliveredProductCount = orders.filter(
-      (o) => o.status === "FULFILLED"
+      (o) => o.status === "DELIVERED"
     ).length;
     const returnedProductCount = orders.filter(
       (o) => o.status === "CANCELED"
@@ -75,7 +75,7 @@ export async function getWalletData(storeId: string, date?: string) {
 
     // Get order counts by status
     const deliveredCount = orders.filter(
-      (o) => o.status === "FULFILLED"
+      (o) => o.status === "DELIVERED"
     ).length;
     const shippingCount = orders.filter((o) => o.status === "CONFIRMED").length;
     const returnedCount = orders.filter((o) => o.status === "CANCELED").length;

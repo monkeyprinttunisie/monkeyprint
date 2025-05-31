@@ -2,20 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getOrders } from "@/actions/orderActions";
+import { getOrders, updateStoreOrdersToPaid } from "@/actions/orderActions";
 import { getStoreById } from "@/actions/storeActions";
+import { getOrdersByStoreIdAndStatus } from "@/actions/orderActions";
+
 import { useSession } from "next-auth/react";
 import { Printer, ChevronDown, ChevronUp } from "lucide-react";
+import { toast } from "sonner";
 
 export default function InvoicePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const storeId = searchParams.get("storeId");
+  const shouldUpdateStatus = searchParams.get("updateStatus") === "true";
 
+  const [store, setStore] = useState<any>(null);
+  const [deliveredOrders, setDeliveredOrders] = useState<any[]>([]);
+  const [canceledOrders, setCanceledOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasUpdatedOrders, setHasUpdatedOrders] = useState(false);
   const { data: session } = useSession();
-  const [orders, setOrders] = useState<any[]>([]);
   const [storeName, setStoreName] = useState("");
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedDelivered, setExpandedDelivered] = useState(true);
   const [expandedReturned, setExpandedReturned] = useState(true);
@@ -68,58 +75,87 @@ export default function InvoicePage() {
 
   // Fetch store info and orders
   useEffect(() => {
-    async function fetchData() {
-      if (!storeId) {
-        setError("No store ID provided");
-        setLoading(false);
+    const fetchData = async () => {
+      if (!storeId) return;
+
+      try {
+        setIsLoading(true);
+
+        // Get store details
+        const storeData = await getStoreById(storeId);
+        setStore(storeData);
+        if (storeData) {
+          setStoreName(storeData.name || "");
+        }
+        // Get DELIVERED and CANCELED orders
+        const delivered = await getOrdersByStoreIdAndStatus(
+          storeId,
+          "DELIVERED"
+        );
+        const canceled = await getOrdersByStoreIdAndStatus(storeId, "CANCELED");
+
+        setDeliveredOrders(delivered || []);
+        setCanceledOrders(canceled || []);
+      } catch (error) {
+        console.error("Error fetching invoice data:", error);
+        toast.error("Failed to load invoice data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [storeId]);
+
+  // Handle order status update after loading invoice
+  useEffect(() => {
+    const updateOrderStatus = async () => {
+      if (!shouldUpdateStatus || !storeId || hasUpdatedOrders || isLoading) {
         return;
       }
 
       try {
-        setLoading(true);
+        // Only run this once per page load
+        setHasUpdatedOrders(true);
 
-        // First, fetch store information
-        const storeData = await getStoreById(storeId);
-        if (storeData && storeData.name) {
-          setStoreName(storeData.name);
-        } else {
-          setError("Store not found");
-        }
+        // Update order statuses
+        const result = await updateStoreOrdersToPaid(storeId);
 
-        // Then fetch orders for this specific store
-        const response = await getOrders(storeId);
-        if (response.success && response.orders) {
-          setOrders(response.orders);
+        if (result.success) {
+          toast.success(result.message);
         } else {
-          setError(response.error || "Failed to fetch orders");
+          toast.error(result.message || "Failed to update orders");
         }
-      } catch (err) {
-        setError("An error occurred while fetching data");
-        console.error(err);
-      } finally {
-        setLoading(false);
+      } catch (error) {
+        console.error("Error updating order status:", error);
+        toast.error("Failed to update order status");
       }
-    }
+    };
 
-    fetchData();
-  }, [storeId]);
+    // Small delay to ensure invoice is displayed before status update
+    const timer = setTimeout(() => {
+      updateOrderStatus();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [storeId, shouldUpdateStatus, hasUpdatedOrders, isLoading]);
 
   const handlePrint = () => {
     window.print();
   };
 
   // Filter orders by status
-  const fulfilledOrders = orders.filter(
-    (order) => order.status === "FULFILLED"
-  );
-  const canceledOrders = orders.filter((order) => order.status === "CANCELED");
+  /* const fulfilledOrders = orders.filter(
+    (order) => order.status === "DELIVERED"
+  ); */
+  /* const canceledOrders = orders.filter((order) => order.status === "CANCELED"); */
 
   // Calculate totals
-  const deliveredTotal = fulfilledOrders.reduce(
+  const deliveredTotal = deliveredOrders.reduce(
     (sum, order) => sum + order.totalPrice,
     0
   );
-  const returnedCount = orders.filter((o) => o.status === "CANCELED").length;
+  const returnedCount = canceledOrders.length;
 
   // Calculate MonkeyPrint's earnings (10% of delivered total after fees)
   const calculateMonkeyPrintEarnings = (order: any) => {
@@ -129,7 +165,7 @@ export default function InvoicePage() {
     return totalAfterFees * 0.1;
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -154,13 +190,13 @@ export default function InvoicePage() {
   }
 
   // Calculate total delivery fees
-  const totalDeliveryFees = fulfilledOrders.reduce((sum, order) => {
+  const totalDeliveryFees = deliveredOrders.reduce((sum, order) => {
     const shippingMethod = order.shippingMethod || "STANDARD";
     return sum + (shippingMethod === "EXPRESS" ? 7 : 5);
   }, 0);
 
   // Calculate total MonkeyPrint earnings
-  const totalMonkeyPrintEarnings = fulfilledOrders.reduce(
+  const totalMonkeyPrintEarnings = deliveredOrders.reduce(
     (sum, order) => sum + calculateMonkeyPrintEarnings(order),
     0
   );
@@ -232,7 +268,7 @@ export default function InvoicePage() {
         </div>
 
         {expandedDelivered &&
-          (fulfilledOrders.length > 0 ? (
+          (deliveredOrders.length > 0 ? (
             <div className="overflow-x-auto -mx-3 sm:mx-0">
               {/* Desktop table - hidden on mobile */}
               <table className="hidden sm:table w-full border-collapse">
@@ -247,7 +283,7 @@ export default function InvoicePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {fulfilledOrders.map((order) => {
+                  {deliveredOrders.map((order) => {
                     const shippingMethod = order.shippingMethod || "STANDARD";
                     const deliveryFee = shippingMethod === "EXPRESS" ? 7 : 5;
                     const monkeyPrintEarnings =
@@ -292,7 +328,7 @@ export default function InvoicePage() {
 
               {/* Mobile cards - shown only on mobile */}
               <div className="sm:hidden space-y-3 px-3">
-                {fulfilledOrders.map((order) => {
+                {deliveredOrders.map((order) => {
                   const shippingMethod = order.shippingMethod || "STANDARD";
                   const deliveryFee = shippingMethod === "EXPRESS" ? 7 : 5;
                   const monkeyPrintEarnings =

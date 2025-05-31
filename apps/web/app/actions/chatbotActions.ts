@@ -437,7 +437,7 @@ export async function sendMessageToChatbot(
             } else if (
               status === "CONFIRMED" ||
               status === "PRINTED" ||
-              status === "FULFILLED"
+              status === "DELIVERED"
             ) {
               statusMessage =
                 "Your order has been processed and should be delivered within the next 2 days.";

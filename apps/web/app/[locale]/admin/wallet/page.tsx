@@ -29,7 +29,7 @@ export default function StoreWalletPage() {
   const [storeImage, setStoreImage] = useState("/default-store.png");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [isAllTime, setIsAllTime] = useState(true); // New state to track all-time view
+  const [isAllTime, setIsAllTime] = useState(true);
   const t = useTranslations("WalletPage");
   const [storeName, setStoreName] = useState("");
   const initialLoadComplete = useRef(false);
@@ -166,8 +166,6 @@ export default function StoreWalletPage() {
         setError("No store ID provided");
         setIsLoading(false);
       }
-    } else if (session === null) {
-      router.push("/auth/login");
     }
   }, [session, storeId, router]);
 

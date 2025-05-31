@@ -14,9 +14,10 @@ enum OrderStatus {
   CANCELED = "CANCELED",
   CONFIRMED = "CONFIRMED",
   PRINTED = "PRINTED",
-  FULFILLED = "FULFILLED",
+  DELIVERED = "DELIVERED",
   PAID = "PAID",
   PENDING = "PENDING",
+  CANCELED_PAID = "CANCELED_PAID",
 }
 export default function OrdersPage() {
   const router = useRouter();
@@ -115,12 +116,14 @@ export default function OrdersPage() {
         return "bg-blue-100 text-blue-800";
       case "PRINTED":
         return "bg-purple-100 text-purple-800";
-      case "FULFILLED":
+      case "DELIVERED":
         return "bg-green-100 text-green-800";
       case "PAID":
         return "bg-green-100 text-green-800";
       case "CANCELED":
         return "bg-red-100 text-red-800";
+      case "CANCELED_PAID":
+        return "bg-green-200 text-green-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -171,9 +174,10 @@ export default function OrdersPage() {
             <option value="PENDING">Pending</option>
             <option value="CONFIRMED">Confirmed</option>
             <option value="PRINTED">Printed</option>
-            <option value="FULFILLED">Fulfilled</option>
+            <option value="DELIVERED">Delivered</option>
             <option value="PAID">Paid</option>
             <option value="CANCELED">Canceled</option>
+            <option value="CANCELED_PAID">Canceled & Paid</option>
           </select>
         </div>
       </div>
@@ -248,9 +252,10 @@ export default function OrdersPage() {
                   <option value="PENDING">Pending</option>
                   <option value="CONFIRMED">Confirmed</option>
                   <option value="PRINTED">Printed</option>
-                  <option value="FULFILLED">Fulfilled</option>
+                  <option value="DELIVERED">Delivered</option>
                   <option value="PAID">Paid</option>
                   <option value="CANCELED">Canceled</option>
+                  <option value="CANCELED_PAID">Canceled & Paid</option>
                 </select>
               </div>
 
