@@ -3,7 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Store } from "@monkeyprint/db";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, AlertCircle } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -100,7 +100,7 @@ export const columns: ColumnDef<StoreWithEarnings>[] = [
           <div className="bg-white rounded-lg shadow-lg p-4 max-w-md mx-auto">
             <h3 className="text-lg font-semibold mb-2">Confirm Payment</h3>
             <p className="text-gray-600 mb-4">
-              This will mark all fulfilled orders for{" "}
+              This will mark all delivered orders for{" "}
               <strong>{store.name}</strong> as paid. Continue?
             </p>
             <div className="flex justify-end gap-2">
@@ -108,62 +108,44 @@ export const columns: ColumnDef<StoreWithEarnings>[] = [
                 Cancel
               </Button>
               <Button
-                variant="default"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                variant="secondary"
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800"
                 disabled={isPaying}
                 onClick={async () => {
                   setIsPaying(true);
                   toast.dismiss(t);
 
                   try {
+                    // Call the server action directly
                     const result = await updateStoreOrdersToPaid(store.id);
 
                     if (result.success) {
                       toast.success(result.message);
-
-                      // Ask if they want to print the invoice
-                      if (result.count > 0) {
-                        toast.custom((t) => (
-                          <div className="bg-white rounded-lg shadow-lg p-4 max-w-md mx-auto">
-                            <h3 className="text-lg font-semibold mb-2">
-                              Print Invoice?
-                            </h3>
-                            <p className="text-gray-600 mb-4">
-                              Would you like to print an invoice for this
-                              payment?
-                            </p>
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="outline"
-                                onClick={() => toast.dismiss(t)}
-                              >
-                                No
-                              </Button>
-                              <Button
-                                variant="default"
-                                className="bg-blue-600 hover:bg-blue-700 text-white"
-                                onClick={() => {
-                                  toast.dismiss(t);
-                                  router.push(
-                                    `/superAdmin/invoice?storeId=${store.id}`
-                                  );
-                                }}
-                              >
-                                Yes, Print Invoice
-                              </Button>
-                            </div>
-                          </div>
-                        ));
-                      }
                     } else {
-                      toast.error(result.message || "Failed to update orders.");
+                      toast.error(result.message || "Failed to update orders");
                     }
                   } catch (error) {
                     console.error("Error processing payment:", error);
-                    toast.error("An error occurred during payment processing.");
+                    toast.error("An error occurred while processing payment");
                   } finally {
                     setIsPaying(false);
                   }
+                }}
+              >
+                Pay without invoice
+              </Button>
+              <Button
+                variant="default"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                disabled={isPaying}
+                onClick={() => {
+                  setIsPaying(true);
+                  toast.dismiss(t);
+
+                  // Redirect to invoice with special parameter to update orders
+                  router.push(
+                    `/superAdmin/wallet/invoice?storeId=${store.id}&updateStatus=true`
+                  );
                 }}
               >
                 {isPaying ? (
@@ -172,7 +154,7 @@ export const columns: ColumnDef<StoreWithEarnings>[] = [
                     Processing...
                   </>
                 ) : (
-                  "Confirm Payment"
+                  "Generate Invoice & Pay"
                 )}
               </Button>
             </div>

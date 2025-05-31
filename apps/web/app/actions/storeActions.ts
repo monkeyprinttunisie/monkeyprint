@@ -418,7 +418,7 @@ export async function getStoreNetEarning(storeId: string) {
 
     // Filter orders by status
     const fulfilledOrders = orders.filter(
-      (order) => order.status === "FULFILLED"
+      (order) => order.status === "DELIVERED"
     );
     const canceledOrders = orders.filter(
       (order) => order.status === "CANCELED"

@@ -349,3 +349,39 @@ export const updateStoreOrdersToPaid = async (storeId: string) => {
     };
   }
 };
+
+export const getOrdersByStoreIdAndStatus = async (
+  storeId: string,
+  status: string
+) => {
+  try {
+    const orders = await db.order.findMany({
+      where: {
+        storeId: storeId,
+        status: status as OrderStatus,
+      },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        contactInfo: {
+          select: {
+            name: true,
+            email: true,
+            phone: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return orders;
+  } catch (error) {
+    console.error(`Error fetching ${status} orders:`, error);
+    return null;
+  }
+};

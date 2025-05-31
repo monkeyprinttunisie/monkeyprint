@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { getUserStoreId } from "@/actions/authActions";
 import { usePathname } from "next/navigation";
 import {
   ChevronDown,
@@ -12,10 +13,8 @@ import {
   Store,
   LayoutDashboardIcon,
   Settings,
-  Globe,
 } from "lucide-react";
 import LogoutButton from "@/components/sharedAdminSuperAdmin/LogoutButton";
-import { useSession } from "next-auth/react";
 import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
 
 interface NavItem {
@@ -33,47 +32,38 @@ interface SuperAdminNavProps {
 export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
   const pathname = usePathname();
-  const { data: session } = useSession();
   const [storeId, setStoreId] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const toggleLanguage = () => {
-    const currentPath = pathname || "";
-
-    // Extract path parts
-    const pathParts = currentPath.split("/");
-
-    // Find the locale part (index 1 after splitting)
-    const currentLocale = pathParts.length > 1 ? pathParts[1] : "en";
-
-    // Determine new locale
-    const newLocale = currentLocale === "en" ? "ar" : "en";
-
-    // Replace locale in path parts and build new path
-    pathParts[1] = newLocale;
-    const newPath = pathParts.join("/");
-
-    // Navigate to new path - must use window.location for complete page refresh
-    window.location.href = newPath;
-  };
-
   useEffect(() => {
-    if (session?.user) {
-      const userStoreId =
-        (session.user as any).storeId ||
-        (session as any).storeId ||
-        (session as any).store?.id ||
-        (session.user as any).store?.id;
+    if (!mounted) return;
 
-      if (userStoreId) {
-        setStoreId(userStoreId);
+    const fetchStoreId = async () => {
+      try {
+        setIsLoading(true);
+
+        // Use the server action to get the store ID directly
+        const id = await getUserStoreId();
+
+        if (id) {
+          setStoreId(id);
+          localStorage.setItem("userStoreId", id);
+        }
+      } catch (error) {
+        console.error("Error fetching store ID:", error);
+        // We already tried localStorage in the first effect
+      } finally {
+        setIsLoading(false);
       }
-    }
-  }, [session]);
+    };
+
+    fetchStoreId();
+  }, [mounted]);
 
   const navItems: NavItem[] = [
     {

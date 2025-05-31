@@ -102,16 +102,17 @@ export const columns: ColumnDef<OrderWithItems>[] = [
       return (
         <div className="flex items-center gap-2">
           <div
-            className={`h-2 w-2 rounded-full ${status === "PENDING"
-              ? "bg-yellow-500"
-              : status === "COMPLETED"
-                ? "bg-green-500"
-                : status === "PRINTED"
-                  ? "bg-blue-500"
-                  : status === "FULFILLED"
-                    ? "bg-purple-500"
-                    : "bg-red-500"
-              }`}
+            className={`h-2 w-2 rounded-full ${
+              status === "PENDING"
+                ? "bg-yellow-500"
+                : status === "COMPLETED"
+                  ? "bg-green-500"
+                  : status === "PRINTED"
+                    ? "bg-blue-500"
+                    : status === "DELIVERED"
+                      ? "bg-purple-500"
+                      : "bg-red-500"
+            }`}
           />
           {status as string}
         </div>

@@ -12,7 +12,7 @@ enum OrderStatus {
   CANCELED = "CANCELED",
   CONFIRMED = "CONFIRMED",
   PRINTED = "PRINTED",
-  FULFILLED = "FULFILLED",
+  DELIVERED = "DELIVERED",
   PAID = "PAID",
   PENDING = "PENDING",
 }
@@ -88,7 +88,7 @@ export default function OrderDetailClient({ id }: OrderDetailClientProps) {
         return "bg-blue-100 text-blue-800";
       case "PRINTED":
         return "bg-purple-100 text-purple-800";
-      case "FULFILLED":
+      case "DELIVERED":
         return "bg-green-100 text-green-800";
       case "PAID":
         return "bg-green-100 text-green-800";
@@ -133,7 +133,10 @@ export default function OrderDetailClient({ id }: OrderDetailClientProps) {
   return (
     <div className="min-h-screen bg-white p-4 mb-[2vh]">
       <div className="flex items-center mb-6">
-        <button onClick={() => router.push("/superAdmin/orders")} className="mr-4">
+        <button
+          onClick={() => router.push("/superAdmin/orders")}
+          className="mr-4"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -311,7 +314,7 @@ export default function OrderDetailClient({ id }: OrderDetailClientProps) {
             <option value="PENDING">Pending</option>
             <option value="CONFIRMED">Confirmed</option>
             <option value="PRINTED">Printed</option>
-            <option value="FULFILLED">Fulfilled</option>
+            <option value="DELIVERED">Delivered</option>
             <option value="PAID">Paid</option>
             <option value="CANCELED">Canceled</option>
           </select>
