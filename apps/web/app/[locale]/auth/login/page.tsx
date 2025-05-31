@@ -34,19 +34,25 @@ export default function LoginPage() {
     const data = await response.json();
 
     if (response.ok) {
-      // Save user to the store
-      setUser(data.user as User);
+      if (data.user.emailVerified) {
+        // Save user to the store
+        setUser(data.user as User);
 
-      // If the user has a store, save it
-      if (data.store) {
-        setCurrentStore(data.store as Store);
-        setStoreRole(data.storeRole as StoreType);
-      }
-      toast.success(t("login_success"));
-      if (data.user.role === "SUPER_ADMIN") {
-        router.push("/superAdmin/dashboard");
+        // If the user has a store, save it
+        if (data.store) {
+          setCurrentStore(data.store as Store);
+          setStoreRole(data.storeRole as StoreType);
+        }
+        toast.success(t("login_success"));
+        if (data.user.role === "SUPER_ADMIN") {
+          router.push("/superAdmin/dashboard");
+        } else {
+          router.push(`/admin/dashboard?id=${data.store.id}`);
+        }
       } else {
-        router.push(`/admin/dashboard?id=${data.store.id}`);
+        // If email is not verified, show error
+        setError(t("email_not_verified"));
+        toast.error(t("email_not_verified"));
       }
     } else {
       // Handle errors

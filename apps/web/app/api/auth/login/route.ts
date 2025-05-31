@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
         email: true,
         image: true,
         role: true,
+        emailVerified: true,
         StoreCollaborator: {
           include: {
             store: true,

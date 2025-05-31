@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@monkeyprint/db";
 import { hashPassword } from "@monkeyprint/utils/hash";
 import { registerSchema } from "@monkeyprint/utils/zod";
+import { sendVerificationEmail } from "@/actions/authActions";
 
 // Helper function to generate a URL-friendly string
 function generateStoreUrl(name: string): string {
@@ -124,6 +125,8 @@ export async function POST(req: Request) {
     //don't show the password in the response
     const { password: newUserPassword, ...userWithoutPassword } =
       result.newUser;
+
+    sendVerificationEmail(result.newUser.email);
 
     return NextResponse.json(
       {

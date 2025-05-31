@@ -11,6 +11,10 @@ export async function signOutAction() {
   await signOut({ redirectTo: "/auth/login" });
 }
 
+export async function sendVerificationEmail(email: string) {
+  return await signIn("resend", { email, redirect: false });
+}
+
 //get the current user from the session
 export async function getCurrentUser() {
   const session = await auth();

@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import Facebook from "next-auth/providers/facebook";
+import Resend from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { ZodError } from "zod";
 import { comparePassword } from "@monkeyprint/utils/hash";
@@ -13,6 +14,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google,
     Facebook,
+    Resend,
     Credentials({
       // You can specify which fields should be submitted, by adding keys to the `credentials` object.
       // e.g. domain, username, password, 2FA token, etc.
@@ -33,6 +35,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (!user) {
             throw new Error("No existing user with this email.");
           }
+
+          // Check if email is verified
+          if (!user.emailVerified) {
+            throw new Error("Please verify your email before logging in.");
+          }
+
           if (!user.password) {
             throw new Error("Please log in using an OAuth provider.");
           }
@@ -116,9 +124,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.name = user.name as string;
         token.picture = user.image as string;
 
-        // Log for debugging
-        console.log("JWT Callback - User:", user);
-        console.log("JWT Callback - Account:", account);
+        if ("emailVerified" in user) {
+          token.emailVerified = user.emailVerified;
+        }
 
         // Check if user has a store relation
         const userWithStore = await db.user.findUnique({
@@ -129,9 +137,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
           },
         });
-
-        // Log for debugging
-        console.log("JWT Callback - UserWithStore:", userWithStore);
 
         if (
           userWithStore?.StoreCollaborator &&
@@ -208,7 +213,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: token.email as string,
           name: token.name || "",
           image: token.picture || "",
-          emailVerified: null,
+          emailVerified: token.emailVerified as Date | null,
           storeId: token.storeId as string,
         };
       }
