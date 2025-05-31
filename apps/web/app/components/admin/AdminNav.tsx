@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import LogoutButton from "@/components/sharedAdminSuperAdmin/LogoutButton";
 import { useSession } from "next-auth/react";
+import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
 
 interface NavItem {
   name: string;
@@ -287,28 +288,8 @@ export default function SuperAdminNav({ isOpen, onClose }: SuperAdminNavProps) {
         <div className="mt-auto">
           <div className="px-4 pt-4 pb-2">
             <div className="bg-blue-800/40 backdrop-blur-sm rounded-xl p-3 flex flex-col gap-3">
-              {/* Language toggle */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm">
-                  <Globe className="h-4 w-4 text-blue-200" />
-                  <span>Language</span>
-                </div>
-                <button
-                  onClick={toggleLanguage}
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-950 hover:bg-blue-900 transition-colors duration-200"
-                >
-                  <span className="text-xs font-medium">
-                    {pathname?.split("/")[1] === "ar" ? "العربية" : "English"}
-                  </span>
-                  <div className="w-5 h-5 flex items-center justify-center rounded-full overflow-hidden border border-blue-700">
-                    {pathname?.split("/")[1] === "ar" ? (
-                      <span className="text-[10px]">🇸🇦</span>
-                    ) : (
-                      <span className="text-[10px]">🇺🇸</span>
-                    )}
-                  </div>
-                </button>
-              </div>
+              {/* Replace the language toggle with the LanguageSwitcher component */}
+              <LanguageSwitcher variant="admin" />
             </div>
           </div>
 
