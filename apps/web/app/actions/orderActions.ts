@@ -4,6 +4,7 @@ import { db, Prisma } from "@monkeyprint/db";
 import { CartItem, ContactInfo, OrderResponse, Order } from "@/types";
 import { revalidatePath } from "next/cache";
 import { ShippingMethod, OrderStatus } from "@monkeyprint/db";
+import { count } from "console";
 
 export type OrderWithItems = Prisma.OrderGetPayload<{
   include: { items: true; contactInfo: true };
@@ -290,3 +291,61 @@ export async function getOrdersByStoreId(
 
   return orders;
 }
+
+export const updateStoreOrdersToPaid = async (storeId: string) => {
+  try {
+    // First, update DELIVERED orders to PAID
+    const deliveredResult = await db.order.updateMany({
+      where: {
+        storeId: storeId,
+        status: "DELIVERED",
+      },
+      data: {
+        status: "PAID",
+      },
+    });
+
+    // Then, update CANCELED orders to CANCELED_PAID
+    const canceledResult = await db.order.updateMany({
+      where: {
+        storeId: storeId,
+        status: "CANCELED",
+      },
+      data: {
+        status: "CANCELED_PAID",
+      },
+    });
+
+    // Calculate total updated orders
+    const totalUpdated = deliveredResult.count + canceledResult.count;
+
+    // Create a detailed message
+    let message = "";
+    if (deliveredResult.count > 0 && canceledResult.count > 0) {
+      message = `${deliveredResult.count} delivered orders marked as paid and ${canceledResult.count} canceled orders marked as canceled_paid.`;
+    } else if (deliveredResult.count > 0) {
+      message = `${deliveredResult.count} delivered orders marked as paid.`;
+    } else if (canceledResult.count > 0) {
+      message = `${canceledResult.count} canceled orders marked as canceled_paid.`;
+    } else {
+      message = "No orders were updated.";
+    }
+
+    return {
+      success: true,
+      message: message,
+      count: totalUpdated,
+      deliveredCount: deliveredResult.count,
+      canceledCount: canceledResult.count,
+    };
+  } catch (error) {
+    console.error("Error updating orders to paid:", error);
+    return {
+      success: false,
+      message: "Failed to update orders.",
+      count: 0,
+      deliveredCount: 0,
+      canceledCount: 0,
+    };
+  }
+};
